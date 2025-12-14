@@ -45,6 +45,3 @@ CLAUDE.local.md
 
 # local dev
 local/
-
-# flowbite-react generated files
-.flowbite-react/
