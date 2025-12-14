@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{ vars.REPOSITORY_NAME || 'HarbingerFinLab/roboinvestor-app' }}
+          repository: ${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}
           ref: ${{ github.ref }}
           token: ${{ secrets.ACTIONS_TOKEN }}
 
@@ -29,7 +29,7 @@ jobs:
         id: check
         uses: ./.github/actions/runner-availability
         with:
-          repository_name: ${{ vars.REPOSITORY_NAME || 'HarbingerFinLab/roboinvestor-app' }}
+          repository_name: ${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}
           runner_labels: 'self-hosted,Linux,X64,AL2023,ci'
           timeout_minutes: '2'
           github_token: ${{ secrets.ACTIONS_TOKEN }}
@@ -51,7 +51,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ vars.REPOSITORY_NAME || 'HarbingerFinLab/roboinvestor-app' }}
+          repository: ${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}
           ref: ${{ github.ref }}
           token: ${{ secrets.ACTIONS_TOKEN }}
 

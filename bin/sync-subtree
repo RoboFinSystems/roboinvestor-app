@@ -5,7 +5,7 @@
 
 set -e
 
-COMMON_REPO="https://github.com/HarbingerFinLab/robosystems-core.git"
+COMMON_REPO="https://github.com/RoboFinSystems/robosystems-core.git"
 COMMON_PREFIX="src/lib/core"
 
 # Colors for output
@@ -82,47 +82,47 @@ case "$COMMAND" in
         echo -e "${BLUE}➕ Adding robosystems-core as subtree...${NC}"
         echo -e "${YELLOW}Repository: $COMMON_REPO${NC}"
         echo -e "${YELLOW}Prefix: $COMMON_PREFIX${NC}"
-        
+
         if [[ -d "$COMMON_PREFIX" ]]; then
             echo -e "${RED}Error: Directory $COMMON_PREFIX already exists${NC}"
             echo "Use 'pull' to update existing subtree or remove the directory first"
             exit 1
         fi
-        
+
         git subtree add --prefix="$COMMON_PREFIX" "$COMMON_REPO" main --squash
-        
+
         echo -e "${GREEN}✅ Subtree added successfully${NC}"
         echo "You can now import components from '@/lib/core'"
         ;;
-        
+
     "pull")
         echo -e "${BLUE}🔄 Pulling latest changes from robosystems-core...${NC}"
         echo -e "${YELLOW}Repository: $COMMON_REPO${NC}"
         echo -e "${YELLOW}Prefix: $COMMON_PREFIX${NC}"
-        
+
         if [[ ! -d "$COMMON_PREFIX" ]]; then
             echo -e "${RED}Error: Subtree directory $COMMON_PREFIX does not exist${NC}"
             echo "Use 'add' command first to set up the subtree"
             exit 1
         fi
-        
+
         git subtree pull --prefix="$COMMON_PREFIX" "$COMMON_REPO" main --squash
-        
+
         echo -e "${GREEN}✅ Latest changes pulled successfully${NC}"
         echo "Run your tests to ensure compatibility"
         ;;
-        
+
     "push")
         echo -e "${BLUE}🚀 Pushing changes to robosystems-core...${NC}"
         echo -e "${YELLOW}Repository: $COMMON_REPO${NC}"
         echo -e "${YELLOW}Prefix: $COMMON_PREFIX${NC}"
-        
+
         if [[ ! -d "$COMMON_PREFIX" ]]; then
             echo -e "${RED}Error: Subtree directory $COMMON_PREFIX does not exist${NC}"
             echo "Use 'add' command first to set up the subtree"
             exit 1
         fi
-        
+
         # Check for uncommitted changes
         UNCOMMITTED_CHANGES=false
         if ! git diff --quiet HEAD -- "$COMMON_PREFIX"; then
@@ -131,10 +131,10 @@ case "$COMMAND" in
             echo "Please commit your changes first before pushing to subtree"
             exit 1
         fi
-        
+
         # Find the last subtree merge commit for this prefix
         LAST_SUBTREE_COMMIT=$(git log --grep="git-subtree-dir: $COMMON_PREFIX" --format="%H" -1 2>/dev/null || echo "")
-        
+
         # Check for committed changes since last subtree operation
         COMMITTED_CHANGES=false
         if [[ -n "$LAST_SUBTREE_COMMIT" ]]; then
@@ -152,7 +152,7 @@ case "$COMMAND" in
                 git log --oneline -5 -- "$COMMON_PREFIX" | sed 's/^/  /'
             fi
         fi
-        
+
         if [[ "$COMMITTED_CHANGES" == true ]]; then
             echo -e "${BLUE}🚀 Pushing changes to subtree repository...${NC}"
             git subtree push --prefix="$COMMON_PREFIX" "$COMMON_REPO" main

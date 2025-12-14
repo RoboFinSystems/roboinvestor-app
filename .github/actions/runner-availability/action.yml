@@ -5,7 +5,7 @@ inputs:
   repository_name:
     description: 'Repository name in format owner/repo'
     required: false
-    default: 'HarbingerFinLab/roboinvestor-app'
+    default: 'RoboFinSystems/roboinvestor-app'
   runner_labels:
     description: 'Comma-separated list of required runner labels'
     required: false
@@ -65,7 +65,7 @@ runs:
           echo "❌ GitHub API returned status ${HTTP_CODE}"
           echo "Response: ${RUNNERS_RESPONSE}"
           echo "❌ Cannot verify runner availability - defaulting to GitHub-hosted runners"
-          
+
           # Set outputs for GitHub-hosted fallback
           echo "runners_available=false" >> $GITHUB_OUTPUT
           echo "runner_type=github-hosted" >> $GITHUB_OUTPUT
@@ -78,7 +78,7 @@ runs:
           echo "❌ Invalid JSON response from GitHub API"
           echo "Response: ${RUNNERS_RESPONSE}"
           echo "❌ Cannot parse runner data - defaulting to GitHub-hosted runners"
-          
+
           # Set outputs for GitHub-hosted fallback
           echo "runners_available=false" >> $GITHUB_OUTPUT
           echo "runner_type=github-hosted" >> $GITHUB_OUTPUT
@@ -93,9 +93,9 @@ runs:
         # Check if we have any online self-hosted runners with required labels
         echo "🎯 Looking for runners with labels: $(IFS=,; echo "${REQUIRED_LABELS[*]}")"
         MATCHING_RUNNERS=$(echo "$RUNNERS_RESPONSE" | jq -r --argjson required_labels "$(printf '%s\n' "${REQUIRED_LABELS[@]}" | jq -R . | jq -s .)" '
-          .runners[] | 
+          .runners[] |
           select(.status == "online") |
-          select(.labels | map(.name) | sort as $runner_labels | 
+          select(.labels | map(.name) | sort as $runner_labels |
                  $required_labels | all(. as $req | $runner_labels | index($req))) |
           .name
         ' 2>/dev/null || echo "")
@@ -112,12 +112,12 @@ runs:
           done
           echo ""
           echo "✅ Self-hosted runners are available and ready!"
-          
+
           # Set outputs for available runners
           echo "runners_available=true" >> $GITHUB_OUTPUT
           echo "runner_type=self-hosted" >> $GITHUB_OUTPUT
           echo 'runner_config=["self-hosted", "Linux", "X64", "AL2023", "ci"]' >> $GITHUB_OUTPUT
-          
+
           # Exit successfully with self-hosted configuration
           exit 0
         else
@@ -130,12 +130,12 @@ runs:
           echo "🚀 Runner deployment may still be in progress."
           echo ""
           echo "⚠️ No suitable self-hosted runners available - will recommend GitHub-hosted runners"
-          
+
           # Set outputs for fallback to GitHub-hosted runners
           echo "runners_available=false" >> $GITHUB_OUTPUT
           echo "runner_type=github-hosted" >> $GITHUB_OUTPUT
           echo 'runner_config=["ubuntu-latest"]' >> $GITHUB_OUTPUT
-          
+
           # Exit successfully with fallback configuration
           exit 0
         fi

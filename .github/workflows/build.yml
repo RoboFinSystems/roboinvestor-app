@@ -89,7 +89,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{ vars.REPOSITORY_NAME || 'HarbingerFinLab/roboinvestor-app' }}
+          repository: ${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}
           ref: ${{ github.ref }}
           token: ${{ secrets.ACTIONS_TOKEN }}
 
@@ -171,7 +171,7 @@ jobs:
             # Check if the main application stack exists
             if aws cloudformation describe-stacks --stack-name $STACK_NAME >/dev/null 2>&1; then
               echo "Stack $STACK_NAME exists, looking up CloudFront distribution ID..."
-              
+
               # Try to get CloudFront distribution ID from CloudFormation stack outputs
               CLOUDFRONT_DISTRIBUTION_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text 2>/dev/null)
 
