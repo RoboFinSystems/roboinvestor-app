@@ -121,7 +121,7 @@ function DesktopSidebar({
           <SidebarItems>
             <OrgSection
               isCollapsed={isCollapsed}
-              show={features.showOrgSection !== false}
+              showOrgSection={features.showOrgSection}
             />
             <SidebarItemGroup className="mt-0 border-t-0 pt-2 pb-1">
               {navigationItems.map((item) => (
@@ -177,7 +177,7 @@ function MobileSidebar({
             <SidebarItems>
               <OrgSection
                 isCollapsed={false}
-                show={features.showOrgSection !== false}
+                showOrgSection={features.showOrgSection}
               />
               <SidebarItemGroup className="mt-0 border-t-0 pt-2 pb-1">
                 {navigationItems.map((item) => (
@@ -306,16 +306,16 @@ function CustomSidebarItem({
 
 function OrgSection({
   isCollapsed,
-  show = true,
+  showOrgSection = true,
 }: {
   isCollapsed: boolean
-  show?: boolean
+  showOrgSection?: boolean
 }) {
   const { currentOrg } = useOrg()
   const pathname = usePathname()
   const isActive = pathname === '/organization'
 
-  if (!show || !currentOrg) return null
+  if (!showOrgSection || !currentOrg) return null
 
   return (
     <SidebarItemGroup className="border-b border-gray-200 pb-2 dark:border-gray-700">
