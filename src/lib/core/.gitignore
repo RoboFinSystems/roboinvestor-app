@@ -26,8 +26,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env
-.env*.local
+.env*
 
 # vercel
 .vercel
@@ -45,3 +44,6 @@ CLAUDE.local.md
 
 # local dev
 local/
+
+package-lock.json
+.vscode/
