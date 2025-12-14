@@ -1,6 +1,6 @@
 {
   "name": "roboinvestor-app",
-  "version": "0.3.5",
+  "version": "0.0.1",
   "private": true,
   "engines": {
     "node": ">=22.0.0"
