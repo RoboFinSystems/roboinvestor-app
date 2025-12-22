@@ -223,7 +223,7 @@ const HomePageContent: FC = function () {
                   Open Source
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  MIT licensed, fully customizable
+                  Apache 2.0 licensed, fully customizable
                 </p>
               </div>
             </div>

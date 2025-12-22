@@ -296,11 +296,10 @@ export default function FeaturesSection() {
 
             <div className="mt-6 rounded-lg bg-emerald-950/50 p-4">
               <div className="text-sm font-semibold text-emerald-400">
-                MIT Licensed
+                Apache 2.0 Licensed
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Use commercially, modify freely, contribute back to the
-                community
+                Use commercially, modify freely, patent protection included
               </p>
             </div>
           </div>
