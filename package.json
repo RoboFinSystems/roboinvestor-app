@@ -37,7 +37,7 @@
     "setup:gha": "./bin/gha-setup"
   },
   "dependencies": {
-    "@robosystems/client": "0.2.23",
+    "@robosystems/client": "0.2.24",
     "flowbite": "^3.1",
     "flowbite-react": "^0.12.5",
     "next": "^15.5.9",
