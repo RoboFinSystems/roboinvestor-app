@@ -324,7 +324,6 @@ describe('MyComponent', () => {
 ### Docker Configuration
 
 - **Multi-stage Build**: Separate build and runtime stages
-- **Base Image**: `node:22.15.0-alpine` for small footprint
 - **CI/CD**: GitHub Actions for automated deployments
 
 ### Environment Configurations
