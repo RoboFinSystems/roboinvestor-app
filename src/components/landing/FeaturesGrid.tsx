@@ -39,7 +39,14 @@ export default function FeaturesGrid() {
                 </svg>
               </div>
               <h3 className="font-heading mb-3 text-center text-lg font-semibold text-white sm:text-xl">
-                LadybugDB Engine
+                <a
+                  href="https://ladybugdb.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-orange-300"
+                >
+                  LadybugDB Engine
+                </a>
               </h3>
               <p className="mb-4 text-sm text-gray-300 sm:text-base">
                 Purpose-built graph database optimized for analytical workloads

@@ -143,9 +143,14 @@ export default function SchemaArchitecture() {
                             <div>RoboSystems</div>
                             <div>Knowledge Graph</div>
                           </div>
-                          <div className="text-xs text-gray-400">
+                          <a
+                            href="https://ladybugdb.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block text-xs text-gray-400 transition-colors hover:text-orange-300"
+                          >
                             Powered by LadybugDB
-                          </div>
+                          </a>
                         </div>
                       </div>
                     </div>
