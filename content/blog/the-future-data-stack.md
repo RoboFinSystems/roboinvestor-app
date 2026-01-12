@@ -1,11 +1,17 @@
 ---
-title: 'Building for the Future Data Stack'
+title: 'The Future Data Stack: Why We Built RoboSystems'
 date: '2026-1-12'
 author: 'Joey French'
 excerpt: 'The modern data stack is collapsing under its own weight. We built RoboSystems from the ground up for what comes next: unified databases, event-driven orchestration, and AI-native semantics.'
 metaDescription: 'Learn how RoboSystems is architected for the future of data engineering. From Dagster-powered orchestration to self-hosted deployments, discover why the next decade belongs to unified, AI-native platforms.'
 tags:
-  ['data-engineering', 'architecture', 'dagster', 'orchestration', 'open-source']
+  [
+    'data-engineering',
+    'architecture',
+    'dagster',
+    'orchestration',
+    'open-source',
+  ]
 keywords:
   [
     'future data stack',
@@ -19,7 +25,7 @@ keywords:
   ]
 featured: true
 coverVideo: '/videos/futuristic-brain-network.mp4'
-canonicalUrl: 'https://robosystems.ai/blog/building-for-the-future-data-stack'
+canonicalUrl: 'https://robosystems.ai/blog/the-future-data-stack'
 ---
 
 ## The Modern Data Stack Is Breaking
@@ -85,12 +91,12 @@ This is asset-centric thinking. You don't write scripts that "run the SEC pipeli
 
 The difference matters when something goes wrong:
 
-| Traditional Orchestration | Asset-Centric Orchestration |
-|---------------------------|----------------------------|
-| "The 2 AM job failed" | "The SEC Q4 filings asset is stale" |
-| "Check the logs" | "Here's the exact run that failed" |
-| "Re-run everything" | "Re-materialize just this asset" |
-| "Hope it works this time" | "Replay with the same inputs" |
+| Traditional Orchestration | Asset-Centric Orchestration         |
+| ------------------------- | ----------------------------------- |
+| "The 2 AM job failed"     | "The SEC Q4 filings asset is stale" |
+| "Check the logs"          | "Here's the exact run that failed"  |
+| "Re-run everything"       | "Re-materialize just this asset"    |
+| "Hope it works this time" | "Replay with the same inputs"       |
 
 We still run scheduled jobs—monthly billing, daily cleanup, nightly processing. But every run is observable. Every asset has provenance. When the auditor asks "where did this number come from?" you can trace it back to the exact source file, transformation, and timestamp.
 
@@ -154,13 +160,13 @@ That's it. No SaaS dependency. No data leaving your network. No per-seat licensi
 
 What gets deployed:
 
-| Component | Service | Purpose |
-|-----------|---------|---------|
-| API | ECS Fargate | Application endpoints |
+| Component     | Service     | Purpose                       |
+| ------------- | ----------- | ----------------------------- |
+| API           | ECS Fargate | Application endpoints         |
 | Orchestration | ECS Fargate | Dagster workers and scheduler |
-| PostgreSQL | RDS | User accounts and billing |
-| LadybugDB | EC2 ARM64 | Graph storage and queries |
-| Cache | ElastiCache | Session and query caching |
+| PostgreSQL    | RDS         | User accounts and billing     |
+| LadybugDB     | EC2 ARM64   | Graph storage and queries     |
+| Cache         | ElastiCache | Session and query caching     |
 
 The entire stack uses GitHub OIDC federation—no AWS credentials stored anywhere. One-hour sessions that can't be abused if compromised.
 
@@ -199,18 +205,21 @@ Orchestration isn't just about data pipelines—it's about the operational heart
 Here's what runs automatically in a production RoboSystems deployment:
 
 **Billing Operations:**
+
 - Monthly credit allocation and overage processing
 - Daily storage usage billing
 - Hourly usage snapshots for analytics
 - Monthly usage report generation
 
 **Infrastructure Maintenance:**
+
 - Hourly cleanup of expired API keys and sessions
 - Weekly health checks on credit system integrity
 - Instance health monitoring and metrics collection
 - Registry cleanup for orphaned resources
 
 **Data Pipelines:**
+
 - SEC filing discovery and processing
 - QuickBooks transaction synchronization
 - Plaid account and transaction sync

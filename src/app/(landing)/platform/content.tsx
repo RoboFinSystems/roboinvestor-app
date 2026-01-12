@@ -47,7 +47,15 @@ export default function PlatformContent() {
               <p className="mx-auto max-w-3xl text-gray-400">
                 Connect your financial data sources, maintain semantic
                 relationships, and power AI-native applications. Built on
-                LadybugDB for blazing-fast analytical performance.
+                <a
+                  href="https://ladybugdb.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-orange-400 transition-colors hover:text-orange-300"
+                >
+                  LadybugDB
+                </a>{' '}
+                for blazing-fast analytical performance.
               </p>
             </div>
 

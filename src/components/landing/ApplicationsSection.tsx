@@ -65,12 +65,11 @@ export default function ApplicationsSection() {
                 </div>
               </div>
               <p className="mt-6 text-center text-sm text-gray-400">
-                Both applications connect to your Company's unified knowledge
-                graph through the RoboSystems API, with specialized schemas for
-                accounting and investment data. Built on LadybugDB's
-                high-performance graph architecture, the platform enables AI
-                agents to query complex relationships in milliseconds, powering
-                intelligent insights and automation.
+                RoboLedger syncs QuickBooks data into the RoboLedger schema for
+                AI-powered financial reporting. RoboInvestor provides access to
+                the SEC Shared Repository for securities research. Both leverage
+                MCP and Claude AI for natural language queries against the
+                knowledge graph.
               </p>
             </div>
           </div>
@@ -104,65 +103,57 @@ export default function ApplicationsSection() {
               </Link>
 
               <p className="mb-6 text-gray-300">
-                Transform natural language requests into complete, validated
-                financial statements. AI-native accounting that delivers minutes
-                to hours close instead of days.
+                Synchronize your QuickBooks accounting data into a unified
+                knowledge graph for AI-powered reporting and analysis.
               </p>
 
               <div className="mb-8 space-y-4">
                 <div>
                   <h4 className="mb-3 font-semibold text-cyan-300">
-                    Core Features
+                    QuickBooks Integration
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li className="flex items-start">
                       <span className="mr-2 text-cyan-400">•</span>
                       <span>
-                        QuickBooks sync for existing users OR Plaid bank feeds
-                        for direct accounting
+                        OAuth2 secure connection to sync accounting data
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-cyan-400">•</span>
                       <span>
-                        Full chart of accounts with journal entries and
-                        AI-assisted categorization
+                        Chart of accounts, journal entries, and transactions
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-cyan-400">•</span>
-                      <span>
-                        Create custom report templates and share digital
-                        financial reports
-                      </span>
+                      <span>Trial balance import for unified reporting</span>
                     </li>
                   </ul>
                 </div>
 
                 <div>
                   <h4 className="mb-3 font-semibold text-cyan-300">
-                    AI Intelligence
+                    AI-Native Reporting
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li className="flex items-start">
                       <span className="mr-2 text-cyan-400">•</span>
                       <span>
-                        Natural language requests generate complete financial
-                        statements with intelligent validation
+                        Natural language queries via MCP and Claude AI
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-cyan-400">•</span>
                       <span>
-                        AI understands your chart of accounts, business
-                        relationships, and reporting requirements
+                        AI generates financial reports from plain English
+                        requests
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-cyan-400">•</span>
                       <span>
-                        Automated transaction classification with anomaly
-                        detection and variance explanations
+                        XBRL-native reports that are queryable and comparable
                       </span>
                     </li>
                   </ul>
@@ -194,86 +185,64 @@ export default function ApplicationsSection() {
                     RoboInvestor
                   </h3>
                   <p className="text-gray-400">
-                    Portfolio Management & Security Analysis Platform
+                    Securities Research & Investment Analytics
                   </p>
                 </div>
               </Link>
 
               <p className="mb-6 text-gray-300">
-                Comprehensive investment and portfolio management tool that
-                brings institutional-grade analytics to your financial assets
-                through the power of knowledge graphs.
+                Access the SEC Shared Repository through AI-powered natural
+                language queries for securities research and competitive
+                analysis.
               </p>
 
               <div className="mb-8 space-y-4">
                 <div>
                   <h4 className="mb-3 font-semibold text-green-300">
-                    Core Features
+                    SEC Shared Repository
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li className="flex items-start">
                       <span className="mr-2 text-green-400">•</span>
                       <span>
-                        <strong className="text-white">
-                          Brokerage Integration:
-                        </strong>{' '}
-                        Sync portfolio holdings and transaction data from your
-                        brokerage or custodian
+                        100,000+ SEC XBRL filings across 4,000+ public companies
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-green-400">•</span>
                       <span>
-                        <strong className="text-white">
-                          Multi-Asset Support:
-                        </strong>{' '}
-                        Stocks, bonds, private equity, precious metals, crypto,
-                        and more
+                        10-K and 10-Q financial statements and fundamentals
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-green-400">•</span>
-                      <span>
-                        <strong className="text-white">
-                          Performance Analytics:
-                        </strong>{' '}
-                        Real-time portfolio performance and attribution
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 text-green-400">•</span>
-                      <span>
-                        <strong className="text-white">
-                          SEC Repository Access:
-                        </strong>{' '}
-                        Research tools for public company analysis
-                      </span>
+                      <span>Peer comparison and industry analysis</span>
                     </li>
                   </ul>
                 </div>
 
                 <div>
                   <h4 className="mb-3 font-semibold text-green-300">
-                    Research & Intelligence
+                    AI-Powered Research
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li className="flex items-start">
                       <span className="mr-2 text-green-400">•</span>
-                      <span>AI-powered financial security analysis</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 text-green-400">•</span>
-                      <span>Build and manage portfolios with AI insights</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 text-green-400">•</span>
                       <span>
-                        Connect Claude for advanced investment research
+                        Natural language queries via MCP and Claude AI
                       </span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2 text-green-400">•</span>
-                      <span>Portfolio optimization and risk analysis</span>
+                      <span>
+                        AI-generated Cypher queries for complex analysis
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-400">•</span>
+                      <span>
+                        Chat-based research interface with query history
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -423,8 +392,8 @@ export default function ApplicationsSection() {
                   Specialized Schemas
                 </h4>
                 <p className="text-sm">
-                  RoboLedger schema for accounting, RoboInvestor schema for
-                  portfolios
+                  RoboLedger for accounting data, SEC XBRL for securities
+                  research
                 </p>
               </div>
               <div className="rounded-lg p-3 text-center sm:p-4">
@@ -444,10 +413,10 @@ export default function ApplicationsSection() {
                   </svg>
                 </div>
                 <h4 className="mb-1 font-semibold text-white">
-                  Connects via API
+                  Data Integration
                 </h4>
                 <p className="text-sm">
-                  Secure access to your Company's knowledge graph data
+                  QuickBooks sync, SEC filings, and shared repository access
                 </p>
               </div>
               <div className="rounded-lg p-3 text-center sm:p-4">
@@ -467,10 +436,10 @@ export default function ApplicationsSection() {
                   </svg>
                 </div>
                 <h4 className="mb-1 font-semibold text-white">
-                  Leverages AI Tools
+                  MCP Agent Access
                 </h4>
                 <p className="text-sm">
-                  MCP tools and Claude powered agents for AI-powered insights
+                  Natural language queries via Claude AI and the MCP protocol
                 </p>
               </div>
             </div>
