@@ -48,11 +48,6 @@ Resources:
         - Key: CreatedBy
           Value: CloudFormation
 
-Conditions:
-  IsProduction: !Equals
-    - !Ref Environment
-    - prod
-
 Outputs:
   StaticAssetsBucketName:
     Description: S3 Bucket for static assets
@@ -71,20 +66,3 @@ Outputs:
     Value: !GetAtt StaticAssetsBucket.RegionalDomainName
     Export:
       Name: !Sub ${AWS::StackName}-StaticAssetsBucketDomainName
-
-  # DEPRECATED: These exports are kept temporarily for backwards compatibility.
-  # The main template now uses a CloudFront Function for www redirects.
-  # Remove these exports after the main template has been deployed.
-  WwwRedirectBucketName:
-    Condition: IsProduction
-    Description: '[DEPRECATED] No longer used - kept for backwards compatibility'
-    Value: 'deprecated-remove-after-deploy'
-    Export:
-      Name: !Sub ${AWS::StackName}-WwwRedirectBucketName
-
-  WwwRedirectBucketWebsiteURL:
-    Condition: IsProduction
-    Description: '[DEPRECATED] No longer used - kept for backwards compatibility'
-    Value: 'deprecated-remove-after-deploy'
-    Export:
-      Name: !Sub ${AWS::StackName}-WwwRedirectBucketWebsiteURL
