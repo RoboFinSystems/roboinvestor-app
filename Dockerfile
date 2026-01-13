@@ -42,6 +42,10 @@ COPY --from=builder /app/next.config.js ./next.config.js
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
+# Copy entrypoint script
+COPY bin/entrypoint.sh /app/bin/entrypoint.sh
+RUN chmod +x /app/bin/entrypoint.sh
+
 # Use non-root user for security
 RUN addgroup -g 1001 -S appgroup && adduser -S appuser -u 1001 -G appgroup
 RUN mkdir -p /app/.next/cache/images
@@ -52,4 +56,4 @@ USER appuser
 
 EXPOSE 3000
 ENV PORT=3000
-CMD ["npm", "start"]
+ENTRYPOINT ["/app/bin/entrypoint.sh"]
