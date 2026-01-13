@@ -68,12 +68,12 @@ on:
         description: 'CPU units for ECS task (256 = 0.25 vCPU)'
         required: false
         type: string
-        default: '512'
+        default: '256'
       memory:
         description: 'Memory in MiB for ECS task'
         required: false
         type: string
-        default: '1024'
+        default: '512'
       fargate_weight:
         description: 'Weight for FARGATE capacity provider (On-Demand instances)'
         required: false
