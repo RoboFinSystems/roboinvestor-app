@@ -17,11 +17,11 @@ on:
         required: true
         type: choice
         options:
+          - all
           - staging
           - prod
-          - all
           - none
-        default: staging
+        default: all
 
 jobs:
   create-branch:
