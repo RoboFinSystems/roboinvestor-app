@@ -84,6 +84,11 @@ on:
         required: false
         type: string
         default: '80'
+      fargate_base:
+        description: 'Minimum tasks guaranteed on FARGATE (On-Demand). Set to 1+ for guaranteed availability during Spot shortages.'
+        required: false
+        type: string
+        default: '0'
 
       # Auto-scaling Configuration
       capacity_min:
@@ -261,7 +266,8 @@ jobs:
                 ParameterKey=ScaleUpMemoryThreshold,ParameterValue=${{ inputs.scale_up_memory_threshold }} \
                 ParameterKey=ScaleDownMemoryThreshold,ParameterValue=${{ inputs.scale_down_memory_threshold }} \
                 ParameterKey=FargateSpotWeight,ParameterValue=${{ inputs.fargate_spot_weight }} \
-                ParameterKey=FargateWeight,ParameterValue=${{ inputs.fargate_weight }}"
+                ParameterKey=FargateWeight,ParameterValue=${{ inputs.fargate_weight }} \
+                ParameterKey=FargateBase,ParameterValue=${{ inputs.fargate_base }}"
 
           # Add domain parameters only for public mode
           if [ "${{ inputs.app_access_mode }}" = "public" ]; then
