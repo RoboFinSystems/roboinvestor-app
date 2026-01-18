@@ -212,8 +212,7 @@ Conditions:
     - !Equals [!Ref AppAccessMode, 'public']
     - !Equals [!Ref AppAccessMode, 'public-http']
 
-  # Check if we're in production environment for www redirect (only applies to public mode)
-  IsProduction: !Equals [!Ref Environment, 'prod']
+  # Production + public mode: enables www.domain.com redirect to domain.com
   IsProductionPublic: !And
     - !Equals [!Ref Environment, 'prod']
     - !Equals [!Ref AppAccessMode, 'public']
@@ -898,7 +897,8 @@ Resources:
             CustomOriginConfig:
               HTTPPort: 80
               HTTPSPort: 443
-              OriginProtocolPolicy: !If [IsPublicMode, 'https-only', 'http-only']
+              OriginProtocolPolicy:
+                !If [IsPublicMode, 'https-only', 'http-only']
               OriginSSLProtocols:
                 - TLSv1.2
         DefaultCacheBehavior:
