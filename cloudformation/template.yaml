@@ -335,9 +335,7 @@ Resources:
           # Origin for dynamic content (App Runner)
           # App Runner always uses HTTPS
           - Id: AppRunner-Dynamic-Content
-            DomainName: !Select
-              - 2
-              - !Split ['/', !GetAtt AppRunnerService.ServiceUrl]
+            DomainName: !GetAtt AppRunnerService.ServiceUrl
             CustomOriginConfig:
               HTTPSPort: 443
               OriginProtocolPolicy: https-only
@@ -467,9 +465,7 @@ Resources:
         Origins:
           # Dummy origin - required by CloudFront but never hit because the function redirects
           - Id: Dummy-Origin
-            DomainName: !Select
-              - 2
-              - !Split ['/', !GetAtt AppRunnerService.ServiceUrl]
+            DomainName: !GetAtt AppRunnerService.ServiceUrl
             CustomOriginConfig:
               HTTPSPort: 443
               OriginProtocolPolicy: https-only
