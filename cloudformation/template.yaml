@@ -265,7 +265,7 @@ Resources:
         EgressConfiguration:
           EgressType: DEFAULT
       ObservabilityConfiguration:
-        ObservabilityEnabled: true
+        ObservabilityEnabled: false
       Tags:
         - Key: Environment
           Value: !Ref Environment
