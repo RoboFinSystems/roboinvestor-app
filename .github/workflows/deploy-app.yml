@@ -158,27 +158,38 @@ jobs:
             echo "is_new_stack=false" >> $GITHUB_OUTPUT
           fi
 
-          # Base parameters (always required)
-          APP_STACK_PARAMS="ParameterKey=Environment,ParameterValue=${{ inputs.environment }} \
-                ParameterKey=AWSAccountId,ParameterValue=${{ inputs.aws_account_id }} \
-                ParameterKey=AppAccessMode,ParameterValue=${{ inputs.app_access_mode }} \
-                ParameterKey=ECRRepository,ParameterValue=${{ inputs.ecr_repository }} \
-                ParameterKey=ECRImageTag,ParameterValue=${{ inputs.ecr_image_tag }} \
-                ParameterKey=Cpu,ParameterValue='${{ inputs.cpu }}' \
-                ParameterKey=Memory,ParameterValue='${{ inputs.memory }}' \
-                ParameterKey=StaticAssetsBucketName,ParameterValue=${{ inputs.static_assets_bucket_name }} \
-                ParameterKey=StaticAssetsBucketArn,ParameterValue=${{ inputs.static_assets_bucket_arn }} \
-                ParameterKey=StaticAssetsBucketDomainName,ParameterValue=${{ inputs.static_assets_bucket_domain }} \
-                ParameterKey=CapacityMin,ParameterValue=${{ inputs.capacity_min }} \
-                ParameterKey=CapacityMax,ParameterValue=${{ inputs.capacity_max }} \
-                ParameterKey=MaxConcurrency,ParameterValue=${{ inputs.max_concurrency }}"
+          # Build parameters JSON file (handles spaces in values correctly)
+          cat > /tmp/cfn-params.json << 'PARAMS_EOF'
+          [
+            {"ParameterKey": "Environment", "ParameterValue": "${{ inputs.environment }}"},
+            {"ParameterKey": "AWSAccountId", "ParameterValue": "${{ inputs.aws_account_id }}"},
+            {"ParameterKey": "AppAccessMode", "ParameterValue": "${{ inputs.app_access_mode }}"},
+            {"ParameterKey": "ECRRepository", "ParameterValue": "${{ inputs.ecr_repository }}"},
+            {"ParameterKey": "ECRImageTag", "ParameterValue": "${{ inputs.ecr_image_tag }}"},
+            {"ParameterKey": "Cpu", "ParameterValue": "${{ inputs.cpu }}"},
+            {"ParameterKey": "Memory", "ParameterValue": "${{ inputs.memory }}"},
+            {"ParameterKey": "StaticAssetsBucketName", "ParameterValue": "${{ inputs.static_assets_bucket_name }}"},
+            {"ParameterKey": "StaticAssetsBucketArn", "ParameterValue": "${{ inputs.static_assets_bucket_arn }}"},
+            {"ParameterKey": "StaticAssetsBucketDomainName", "ParameterValue": "${{ inputs.static_assets_bucket_domain }}"},
+            {"ParameterKey": "CapacityMin", "ParameterValue": "${{ inputs.capacity_min }}"},
+            {"ParameterKey": "CapacityMax", "ParameterValue": "${{ inputs.capacity_max }}"},
+            {"ParameterKey": "MaxConcurrency", "ParameterValue": "${{ inputs.max_concurrency }}"}
+          ]
+          PARAMS_EOF
 
           # Add domain parameters only for public mode
           if [ "${{ inputs.app_access_mode }}" = "public" ]; then
-            APP_STACK_PARAMS="$APP_STACK_PARAMS \
-                ParameterKey=DomainName,ParameterValue=${{ inputs.domain_name }} \
-                ParameterKey=HostedZoneId,ParameterValue=$HOSTED_ZONE_ID"
+            # Remove trailing ] and add domain params
+            sed -i '$ d' /tmp/cfn-params.json
+            cat >> /tmp/cfn-params.json << DOMAIN_EOF
+            ,{"ParameterKey": "DomainName", "ParameterValue": "${{ inputs.domain_name }}"},
+            {"ParameterKey": "HostedZoneId", "ParameterValue": "$HOSTED_ZONE_ID"}
+          ]
+          DOMAIN_EOF
           fi
+
+          echo "Parameters:"
+          cat /tmp/cfn-params.json
 
           # Deploy or update the stack
           if [ "$STACK_ACTION" = "create-stack" ]; then
@@ -187,14 +198,14 @@ jobs:
               --stack-name ${{ inputs.stack_name }} \
               --template-body file://cloudformation/template.yaml \
               --capabilities CAPABILITY_NAMED_IAM \
-              --parameters $APP_STACK_PARAMS
+              --parameters file:///tmp/cfn-params.json
           else
             # Update existing stack, handling "No updates" error
             UPDATE_OUTPUT=$(aws cloudformation $STACK_ACTION \
               --stack-name ${{ inputs.stack_name }} \
               --template-body file://cloudformation/template.yaml \
               --capabilities CAPABILITY_NAMED_IAM \
-              --parameters $APP_STACK_PARAMS 2>&1) || true
+              --parameters file:///tmp/cfn-params.json 2>&1) || true
 
             # Check if the error was "No updates are to be performed"
             if echo "$UPDATE_OUTPUT" | grep -q "No updates are to be performed"; then
