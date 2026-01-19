@@ -115,7 +115,6 @@ Parameters:
     MaxValue: 200
     Description: Maximum concurrent requests per instance before scaling
 
-
   # Tagging Configuration
   ServiceTag:
     Type: String
