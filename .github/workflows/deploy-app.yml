@@ -283,7 +283,7 @@ jobs:
       - name: Verify Health Check
         run: |
           SERVICE_URL="${{ steps.get-service-info.outputs.service_url }}"
-          HEALTH_URL="${SERVICE_URL}/api/utilities/health"
+          HEALTH_URL="https://${SERVICE_URL}/api/utilities/health"
 
           echo "Checking health endpoint: $HEALTH_URL"
 
