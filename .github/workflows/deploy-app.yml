@@ -164,8 +164,8 @@ jobs:
                 ParameterKey=AppAccessMode,ParameterValue=${{ inputs.app_access_mode }} \
                 ParameterKey=ECRRepository,ParameterValue=${{ inputs.ecr_repository }} \
                 ParameterKey=ECRImageTag,ParameterValue=${{ inputs.ecr_image_tag }} \
-                ParameterKey=Cpu,ParameterValue=\"${{ inputs.cpu }}\" \
-                ParameterKey=Memory,ParameterValue=\"${{ inputs.memory }}\" \
+                ParameterKey=Cpu,ParameterValue='${{ inputs.cpu }}' \
+                ParameterKey=Memory,ParameterValue='${{ inputs.memory }}' \
                 ParameterKey=StaticAssetsBucketName,ParameterValue=${{ inputs.static_assets_bucket_name }} \
                 ParameterKey=StaticAssetsBucketArn,ParameterValue=${{ inputs.static_assets_bucket_arn }} \
                 ParameterKey=StaticAssetsBucketDomainName,ParameterValue=${{ inputs.static_assets_bucket_domain }} \
