@@ -1,6 +1,6 @@
 # RoboInvestor App
 
-> **Version 0.1 (Alpha)** — Core infrastructure complete, actively developing investment-specific features
+> **Version 0.2 (Alpha)** — Core infrastructure complete, actively developing investment-specific features
 
 RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and Claude-powered investment insights via the RoboSystems knowledge graph.
 
