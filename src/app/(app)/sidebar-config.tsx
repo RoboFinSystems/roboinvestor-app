@@ -21,13 +21,13 @@ import {
  * Some features are disabled for shared repositories:
  * - Schema (read-only, managed internally)
  * - Subgraphs (not applicable)
- * - Backups (managed internally)
  * - Data Lake (Duckdb tables and files in S3)
  *
  * Features that work for repositories:
  * - Console (can query shared repository data!)
  * - Usage (shows credit consumption)
  * - Dashboard (limited view)
+ * - Backups (download system-generated backups)
  */
 export const getNavigationItems = (
   currentGraph: GraphInfo | null
@@ -56,7 +56,7 @@ export const getNavigationItems = (
           label: 'Console',
           href: '/console',
         },
-        // Hide these items for repositories
+        // Hide these items for repositories (except Backups for downloads)
         ...(!isRepository
           ? [
               {
@@ -74,13 +74,14 @@ export const getNavigationItems = (
                 label: 'Subgraphs',
                 href: '/subgraphs',
               },
-              {
-                icon: HiDatabase,
-                label: 'Backups',
-                href: '/backups',
-              },
             ]
           : []),
+        // Backups available for all graphs (repositories have download-only access)
+        {
+          icon: HiDatabase,
+          label: 'Backups',
+          href: '/backups',
+        },
         {
           icon: HiChartBar,
           label: 'Usage',

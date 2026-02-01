@@ -1,6 +1,6 @@
 'use client'
 
-import { customTheme, useGraphContext } from '@/lib/core'
+import { customTheme, useGraphContext, useIsRepository } from '@/lib/core'
 import { useToast } from '@/lib/core/hooks/use-toast'
 import { useOperationMonitoring } from '@/lib/core/task-monitoring/operationHooks'
 import type { BackupResponse, BackupStatsResponse } from '@robosystems/client'
@@ -44,9 +44,17 @@ import {
   HiUpload,
 } from 'react-icons/hi'
 
+interface DownloadQuota {
+  limit_per_day: number
+  used_today: number
+  remaining: number
+  resets_at: string
+}
+
 export default function BackupManagementContent() {
   const { state: graphState } = useGraphContext()
   const selectedGraphId = graphState.currentGraphId
+  const { isRepository } = useIsRepository()
   const { showSuccess, showError, showInfo, ToastContainer } = useToast()
 
   const [backups, setBackups] = useState<BackupResponse[]>([])
@@ -56,6 +64,7 @@ export default function BackupManagementContent() {
   const [selectedBackup, setSelectedBackup] = useState<BackupResponse | null>(
     null
   )
+  const [downloadQuota, setDownloadQuota] = useState<DownloadQuota | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -95,6 +104,13 @@ export default function BackupManagementContent() {
       }
 
       setBackups(backupsResponse.data?.backups || [])
+
+      // Set download quota for shared repositories
+      if ((backupsResponse.data as any)?.download_quota) {
+        setDownloadQuota((backupsResponse.data as any).download_quota)
+      } else {
+        setDownloadQuota(null)
+      }
 
       try {
         const statsResponse = await getBackupStats({
@@ -390,22 +406,64 @@ export default function BackupManagementContent() {
             <HiRefresh className="mr-2 h-4 w-4" />
             Refresh
           </Button>
-          <Button
-            onClick={() => {
-              setCreateFormEncryption(false)
-              setCreateFormRetentionDays(90)
-              createOperationMonitor.reset()
-              setShowCreateModal(true)
-            }}
-          >
-            <HiPlus className="mr-2 h-4 w-4" />
-            Create Backup
-          </Button>
+          {!isRepository && (
+            <Button
+              onClick={() => {
+                setCreateFormEncryption(false)
+                setCreateFormRetentionDays(90)
+                createOperationMonitor.reset()
+                setShowCreateModal(true)
+              }}
+            >
+              <HiPlus className="mr-2 h-4 w-4" />
+              Create Backup
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {backupStats && (
+      {/* Download Quota Card for Shared Repositories */}
+      {isRepository && downloadQuota && (
+        <Card theme={customTheme.card}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
+                <HiDownload className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                  Daily Download Quota
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Resets at {new Date(downloadQuota.resets_at).toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {downloadQuota.remaining} / {downloadQuota.limit_per_day}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                downloads remaining
+              </div>
+            </div>
+          </div>
+          {downloadQuota.remaining === 0 && (
+            <div className="mt-3 rounded-lg bg-yellow-50 p-3 dark:bg-yellow-900/20">
+              <div className="flex items-center gap-2 text-sm text-yellow-800 dark:text-yellow-300">
+                <HiExclamation className="h-4 w-4" />
+                <span>
+                  Daily download limit reached. Limit resets at{' '}
+                  {new Date(downloadQuota.resets_at).toLocaleTimeString()}.
+                </span>
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Stats Cards - Only for user graphs */}
+      {!isRepository && backupStats && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <Card theme={customTheme.card}>
             <div className="space-y-2">
@@ -470,7 +528,9 @@ export default function BackupManagementContent() {
                       No backups found
                     </p>
                     <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                      Create your first backup to get started
+                      {isRepository
+                        ? 'No backups available yet. System backups are generated periodically.'
+                        : 'Create your first backup to get started'}
                     </p>
                   </div>
                 </TableCell>
@@ -514,17 +574,27 @@ export default function BackupManagementContent() {
                         </Button>
                       </Tooltip>
                       {!backup.encryption_enabled && (
-                        <Tooltip content="Download backup">
+                        <Tooltip
+                          content={
+                            isRepository && downloadQuota?.remaining === 0
+                              ? 'Daily download limit reached'
+                              : 'Download backup'
+                          }
+                        >
                           <Button
                             size="sm"
                             color="gray"
                             onClick={() => handleDownloadBackup(backup)}
+                            disabled={
+                              isRepository && downloadQuota?.remaining === 0
+                            }
                           >
                             <HiDownload className="h-4 w-4" />
                           </Button>
                         </Tooltip>
                       )}
-                      {backup.encryption_enabled && (
+                      {/* Restore button - only for user graphs with encrypted backups */}
+                      {!isRepository && backup.encryption_enabled && (
                         <Tooltip content="Restore backup">
                           <Button
                             size="sm"
