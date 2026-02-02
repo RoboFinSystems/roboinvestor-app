@@ -8,9 +8,6 @@ on:
         required: true
         type: string
     secrets:
-      ACTIONS_TOKEN:
-        description: 'GitHub token for repository operations'
-        required: true
       ANTHROPIC_API_KEY:
         description: 'API key for Claude changelog generation'
         required: true
@@ -39,9 +36,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}
+          repository: ${{ github.repository }}
           ref: ${{ inputs.branch_ref }}
-          token: ${{ secrets.ACTIONS_TOKEN }}
+          token: ${{ github.token }}
           fetch-depth: 0
 
       - name: Get Version from package.json
@@ -279,15 +276,15 @@ jobs:
             ## 🔗 Links
 
             - **Live App:** [roboinvestor.ai](https://roboinvestor.ai)
-            - **Full Changelog:** [${{ steps.analyze-changes.outputs.last_tag }}...v${{ steps.get-version.outputs.version }}](https://github.com/${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}/compare/${{ steps.analyze-changes.outputs.last_tag }}...v${{ steps.get-version.outputs.version }})
-            - **All Releases:** [View all releases](https://github.com/${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}/releases)
+            - **Full Changelog:** [${{ steps.analyze-changes.outputs.last_tag }}...v${{ steps.get-version.outputs.version }}](https://github.com/${{ github.repository }}/compare/${{ steps.analyze-changes.outputs.last_tag }}...v${{ steps.get-version.outputs.version }})
+            - **All Releases:** [View all releases](https://github.com/${{ github.repository }}/releases)
 
             ---
             🤖 Generated with [Claude Code](https://claude.ai/code)
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Create release summary
         if: steps.check-tag.outputs.tag_exists == 'false'
@@ -296,7 +293,7 @@ jobs:
 
           echo "## 🚀 RoboInvestor v$VERSION Released" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Release URL:** [v$VERSION](https://github.com/${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}/releases/tag/v$VERSION)" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL:** [v$VERSION](https://github.com/${{ github.repository }}/releases/tag/v$VERSION)" >> $GITHUB_STEP_SUMMARY
           echo "**Live App:** [roboinvestor.ai](https://roboinvestor.ai)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📊 Frontend Statistics" >> $GITHUB_STEP_SUMMARY
@@ -316,7 +313,7 @@ jobs:
         run: |
           VERSION="${{ steps.get-version.outputs.version }}"
           TAG_NAME="v$VERSION"
-          RELEASE_URL="https://github.com/${{ vars.REPOSITORY_NAME || 'RoboFinSystems/roboinvestor-app' }}/releases/tag/$TAG_NAME"
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/$TAG_NAME"
 
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
