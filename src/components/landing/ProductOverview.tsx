@@ -265,12 +265,13 @@ export default function ProductOverview() {
                 Institutional Memory
               </h4>
               <p className="mb-4 text-sm text-gray-400">
-                Every transaction, decision, and relationship is preserved. AI
-                remembers context across your entire financial history.
+                Every transaction, decision, and relationship is preserved in
+                the graph. AI agents build persistent memory — concepts,
+                observations, and context — that compounds across sessions.
               </p>
               <div className="rounded-lg bg-black/30 p-3">
                 <p className="text-xs text-gray-500 italic">
-                  "How did we handle this situation when it happened in 2022?"
+                  "What patterns did we find in last quarter's analysis?"
                 </p>
               </div>
             </div>

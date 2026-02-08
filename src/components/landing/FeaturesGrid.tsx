@@ -247,7 +247,7 @@ export default function FeaturesGrid() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2 text-cyan-400">•</span>
-                  Subgraphs for teams and projects
+                  AI memory workspaces and subgraphs
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2 text-cyan-400">•</span>

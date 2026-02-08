@@ -75,6 +75,12 @@ export default function Header() {
               Open Source
             </Link>
             <Link
+              href="/pricing"
+              className="px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-cyan-400"
+            >
+              Pricing
+            </Link>
+            <Link
               href="/blog"
               className="px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-cyan-400"
             >
@@ -150,6 +156,13 @@ export default function Header() {
                 className="px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-cyan-400"
               >
                 Open Source
+              </Link>
+              <Link
+                href="/pricing"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-cyan-400"
+              >
+                Pricing
               </Link>
               <Link
                 href="/blog"

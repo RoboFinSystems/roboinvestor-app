@@ -172,13 +172,22 @@ export function CreateSubgraphModal({
                     </h3>
                     <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
                       <p>
-                        Subgraphs allow you to create isolated environments
-                        within your main graph. Perfect for:
+                        Subgraphs are isolated graph environments within your
+                        main graph. Use them for:
                       </p>
                       <ul className="mt-1 list-inside list-disc">
-                        <li>Development and staging environments</li>
-                        <li>Multi-tenant applications</li>
-                        <li>Data isolation and testing</li>
+                        <li>
+                          AI memory and knowledge graphs — give agents
+                          persistent memory with built-in schema
+                        </li>
+                        <li>
+                          Data workspaces — fork your data, build mappings or
+                          transformations, then publish back
+                        </li>
+                        <li>
+                          Development and testing — experiment without affecting
+                          production
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -196,7 +205,7 @@ export function CreateSubgraphModal({
                 <TextInput
                   id="name"
                   type="text"
-                  placeholder="e.g., dev, staging, prod-1"
+                  placeholder="e.g., memory, research, staging"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({
