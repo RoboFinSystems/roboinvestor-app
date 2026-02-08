@@ -251,9 +251,10 @@ export function SubgraphCreationWizard({
         className="mt-6"
         theme={customTheme.alert}
       >
-        <span className="font-medium">About Subgraphs:</span> Subgraphs allow
-        you to create isolated environments within your main graph, perfect for
-        development, staging, multi-tenant applications, and data isolation.
+        <span className="font-medium">About Subgraphs:</span> Subgraphs are
+        isolated graph environments within your main graph. Use them for AI
+        memory and knowledge graphs, data workspaces with fork and publish
+        workflows, or development and testing environments.
       </Alert>
     </div>
   )

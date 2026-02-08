@@ -80,7 +80,7 @@ export function SubgraphInfoStep({
         <TextInput
           id="subgraph-name"
           type="text"
-          placeholder="e.g., dev-environment, staging, prod-1"
+          placeholder="e.g., memory, research, staging"
           value={formData.name}
           onChange={handleNameChange}
           color={errors.name ? 'failure' : undefined}

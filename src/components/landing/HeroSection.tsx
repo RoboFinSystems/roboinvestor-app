@@ -111,8 +111,8 @@ export default function HeroSection() {
                   MCP-Powered AI Agents
                 </h3>
                 <p className="text-center text-sm text-gray-400">
-                  Claude AI agents with specialized tools for querying and
-                  analyzing your knowledge graph
+                  AI agents that query, analyze, and build persistent memory
+                  across sessions in your knowledge graph
                 </p>
               </div>
             </div>

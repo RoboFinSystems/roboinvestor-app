@@ -253,7 +253,8 @@ export default function BootstrapGuide() {
               <p className="text-sm text-emerald-300">
                 <strong>What bootstrap creates:</strong> OIDC Identity Provider,
                 IAM Roles, ECR Repository, GitHub Variables, and AWS Secrets
-                Manager entries - all automated.
+                Manager entries - all automated. Production deploys via
+                CloudFormation templates with GitHub Actions CI/CD.
               </p>
             </div>
           </div>
@@ -324,18 +325,6 @@ export default function BootstrapGuide() {
                 <li>+ OAuth integrations work</li>
               </ul>
             </div>
-          </div>
-
-          <div className="mt-6 rounded-lg bg-zinc-800/50 p-4">
-            <h4 className="mb-2 text-sm font-semibold text-gray-300">
-              Switch to Public Mode
-            </h4>
-            <pre className="overflow-x-auto text-xs text-gray-400">
-              <code>{`gh variable set API_ACCESS_MODE_PROD --body "public"
-gh variable set API_DOMAIN_NAME_ROOT --body "yourdomain.com"
-gh variable set API_DOMAIN_NAME_PROD --body "api.yourdomain.com"
-just deploy prod`}</code>
-            </pre>
           </div>
         </div>
 

@@ -48,11 +48,13 @@ export default function PricingContent() {
                       Standard
                     </h3>
                     <div className="mb-4">
-                      <span className="text-4xl font-bold text-white">$50</span>
+                      <span className="text-4xl font-bold text-white">
+                        $100
+                      </span>
                       <span className="text-gray-400">/month</span>
                     </div>
                     <p className="text-gray-400">
-                      For testing and development, or just getting started
+                      Dedicated graph infrastructure to get started
                     </p>
                   </div>
                   <ul className="mb-8 space-y-4">
@@ -86,7 +88,7 @@ export default function PricingContent() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      10GB storage allocation
+                      Up to 5M rows per table
                     </li>
                     <li className="flex items-start text-gray-300">
                       <svg
@@ -102,7 +104,7 @@ export default function PricingContent() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      Isolated graph on shared instance
+                      6 GB dedicated RAM with up to 3 subgraphs
                     </li>
                     <li className="flex items-start text-gray-300">
                       <svg
@@ -158,7 +160,7 @@ export default function PricingContent() {
                 <div className="flex-1">
                   <div className="mb-8">
                     <h3 className="font-heading mb-2 text-2xl font-bold text-white">
-                      Enterprise
+                      Large
                     </h3>
                     <div className="mb-4">
                       <span className="text-4xl font-bold text-white">
@@ -167,7 +169,7 @@ export default function PricingContent() {
                       <span className="text-gray-400">/month</span>
                     </div>
                     <p className="text-gray-400">
-                      Best value for growing companies
+                      Enhanced performance for growing companies
                     </p>
                   </div>
                   <ul className="mb-8 space-y-4">
@@ -201,7 +203,7 @@ export default function PricingContent() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      50GB storage allocation
+                      Up to 25M rows per table
                     </li>
                     <li className="flex items-start text-gray-300">
                       <svg
@@ -217,7 +219,7 @@ export default function PricingContent() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      Dedicated instance with up to 10 subgraphs
+                      14 GB dedicated RAM with up to 10 subgraphs
                     </li>
                     <li className="flex items-start text-gray-300">
                       <svg
@@ -268,7 +270,7 @@ export default function PricingContent() {
                 <div className="flex-1">
                   <div className="mb-8">
                     <h3 className="font-heading mb-2 text-2xl font-bold text-white">
-                      Premium
+                      XLarge
                     </h3>
                     <div className="mb-4">
                       <span className="text-4xl font-bold text-white">
@@ -277,7 +279,7 @@ export default function PricingContent() {
                       <span className="text-gray-400">/month</span>
                     </div>
                     <p className="text-gray-400">
-                      For larger companies with data-intensive operations
+                      Maximum performance for data-intensive operations
                     </p>
                   </div>
                   <ul className="mb-8 space-y-4">
@@ -311,7 +313,7 @@ export default function PricingContent() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      100GB storage allocation
+                      Up to 100M rows per table
                     </li>
                     <li className="flex items-start text-gray-300">
                       <svg
@@ -327,7 +329,7 @@ export default function PricingContent() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      Premium dedicated instance with up to 25 subgraphs
+                      30 GB dedicated RAM with up to 25 subgraphs
                     </li>
                     <li className="flex items-start text-gray-300">
                       <svg

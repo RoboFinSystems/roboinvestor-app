@@ -101,8 +101,8 @@ export function SubgraphReviewStep({
             <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
               <ul className="list-inside list-disc space-y-1">
                 <li>The subgraph will be created as an isolated environment</li>
-                <li>You can manage data separately from the parent graph</li>
-                <li>All changes in the subgraph are isolated until merged</li>
+                <li>Data in the subgraph is isolated from the parent graph</li>
+                <li>You can manage and write data independently</li>
                 <li>Make sure the subgraph name is unique and descriptive</li>
               </ul>
             </div>

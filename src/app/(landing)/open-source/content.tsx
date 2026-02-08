@@ -2,7 +2,6 @@ import FloatingElementsVariant from '@/components/landing/FloatingElementsVarian
 import Footer from '@/components/landing/Footer'
 import Header from '@/components/landing/Header'
 import AiIntegrationMcp from '@/components/open-source/AiIntegrationMcp'
-import AwsInfrastructure from '@/components/open-source/AwsInfrastructure'
 import BootstrapGuide from '@/components/open-source/BootstrapGuide'
 import ClientLibraries from '@/components/open-source/ClientLibraries'
 import GettingStarted from '@/components/open-source/GettingStarted'
@@ -57,7 +56,6 @@ export default function OpenSourceContent() {
         </section>
 
         <ClientLibraries />
-        <AwsInfrastructure />
         <BootstrapGuide />
 
         {/* CTA Section */}
@@ -73,7 +71,7 @@ export default function OpenSourceContent() {
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="https://github.com/RoboFinSystems/robosystems"
+                href="https://github.com/RoboFinSystems/robosystems/fork"
                 className="flex items-center gap-2 rounded-lg bg-linear-to-r from-cyan-500 to-blue-500 px-8 py-3 font-medium text-white transition-all hover:shadow-lg hover:shadow-cyan-500/25"
               >
                 <svg
@@ -87,7 +85,7 @@ export default function OpenSourceContent() {
                     clipRule="evenodd"
                   />
                 </svg>
-                Clone Repo
+                Fork on GitHub
               </a>
               <a
                 href="https://github.com/RoboFinSystems/robosystems/wiki"

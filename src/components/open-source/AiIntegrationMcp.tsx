@@ -84,28 +84,45 @@ export default function AiIntegrationMcp() {
           </pre>
         </div>
 
-        <div className="rounded-xl bg-black/50 p-4">
-          <h4 className="mb-3 text-sm font-semibold text-white">
-            Example Questions You Can Ask Claude:
-          </h4>
-          <ul className="space-y-2 text-sm text-gray-300">
-            <li className="flex items-start">
-              <span className="mr-2 text-purple-400">•</span>
-              "What was Apple's revenue for the last 5 years?"
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2 text-purple-400">•</span>
-              "Compare NVIDIA and AMD net income trends"
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2 text-purple-400">•</span>
-              "Show me Tesla's total assets by quarter"
-            </li>
-            <li className="flex items-start">
-              <span className="mr-2 text-purple-400">•</span>
-              "What are the most recent earnings per share for Microsoft?"
-            </li>
-          </ul>
+        <div className="space-y-4 rounded-xl bg-black/50 p-4">
+          <div>
+            <h4 className="mb-3 text-sm font-semibold text-white">
+              Query Your Knowledge Graph:
+            </h4>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start">
+                <span className="mr-2 text-purple-400">•</span>
+                "What was Apple's revenue for the last 5 years?"
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-purple-400">•</span>
+                "Compare NVIDIA and AMD net income trends"
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-purple-400">•</span>
+                "Show me Tesla's total assets by quarter"
+              </li>
+            </ul>
+          </div>
+          <div className="border-t border-purple-500/20 pt-4">
+            <h4 className="mb-3 text-sm font-semibold text-white">
+              AI Memory & Workspaces:
+            </h4>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li className="flex items-start">
+                <span className="mr-2 text-purple-400">•</span>
+                "Create a memory workspace and save what we found about margins"
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-purple-400">•</span>
+                "What patterns did we identify in last quarter's analysis?"
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-purple-400">•</span>
+                "Fork the graph and build a custom element mapping"
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
