@@ -13,6 +13,7 @@ interface FloatingElementsVariantProps {
     | 'platform-investment'
     | 'hero'
     | 'product'
+    | 'sec-repository'
     | 'applications'
     | 'integrations'
     | 'opensource'
@@ -128,6 +129,15 @@ export default function FloatingElementsVariant({
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="animate-float absolute -top-32 left-0 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-blue-600/12 to-cyan-600/12 blur-3xl"></div>
           <div className="animate-float-slow absolute right-1/3 bottom-0 h-[550px] w-[550px] rounded-full bg-gradient-to-br from-green-600/10 to-teal-600/10 blur-3xl"></div>
+        </div>
+      )
+
+    case 'sec-repository':
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="animate-float-slow absolute -top-20 left-1/4 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-cyan-600/15 to-blue-600/15 blur-3xl"></div>
+          <div className="animate-float-slower absolute -right-32 bottom-1/3 h-[550px] w-[550px] rounded-full bg-gradient-to-br from-blue-600/12 to-indigo-600/12 blur-3xl"></div>
+          <div className="animate-float absolute top-2/3 left-0 h-[450px] w-[450px] rounded-full bg-gradient-to-br from-cyan-600/8 to-teal-600/8 blur-3xl"></div>
         </div>
       )
 

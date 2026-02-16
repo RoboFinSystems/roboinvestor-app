@@ -56,11 +56,8 @@ export default function GettingStarted() {
 git clone https://github.com/RoboFinSystems/robosystems.git
 cd robosystems
 
-# Install uv (Python package and version manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install just (command runner)
-uv tool install rust-just
+# Install uv and just
+brew install uv just
 
 # Start all services via Docker Compose
 just start

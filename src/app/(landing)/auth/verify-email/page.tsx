@@ -34,9 +34,9 @@ function VerifyEmailContent() {
           setStatus('success')
           setMessage(result.message || 'Email verified successfully!')
 
-          // Redirect to dashboard after 3 seconds
+          // Redirect to home after 3 seconds
           timeoutId = setTimeout(() => {
-            router.push('/dashboard')
+            router.push('/home')
           }, 3000)
         } else {
           setStatus('error')
@@ -82,7 +82,7 @@ function VerifyEmailContent() {
               </h2>
               <p className="mt-2 text-gray-600 dark:text-gray-400">{message}</p>
               <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                Redirecting to dashboard...
+                Redirecting...
               </p>
             </>
           )}
