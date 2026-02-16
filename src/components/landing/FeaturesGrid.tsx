@@ -234,11 +234,11 @@ export default function FeaturesGrid() {
                 </svg>
               </div>
               <h3 className="font-heading mb-3 text-center text-lg font-semibold text-white sm:text-xl">
-                Isolated & Scalable
+                Isolated & Organized
               </h3>
               <p className="mb-4 text-sm text-gray-300 sm:text-base">
-                Your data lives in its own graph. Scale from startup to
-                enterprise without migration.
+                Your data lives in its own graph. Keep teams, projects, and AI
+                workspaces cleanly separated.
               </p>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li className="flex items-start">
@@ -252,10 +252,6 @@ export default function FeaturesGrid() {
                 <li className="flex items-start">
                   <span className="mr-2 text-cyan-400">•</span>
                   One-click backup and restore
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 text-cyan-400">•</span>
-                  Upgrade tiers without downtime
                 </li>
               </ul>
             </div>
@@ -284,7 +280,8 @@ export default function FeaturesGrid() {
                 Enterprise Security
               </h3>
               <p className="mb-4 text-sm text-gray-300 sm:text-base">
-                Bank-grade security for your most sensitive financial data.
+                Built with security in mind for your most sensitive financial
+                data.
               </p>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li className="flex items-start">

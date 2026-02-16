@@ -4,10 +4,13 @@ import ContactModal from '@/components/landing/ContactModal'
 import FloatingElementsVariant from '@/components/landing/FloatingElementsVariant'
 import Footer from '@/components/landing/Footer'
 import Header from '@/components/landing/Header'
+import { useUser } from '@/lib/core/hooks'
+import Link from 'next/link'
 import { useState } from 'react'
 
 export default function PricingContent() {
   const [showContact, setShowContact] = useState(false)
+  const { isAuthenticated } = useUser()
 
   return (
     <div className="min-h-screen bg-black">
@@ -139,9 +142,15 @@ export default function PricingContent() {
                   </ul>
                 </div>
                 <div className="flex flex-col gap-3">
+                  <Link
+                    href={isAuthenticated ? '/home' : '/register'}
+                    className="block w-full rounded-lg bg-cyan-500/80 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-cyan-600/80"
+                  >
+                    {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+                  </Link>
                   <button
                     onClick={() => setShowContact(true)}
-                    className="block w-full rounded-lg border border-cyan-700 bg-cyan-500/80 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-cyan-800/80"
+                    className="block w-full rounded-lg border border-cyan-700 py-3 text-center font-medium text-gray-300 transition-all duration-300 hover:bg-cyan-800/20 hover:text-white"
                   >
                     Contact Sales
                   </button>
@@ -253,14 +262,22 @@ export default function PricingContent() {
                     </li>
                   </ul>
                 </div>
-                <button
-                  onClick={() => {
-                    setShowContact(true)
-                  }}
-                  className="block w-full rounded-lg bg-orange-600 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-orange-700"
-                >
-                  Contact Sales
-                </button>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href={isAuthenticated ? '/home' : '/register'}
+                    className="block w-full rounded-lg bg-orange-600 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-orange-700"
+                  >
+                    {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setShowContact(true)
+                    }}
+                    className="block w-full rounded-lg border border-orange-600 py-3 text-center font-medium text-gray-300 transition-all duration-300 hover:bg-orange-900/20 hover:text-white"
+                  >
+                    Contact Sales
+                  </button>
+                </div>
               </div>
 
               {/* Premium */}
@@ -363,14 +380,22 @@ export default function PricingContent() {
                     </li>
                   </ul>
                 </div>
-                <button
-                  onClick={() => {
-                    setShowContact(true)
-                  }}
-                  className="block w-full rounded-lg border border-purple-500/50 bg-purple-500/80 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-purple-900/30"
-                >
-                  Contact Sales
-                </button>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href={isAuthenticated ? '/home' : '/register'}
+                    className="block w-full rounded-lg bg-purple-500/80 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-purple-600/80"
+                  >
+                    {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setShowContact(true)
+                    }}
+                    className="block w-full rounded-lg border border-purple-500/50 py-3 text-center font-medium text-gray-300 transition-all duration-300 hover:bg-purple-900/20 hover:text-white"
+                  >
+                    Contact Sales
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -453,14 +478,24 @@ export default function PricingContent() {
                       </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      setShowContact(true)
-                    }}
-                    className="mt-6 block w-full rounded-lg border border-green-700 bg-green-500/80 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-green-800/80"
-                  >
-                    Contact Sales
-                  </button>
+                  <div className="mt-6 flex flex-col gap-3">
+                    <Link
+                      href={
+                        isAuthenticated ? '/repositories/browse' : '/register'
+                      }
+                      className="block w-full rounded-lg bg-green-500/80 py-3 text-center font-medium text-white transition-all duration-300 hover:bg-green-600/80"
+                    >
+                      {isAuthenticated ? 'Browse Repositories' : 'Get Started'}
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setShowContact(true)
+                      }}
+                      className="block w-full rounded-lg border border-green-700 py-3 text-center font-medium text-gray-300 transition-all duration-300 hover:bg-green-800/20 hover:text-white"
+                    >
+                      Contact Sales
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -507,24 +542,25 @@ export default function PricingContent() {
               Ready to Transform Your Financial Data?
             </h2>
             <p className="mb-8 text-lg text-gray-400">
-              Start building your knowledge graph today with our enterprise
-              platform
+              {isAuthenticated
+                ? 'Manage your graphs and subscriptions from your dashboard'
+                : 'Create a free account and start building your knowledge graph today'}
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link
+                href={isAuthenticated ? '/home' : '/register'}
+                className="rounded-lg bg-linear-to-r from-cyan-500 to-blue-500 px-8 py-3 font-medium text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-cyan-500/40"
+              >
+                {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+              </Link>
               <button
                 onClick={() => {
                   setShowContact(true)
                 }}
-                className="rounded-lg bg-linear-to-r from-cyan-500 to-blue-500 px-8 py-3 font-medium text-white transition-all hover:shadow-lg hover:shadow-cyan-500/25"
+                className="rounded-lg border border-gray-700 px-8 py-3 font-medium text-gray-300 transition-all hover:border-gray-500 hover:text-white"
               >
                 Contact Sales
               </button>
-              <a
-                href="/open-source"
-                className="rounded-lg border border-gray-700 bg-zinc-800 px-8 py-3 font-medium text-white transition-all hover:bg-zinc-700"
-              >
-                Deploy Open Source
-              </a>
             </div>
           </div>
         </section>

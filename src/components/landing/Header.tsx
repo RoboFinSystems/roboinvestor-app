@@ -61,7 +61,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden space-x-6 md:flex">
+          <nav className="hidden space-x-6 lg:flex">
             <Link
               href="/platform"
               className="px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-cyan-400"
@@ -97,12 +97,24 @@ export default function Header() {
               </svg>
               GitHub
             </a>
+            <Link
+              href="/login"
+              className="px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-white"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-lg bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-cyan-500/40"
+            >
+              Register
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex items-center justify-center p-2 text-gray-300 transition-colors hover:text-cyan-400 md:hidden"
+            className="flex items-center justify-center p-2 text-gray-300 transition-colors hover:text-cyan-400 lg:hidden"
             aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? (
@@ -141,7 +153,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="border-t border-gray-800 py-4 md:hidden">
+          <nav className="border-t border-gray-800 py-4 lg:hidden">
             <div className="flex flex-col space-y-2">
               <Link
                 href="/platform"
@@ -187,6 +199,22 @@ export default function Header() {
                 </svg>
                 GitHub
               </a>
+              <div className="border-t border-gray-800 pt-2">
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="mx-4 mt-2 block rounded-lg bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-center text-sm font-medium text-white shadow-lg shadow-cyan-500/25"
+                >
+                  Register
+                </Link>
+              </div>
             </div>
           </nav>
         )}

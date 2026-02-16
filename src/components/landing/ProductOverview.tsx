@@ -10,7 +10,7 @@ export default function ProductOverview() {
         {/* Main Headline */}
         <div className="mb-16 text-center">
           <p className="mb-4 text-sm font-semibold tracking-wider text-cyan-400 uppercase">
-            Beyond GraphRAG
+            How It Works
           </p>
           <h2 className="font-heading mb-6 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
             The Financial Context Graph

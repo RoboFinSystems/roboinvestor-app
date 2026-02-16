@@ -105,6 +105,22 @@ export default function Footer() {
                   Open Source
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/login"
+                  className="text-gray-400 transition-colors hover:text-white"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/register"
+                  className="text-gray-400 transition-colors hover:text-white"
+                >
+                  Register
+                </Link>
+              </li>
             </ul>
           </div>
 

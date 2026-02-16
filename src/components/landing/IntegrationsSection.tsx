@@ -26,7 +26,7 @@ export default function IntegrationsSection() {
           </h3>
           <div className="grid gap-6 md:grid-cols-3">
             {/* QuickBooks */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 transition-all hover:border-green-500/50">
+            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 opacity-75 transition-all hover:border-green-500/50">
               <div className="mb-4 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-600">
                   <span className="text-lg font-bold text-white">QB</span>
@@ -35,6 +35,9 @@ export default function IntegrationsSection() {
                   <h4 className="font-semibold text-white">QuickBooks</h4>
                   <p className="text-sm text-gray-400">Accounting</p>
                 </div>
+                <span className="rounded-full bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-400">
+                  In Development
+                </span>
               </div>
               <p className="text-sm text-gray-400">
                 Sync your chart of accounts, transactions, and trial balance.
@@ -57,6 +60,12 @@ export default function IntegrationsSection() {
                 Import 10-K and 10-Q filings for any public company. Structured
                 XBRL facts become queryable graph nodes.
               </p>
+              <Link
+                href="#sec-repository"
+                className="mt-3 inline-block text-sm text-cyan-400 hover:text-cyan-300"
+              >
+                See the SEC Repository →
+              </Link>
             </div>
 
             {/* Plaid */}
@@ -206,88 +215,6 @@ export default function IntegrationsSection() {
     └── processors/
         └── transform.py`}</code>
               </pre>
-            </div>
-          </div>
-        </div>
-
-        {/* SEC Shared Repository - Flagship Data Product */}
-        <div>
-          <h3 className="mb-8 text-center text-lg font-semibold text-gray-300">
-            Shared Repositories
-          </h3>
-          <div className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-cyan-950/30 to-zinc-900 p-6 sm:p-8">
-            <div className="grid gap-8 lg:grid-cols-5">
-              <div className="lg:col-span-3">
-                <div className="mb-4 flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-cyan-600">
-                    <span className="text-xl font-bold text-white">SEC</span>
-                  </div>
-                  <div>
-                    <h4 className="font-heading text-xl font-semibold text-white">
-                      SEC XBRL Repository
-                    </h4>
-                    <p className="text-sm text-cyan-400">
-                      Subscribe and query instantly
-                    </p>
-                  </div>
-                </div>
-                <p className="mb-6 text-gray-300">
-                  A pre-built context graph containing financial data from every
-                  public company's SEC filings. Subscribe once, and your AI
-                  agents gain instant access to market intelligence for
-                  benchmarking, competitive analysis, and research.
-                </p>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg bg-black/30 p-3 text-center">
-                    <div className="text-2xl font-bold text-cyan-400">
-                      4,000+
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Public Companies
-                    </div>
-                  </div>
-                  <div className="rounded-lg bg-black/30 p-3 text-center">
-                    <div className="text-2xl font-bold text-cyan-400">
-                      100K+
-                    </div>
-                    <div className="text-xs text-gray-500">XBRL Filings</div>
-                  </div>
-                  <div className="rounded-lg bg-black/30 p-3 text-center">
-                    <div className="text-2xl font-bold text-cyan-400">
-                      Daily
-                    </div>
-                    <div className="text-xs text-gray-500">Updates</div>
-                  </div>
-                </div>
-              </div>
-              <div className="lg:col-span-2">
-                <div className="rounded-xl bg-black/30 p-4">
-                  <p className="mb-3 text-sm font-medium text-white">
-                    Example: Compare R&D spending
-                  </p>
-                  <div className="rounded-lg bg-zinc-900 p-3">
-                    <p className="text-sm text-gray-300 italic">
-                      "Compare Microsoft and Google's R&D spending as a
-                      percentage of revenue over the last 3 years"
-                    </p>
-                  </div>
-                  <p className="mt-4 text-xs text-gray-400">
-                    Your AI traverses the SEC repository to pull standardized
-                    XBRL facts, calculate ratios, and return comparative
-                    analysis—all from a natural language query.
-                  </p>
-                </div>
-                <div className="mt-4 rounded-xl border border-dashed border-gray-700 bg-black/20 p-4">
-                  <p className="mb-2 text-sm font-medium text-white">
-                    Coming Soon
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Market data partnerships, industry benchmarks, and economic
-                    indicators—subscribe through the data marketplace or bring
-                    your own vendor credentials.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

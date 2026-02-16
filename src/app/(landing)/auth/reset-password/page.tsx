@@ -117,11 +117,11 @@ function ResetPasswordContent() {
 
       if (result.success) {
         setStatus('success')
-        setMessage('Password reset successfully! Redirecting to dashboard...')
+        setMessage('Password reset successfully! Redirecting...')
 
         // Redirect after 2 seconds
         const timeoutId = setTimeout(() => {
-          router.push('/dashboard')
+          router.push('/home')
         }, 2000)
         setRedirectTimeout(timeoutId)
       } else {

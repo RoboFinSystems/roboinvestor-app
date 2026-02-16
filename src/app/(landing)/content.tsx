@@ -9,6 +9,7 @@ import HeroSection from '@/components/landing/HeroSection'
 import IntegrationsSection from '@/components/landing/IntegrationsSection'
 import OpenSourceSection from '@/components/landing/OpenSourceSection'
 import ProductOverview from '@/components/landing/ProductOverview'
+import SECRepositorySection from '@/components/landing/SECRepositorySection'
 
 export default function LandingPageContent() {
   return (
@@ -18,6 +19,7 @@ export default function LandingPageContent() {
       <main>
         <HeroSection />
         <ProductOverview />
+        <SECRepositorySection />
         <FeaturesGrid />
         <IntegrationsSection />
         <ApplicationsSection />
