@@ -28,7 +28,7 @@ export default function ProductOverview() {
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-4 md:grid-cols-3">
               {/* Stage 1: Scattered Data */}
-              <div className="relative rounded-2xl border border-gray-800 bg-gradient-to-br from-zinc-900 to-zinc-800 p-6">
+              <div className="relative rounded-2xl border border-gray-800 bg-linear-to-br from-zinc-900 to-zinc-800 p-6">
                 <div className="absolute -top-3 left-6">
                   <span className="rounded-full bg-gray-700 px-3 py-1 text-xs font-medium text-gray-300">
                     Before
@@ -97,7 +97,7 @@ export default function ProductOverview() {
               </div>
 
               {/* Stage 2: Context Graph */}
-              <div className="relative rounded-2xl border border-cyan-500/50 bg-gradient-to-br from-cyan-950/40 to-zinc-900 p-6">
+              <div className="relative rounded-2xl border border-cyan-500/50 bg-linear-to-br from-cyan-950/40 to-zinc-900 p-6">
                 <div className="absolute -top-3 left-6">
                   <span className="rounded-full bg-cyan-600 px-3 py-1 text-xs font-medium text-white">
                     After
@@ -180,7 +180,7 @@ export default function ProductOverview() {
           </h3>
           <div className="grid gap-6 md:grid-cols-3">
             {/* Multi-hop Reasoning */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6">
+            <div className="group rounded-xl border border-gray-800 bg-zinc-900/50 p-6 transition-all duration-300 hover:border-gray-700">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/20">
                 <svg
                   className="h-6 w-6 text-purple-400"
@@ -212,7 +212,7 @@ export default function ProductOverview() {
             </div>
 
             {/* Semantic Understanding */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6">
+            <div className="group rounded-xl border border-gray-800 bg-zinc-900/50 p-6 transition-all duration-300 hover:border-gray-700">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/20">
                 <svg
                   className="h-6 w-6 text-cyan-400"
@@ -229,23 +229,24 @@ export default function ProductOverview() {
                 </svg>
               </div>
               <h4 className="mb-2 font-semibold text-white">
-                Semantic Understanding
+                Vector Semantic Search
               </h4>
               <p className="mb-4 text-sm text-gray-400">
-                AI understands financial concepts, not just keywords. Revenue
-                isn't a string—it's connected to segments, periods, and
-                standards.
+                Every element is enriched with embeddings and mapped to a
+                canonical taxonomy. AI agents resolve concepts like
+                &ldquo;revenue&rdquo; to exact XBRL elements via vector
+                similarity&mdash;no keyword matching required.
               </p>
               <div className="rounded-lg bg-black/30 p-3">
                 <p className="text-xs text-gray-500 italic">
-                  "Show me all revenue recognition changes across our
-                  subsidiaries"
+                  &ldquo;resolve-element: revenue for NVDA&rdquo; &rarr;
+                  us-gaap:RevenueFromContract... (0.97 confidence)
                 </p>
               </div>
             </div>
 
             {/* Institutional Memory */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6">
+            <div className="group rounded-xl border border-gray-800 bg-zinc-900/50 p-6 transition-all duration-300 hover:border-gray-700">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/20">
                 <svg
                   className="h-6 w-6 text-orange-400"

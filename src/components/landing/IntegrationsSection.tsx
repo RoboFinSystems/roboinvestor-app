@@ -26,7 +26,7 @@ export default function IntegrationsSection() {
           </h3>
           <div className="grid gap-6 md:grid-cols-3">
             {/* QuickBooks */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 opacity-75 transition-all hover:border-green-500/50">
+            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 opacity-75 transition-all duration-300 hover:border-green-500/50">
               <div className="mb-4 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-600">
                   <span className="text-lg font-bold text-white">QB</span>
@@ -46,7 +46,7 @@ export default function IntegrationsSection() {
             </div>
 
             {/* SEC XBRL */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 transition-all hover:border-purple-500/50">
+            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 transition-all duration-300 hover:border-purple-500/50">
               <div className="mb-4 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600">
                   <span className="text-lg font-bold text-white">SEC</span>
@@ -69,7 +69,7 @@ export default function IntegrationsSection() {
             </div>
 
             {/* Plaid */}
-            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 opacity-75 transition-all hover:border-blue-500/50">
+            <div className="rounded-xl border border-gray-800 bg-zinc-900/50 p-6 opacity-75 transition-all duration-300 hover:border-blue-500/50">
               <div className="mb-4 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600">
                   <svg
@@ -103,7 +103,7 @@ export default function IntegrationsSection() {
         </div>
 
         {/* Extensibility */}
-        <div className="mb-16 rounded-2xl border border-gray-800 bg-gradient-to-br from-zinc-900 to-zinc-800/50 p-6 sm:p-8">
+        <div className="mb-16 rounded-2xl border border-gray-800 bg-linear-to-br from-zinc-900 to-zinc-800/50 p-6 sm:p-8">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
               <h3 className="font-heading mb-4 text-xl font-semibold text-white sm:text-2xl">
