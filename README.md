@@ -5,9 +5,8 @@
 RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and Claude-powered investment insights via the RoboSystems knowledge graph.
 
 - **Portfolio Intelligence**: Track and analyze investment holdings with AI-powered insights and recommendations
-- **Securities Analysis**: Real-time market data integration with intelligent pattern recognition
 - **Natural Language Queries**: Ask questions about your portfolio in plain English and get instant answers
-- **AI-Powered Guidance**: Leverage Claude AI for investment analysis that understands market context
+- **AI-Powered Guidance**: Leverage Claude AI for investment analysis via the knowledge graph
 - **Knowledge Graph Foundation**: Investment data modeled as a semantic graph preserving relationships
 - **MCP Integration**: Model Context Protocol support for Claude Desktop and Claude Code
 
@@ -15,23 +14,20 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 
 ### Available Now
 
-- **Interactive Console**: Natural language and Cypher query terminal for graph exploration
+- **AI Console**: Natural language and Cypher query terminal with streaming results and MCP integration
 - **Entity Browser**: Search and manage entities across graphs with relationships
 - **Graph Creation**: Wizard-based portfolio graph setup with schema selection
-- **AI Chat**: Natural language interface for investment queries and analysis
 - **API Keys**: Secure programmatic access with key creation and rotation
-- **Settings**: Profile management and credit balance monitoring
-- **Authentication**: Full auth flow with session management
+- **Settings**: Profile and password management
 
 ### Roadmap
 
 - **Investment Dashboard**: Personalized portfolio overview with key metrics and AI insights
-- **Securities Management**: Track stocks, bonds, and other securities with real-time data
-- **Portfolio Tracking**: Real-time position tracking, performance, and cost basis
+- **Securities Management**: Track stocks, bonds, and other securities with market data
+- **Portfolio Tracking**: Position tracking, performance, and cost basis
 - **Asset Allocation**: Visualization by sector, asset class, and geography
 - **Risk Analytics**: Beta, volatility, Sharpe ratio, and correlation analysis
 - **Dividend Tracking**: Yield monitoring and reinvestment tracking
-- **Report Generation**: Create and share investment reports with stakeholders
 
 ## Quick Start
 
@@ -70,6 +66,16 @@ npm run format:check     # Check formatting compliance
 npm run typecheck        # TypeScript type checking
 ```
 
+### SDLC Commands
+
+```bash
+npm run feature:create   # Create a feature branch
+npm run pr:create        # Create pull request
+npm run release:create   # Create GitHub release
+npm run deploy:staging   # Deploy to staging environment
+npm run deploy:prod      # Deploy to production
+```
+
 ### Core Subtree Management
 
 ```bash
@@ -103,27 +109,10 @@ See the **[Bootstrap Guide](https://github.com/RoboFinSystems/robosystems/wiki/B
 
 **Application Layer:**
 
-- Next.js 15 App Router with React Server Components
+- Next.js 16 App Router
 - TypeScript 5 for type safety
 - Flowbite React with Tailwind CSS for UI components
 - RoboSystems Client SDK for API communication and authentication
-
-**Key Features:**
-
-- **Interactive Console**: Natural language and Cypher query terminal with streaming results, built-in commands, and MCP setup guides
-- **Entity Browser**: Search and manage entities across graphs with parent/subsidiary relationships
-- **Graph Creation**: Wizard-based portfolio graph setup with RoboInvestor schema extensions
-- **AI Chat**: Natural language interface for investment queries and analysis
-- **Settings**: Profile management, API keys, and credit balance monitoring
-
-**Roadmap Features:**
-
-- **Investment Dashboard**: Personalized portfolio overview with key metrics and AI insights
-- **Securities Management**: Track stocks, bonds, and other securities with real-time data
-- **Portfolio Tracking**: Real-time position tracking, performance metrics, and cost basis
-- **Asset Allocation**: Visualization by sector, asset class, and geography
-- **Risk Analytics**: Beta, volatility, Sharpe ratio, and correlation analysis
-- **Dividend Tracking**: Yield monitoring and reinvestment tracking
 
 **Core Library (`/src/lib/core/`):**
 
@@ -133,7 +122,7 @@ Shared modules maintained as a git subtree across RoboSystems frontend apps:
 - Session management and JWT handling
 - Graph creation wizard and shared components
 - Layout, forms, chat, and settings components
-- User, company, graph, and credit contexts
+- Graph, organization, and entity contexts
 - SSE-based background job progress tracking
 
 **Infrastructure:**
@@ -144,18 +133,10 @@ Shared modules maintained as a git subtree across RoboSystems frontend apps:
 
 ## CI/CD
 
-### Workflows
-
 - **`prod.yml`**: Production deployment to roboinvestor.ai
 - **`staging.yml`**: Staging deployment to staging.roboinvestor.ai
 - **`test.yml`**: Automated testing on pull requests
 - **`build.yml`**: Docker image building for ECR
-
-### Infrastructure
-
-- **AWS App Runner** with auto-scaling
-- **S3 + CloudFront** for static asset hosting
-- **CloudFormation** templates in `/cloudformation/`
 
 ## Support
 
@@ -168,4 +149,4 @@ Shared modules maintained as a git subtree across RoboSystems frontend apps:
 
 Apache License 2.0 - see [LICENSE](LICENSE) for details.
 
-Apache-2.0 © 2025 RFS LLC
+Apache-2.0 © 2026 RFS LLC
