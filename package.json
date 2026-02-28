@@ -42,10 +42,10 @@
     "setup:bootstrap": "./bin/bootstrap.sh"
   },
   "dependencies": {
-    "@robosystems/client": "0.2.31",
+    "@robosystems/client": "^0.2.32",
     "flowbite": "^3.1",
     "flowbite-react": "^0.12.5",
-    "next": "^16.1.6",
+    "next": "^15.5.11",
     "react": "^19",
     "react-dom": "^19",
     "react-icons": "^4",

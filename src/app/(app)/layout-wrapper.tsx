@@ -1,7 +1,14 @@
 'use client'
 
 import { EntitySelectorDropdown } from '@/components/EntitySelectorDropdown'
-import { CoreNavbar, CoreSidebar } from '@/lib/core'
+import {
+  CoreNavbar,
+  CoreSidebar,
+  GraphFilters,
+  onlyRepositories,
+  useGraphContext,
+} from '@/lib/core'
+import { useMemo } from 'react'
 import { LayoutContent } from './layout-content'
 import { useRoboInvestorSidebarConfig } from './sidebar-config'
 
@@ -10,7 +17,26 @@ interface LayoutWrapperProps {
 }
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
-  const sidebarConfig = useRoboInvestorSidebarConfig()
+  const { state } = useGraphContext()
+
+  // Roboinvestor entity graphs (for Entity, Portfolio)
+  const hasEntityGraph = useMemo(
+    () => state.graphs.filter(GraphFilters.roboinvestor).length > 0,
+    [state.graphs]
+  )
+
+  // Roboinvestor graphs OR shared repositories like SEC (for Console)
+  const hasAnyGraph = useMemo(
+    () =>
+      state.graphs.filter(GraphFilters.roboinvestor).length > 0 ||
+      state.graphs.filter(onlyRepositories).length > 0,
+    [state.graphs]
+  )
+
+  const sidebarConfig = useRoboInvestorSidebarConfig({
+    hasEntityGraph,
+    hasAnyGraph,
+  })
 
   return (
     <>
@@ -24,7 +50,6 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
         <CoreSidebar
           navigationItems={sidebarConfig.navigationItems}
           features={sidebarConfig.features}
-          bottomMenuActions={sidebarConfig.bottomMenuActions}
           borderColorClass="dark:border-gray-800"
         />
         <LayoutContent>{children}</LayoutContent>

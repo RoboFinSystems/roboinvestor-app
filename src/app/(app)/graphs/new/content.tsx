@@ -51,6 +51,7 @@ export function NewGraphContent() {
       // RoboInvestor-specific configuration
       allowGenericGraphs={false} // Only allow entity graphs
       requiredExtensions={['roboinvestor']} // Require roboinvestor schema
+      allowedExtensions={['roboinvestor', 'roboledger']} // Only show relevant schemas
       requireInitialEntity={true} // Always create with initial entity
       showTierSelection={true}
       onSuccess={handleSuccess}
