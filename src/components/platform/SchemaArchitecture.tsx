@@ -46,7 +46,7 @@ export default function SchemaArchitecture() {
       name: 'Base Schema',
       description: 'Foundation for all data',
       components: ['Entity', 'Taxonomy', 'Element', 'Period', 'Unit'],
-      icon: '/images/logo.png',
+      icon: '/images/logos/robosystems.png',
       useImage: true,
     },
     {
@@ -105,7 +105,7 @@ export default function SchemaArchitecture() {
           </h2>
           <p className="mx-auto max-w-3xl text-gray-400">
             Unify disparate financial data sources into a cohesive, queryable
-            context graph that powers advanced analytics and AI-native
+            knowledge graph that powers advanced analytics and AI-native
             applications
           </p>
         </div>

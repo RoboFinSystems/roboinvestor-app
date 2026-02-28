@@ -133,7 +133,6 @@ export function CheckoutContent({ sessionId }: CheckoutContentProps) {
     showError,
     handleApiError,
     refreshGraphs,
-    setCurrentGraph,
   ])
 
   useEffect(() => {

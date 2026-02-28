@@ -148,10 +148,9 @@ export default function SECRepositorySection() {
             Every Public Company. One Knowledge Graph.
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
-            A pre-built context graph of every public company&apos;s SEC
-            filings, semantically enriched with vector embeddings. AI agents
-            resolve financial concepts by meaning&mdash;not keywords&mdash;using
-            a canonical taxonomy of 40+ financial concepts.
+            A pre-built knowledge graph of every public company&apos;s SEC
+            filings. Subscribe once and your AI agents gain instant access to
+            market intelligence&mdash;no data pipeline setup required.
           </p>
         </div>
 
