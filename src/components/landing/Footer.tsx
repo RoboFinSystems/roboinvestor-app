@@ -131,7 +131,10 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="https://robosystems.ai"
+                  href={
+                    process.env.NEXT_PUBLIC_ROBOSYSTEMS_APP_URL ||
+                    'https://robosystems.ai'
+                  }
                   className="text-gray-400 transition-colors hover:text-white"
                 >
                   RoboSystems
@@ -139,7 +142,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="https://roboledger.ai"
+                  href={
+                    process.env.NEXT_PUBLIC_ROBOLEDGER_APP_URL ||
+                    'https://roboledger.ai'
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 transition-colors hover:text-white"
@@ -149,7 +155,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="https://roboinvestor.ai"
+                  href={
+                    process.env.NEXT_PUBLIC_ROBOINVESTOR_APP_URL ||
+                    'https://roboinvestor.ai'
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 transition-colors hover:text-white"
