@@ -4,6 +4,7 @@ import { EntitySelectorDropdown } from '@/components/EntitySelectorDropdown'
 import {
   CoreNavbar,
   CoreSidebar,
+  CURRENT_APP,
   GraphFilters,
   onlyRepositories,
   useGraphContext,
@@ -42,7 +43,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     <>
       <CoreNavbar
         appName="RoboInvestor"
-        currentApp="roboinvestor"
+        currentApp={CURRENT_APP}
         borderColorClass="dark:border-gray-800"
         additionalComponents={<EntitySelectorDropdown />}
       />
