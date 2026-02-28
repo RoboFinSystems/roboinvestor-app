@@ -205,7 +205,7 @@ export default function OpenSourceSection() {
                 </h3>
               </div>
               <p className="mb-4 text-sm text-gray-300">
-                The platform is free. We help you succeed with it.
+                The platform is open source. We help you succeed with it.
               </p>
 
               <ul className="mb-4 space-y-2 text-sm text-gray-400">

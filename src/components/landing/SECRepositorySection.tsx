@@ -159,12 +159,12 @@ export default function SECRepositorySection() {
           {[
             { value: '4,000+', label: 'Public Companies' },
             { value: '100K+', label: 'XBRL Filings' },
+            { value: '40+', label: 'Canonical Concepts' },
             { value: 'Daily', label: 'Updates' },
-            { value: '10-K & 10-Q', label: 'Financial Statements' },
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl border border-gray-800 bg-zinc-900/50 p-4 text-center sm:p-6"
+              className="rounded-xl border border-gray-800 bg-zinc-900/50 p-4 text-center transition-all duration-300 hover:border-gray-700 sm:p-6"
             >
               <div className="text-2xl font-bold text-cyan-400 sm:text-3xl">
                 {stat.value}
@@ -232,7 +232,7 @@ export default function SECRepositorySection() {
           {/* Access Methods - Right */}
           <div className="flex flex-col gap-4 lg:col-span-2">
             {/* MCP Clients */}
-            <div className="flex-1 rounded-xl border border-gray-800 bg-zinc-900/50 p-5">
+            <div className="flex-1 rounded-xl border border-gray-800 bg-zinc-900/50 p-5 transition-all duration-300 hover:border-gray-700">
               <div className="mb-2 flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/20">
                   <svg
@@ -258,7 +258,7 @@ export default function SECRepositorySection() {
             </div>
 
             {/* MCP Protocol */}
-            <div className="flex-1 rounded-xl border border-gray-800 bg-zinc-900/50 p-5">
+            <div className="flex-1 rounded-xl border border-gray-800 bg-zinc-900/50 p-5 transition-all duration-300 hover:border-gray-700">
               <div className="mb-2 flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/20">
                   <svg
@@ -285,7 +285,7 @@ export default function SECRepositorySection() {
             </div>
 
             {/* API & SDKs */}
-            <div className="flex-1 rounded-xl border border-gray-800 bg-zinc-900/50 p-5">
+            <div className="flex-1 rounded-xl border border-gray-800 bg-zinc-900/50 p-5 transition-all duration-300 hover:border-gray-700">
               <div className="mb-2 flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20">
                   <svg

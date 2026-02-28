@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -172,20 +173,14 @@ export default function HeroSection() {
           {/* Trust Indicators */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 sm:gap-6 sm:text-sm md:mt-12">
             <div className="flex items-center gap-2">
-              <svg
-                className="h-5 w-5 text-cyan-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-              <span>Powered by Claude</span>
+              <Image
+                src="/images/claude.svg"
+                alt="Claude AI"
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
+              <span>Claude AI</span>
             </div>
             <div className="flex items-center gap-2">
               <svg

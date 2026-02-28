@@ -59,7 +59,7 @@ export default function FeaturesGrid() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2 text-orange-400">•</span>
-                  Vectorized query execution
+                  HNSW vector indexes for semantic search
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2 text-orange-400">•</span>
@@ -153,7 +153,7 @@ export default function FeaturesGrid() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2 text-indigo-400">•</span>
-                  Schema discovery and fact exploration
+                  Semantic element and structure resolution
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2 text-indigo-400">•</span>
