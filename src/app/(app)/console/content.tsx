@@ -15,14 +15,15 @@ const ROBOINVESTOR_CONSOLE_CONFIG: ConsoleConfig = {
       'Ask questions in plain English and get Cypher queries generated automatically. The SEC graph contains filings from over 10,000 public companies.',
     contextLabel: 'Graph',
     naturalLanguageExamples: [
-      'Compare NVIDIA and AMD revenue over the last 3 years',
-      'Which semiconductor companies had the highest net income in 2024?',
-      'Show me Apple total assets vs total liabilities by quarter',
+      'How many nodes are in the graph?',
+      'How many companies are in the graph?',
+      'How many facts are in the latest report?',
+      'What was the last report filed?',
     ],
     directQueryExamples: [
-      "MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:Revenues'}), (f)-[:FACT_HAS_ENTITY]->(e:Entity), (f)-[:FACT_HAS_PERIOD]->(p:Period) WHERE e.ticker = 'NVDA' AND p.duration_type = 'annual' RETURN DISTINCT f.numeric_value, p.end_date ORDER BY p.end_date DESC LIMIT 5",
-      "MATCH (e:Entity) WHERE e.industry CONTAINS 'Semiconductor' RETURN e.ticker, e.name, e.industry LIMIT 20",
-      "MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:NetIncomeLoss'}), (f)-[:FACT_HAS_ENTITY]->(e:Entity), (f)-[:FACT_HAS_PERIOD]->(p:Period) WHERE p.duration_type = 'annual' RETURN DISTINCT e.ticker, e.name, f.numeric_value, p.end_date ORDER BY f.numeric_value DESC LIMIT 10",
+      'MATCH (n) RETURN labels(n), count(n) ORDER BY count(n) DESC',
+      "MATCH (e:Entity) WHERE e.ticker = 'AAPL' RETURN e",
+      'MATCH (e:Entity) RETURN e.ticker, e.name, e.industry LIMIT 10',
     ],
     closingMessage: 'How can I help you analyze your investments today?',
   },
@@ -37,6 +38,20 @@ const ROBOINVESTOR_CONSOLE_CONFIG: ConsoleConfig = {
     contextIdFallback: 'your_graph_id',
   },
   sampleQueries: [
+    {
+      name: 'Graph overview',
+      query: `MATCH (n)
+RETURN labels(n) AS label, count(n) AS count
+ORDER BY count DESC`,
+    },
+    {
+      name: 'Companies by industry',
+      query: `MATCH (e:Entity)
+WHERE e.industry IS NOT NULL
+RETURN e.industry, count(e) AS company_count
+ORDER BY company_count DESC
+LIMIT 15`,
+    },
     {
       name: 'NVIDIA annual revenue',
       query: `MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:Revenues'}),
@@ -69,12 +84,11 @@ ORDER BY p.end_date DESC, el.name
 LIMIT 15`,
     },
     {
-      name: 'Companies by industry',
-      query: `MATCH (e:Entity)
-WHERE e.industry IS NOT NULL
-RETURN e.industry, count(e) AS company_count
-ORDER BY company_count DESC
-LIMIT 15`,
+      name: 'Recent SEC filings',
+      query: `MATCH (e:Entity)-[:ENTITY_HAS_REPORT]->(r:Report)
+RETURN e.ticker, e.name, r.form, r.report_date, r.filing_date
+ORDER BY r.filing_date DESC
+LIMIT 25`,
     },
     {
       name: 'Revenue by segment (dimensional)',
