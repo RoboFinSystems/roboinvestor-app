@@ -5,77 +5,91 @@ import { ConsoleContent, type ConsoleConfig } from '@/lib/core'
 const ROBOINVESTOR_CONSOLE_CONFIG: ConsoleConfig = {
   header: {
     title: 'RoboInvestor Console',
-    subtitle: 'Interactive investment analysis',
+    subtitle: 'Text-to-Cypher for SEC financial filings',
     gradientFrom: 'from-emerald-500',
     gradientTo: 'to-teal-600',
   },
   welcome: {
     consoleName: 'RoboInvestor Console',
-    description: 'Claude-powered interactive investment analysis console',
-    contextLabel: 'Portfolio',
+    description:
+      'Ask questions in plain English and get Cypher queries generated automatically. The SEC graph contains filings from over 10,000 public companies.',
+    contextLabel: 'Graph',
     naturalLanguageExamples: [
-      'Show me my portfolio performance',
-      'What are my top performing holdings?',
-      'Analyze my asset allocation',
-      'What dividends have I received this year?',
+      'Compare NVIDIA and AMD revenue over the last 3 years',
+      'Which semiconductor companies had the highest net income in 2024?',
+      'Show me Apple total assets vs total liabilities by quarter',
     ],
     directQueryExamples: [
-      'MATCH (h:Holding) RETURN h.symbol, h.shares LIMIT 10',
-      'MATCH (t:Transaction) RETURN t.date, t.type ORDER BY t.date DESC',
+      "MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:Revenues'}), (f)-[:FACT_HAS_ENTITY]->(e:Entity), (f)-[:FACT_HAS_PERIOD]->(p:Period) WHERE e.ticker = 'NVDA' AND p.duration_type = 'annual' RETURN DISTINCT f.numeric_value, p.end_date ORDER BY p.end_date DESC LIMIT 5",
+      "MATCH (e:Entity) WHERE e.industry CONTAINS 'Semiconductor' RETURN e.ticker, e.name, e.industry LIMIT 20",
+      "MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:NetIncomeLoss'}), (f)-[:FACT_HAS_ENTITY]->(e:Entity), (f)-[:FACT_HAS_PERIOD]->(p:Period) WHERE p.duration_type = 'annual' RETURN DISTINCT e.ticker, e.name, f.numeric_value, p.end_date ORDER BY f.numeric_value DESC LIMIT 10",
     ],
     closingMessage: 'How can I help you analyze your investments today?',
   },
   mcp: {
-    serverName: 'roboinvestor',
-    packageName: '@roboinvestor/mcp',
+    serverName: 'robosystems',
+    packageName: '@robosystems/mcp',
     exampleQuestions: [
-      'Show me my portfolio performance this year',
-      'What are my best performing holdings?',
-      'Analyze my dividend income trends',
+      'Compare Tesla and Ford revenue trends',
+      'Which companies in the graph have the most cash on hand?',
+      'Show me Microsoft earnings per share over time',
     ],
-    contextIdFallback: 'your_portfolio_id',
+    contextIdFallback: 'your_graph_id',
   },
   sampleQueries: [
     {
-      name: 'Portfolio holdings',
-      query: `MATCH (h:Holding)-[:IN_PORTFOLIO]->(p:Portfolio)
-RETURN h.symbol, h.shares, h.cost_basis, h.current_value
-ORDER BY h.current_value DESC LIMIT 20`,
+      name: 'NVIDIA annual revenue',
+      query: `MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:Revenues'}),
+      (f)-[:FACT_HAS_ENTITY]->(e:Entity),
+      (f)-[:FACT_HAS_PERIOD]->(p:Period)
+WHERE e.ticker = 'NVDA' AND p.duration_type = 'annual'
+RETURN DISTINCT e.ticker, f.numeric_value, p.end_date
+ORDER BY p.end_date DESC`,
     },
     {
-      name: 'Recent transactions',
-      query: `MATCH (t:Transaction)-[:IN_ACCOUNT]->(a:Account)
-RETURN t.date, t.type, t.symbol, t.shares, t.price
-ORDER BY t.date DESC LIMIT 20`,
+      name: 'Compare net income across tech companies',
+      query: `MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:NetIncomeLoss'}),
+      (f)-[:FACT_HAS_ENTITY]->(e:Entity),
+      (f)-[:FACT_HAS_PERIOD]->(p:Period)
+WHERE e.ticker IN ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'META'] AND p.duration_type = 'annual'
+RETURN DISTINCT e.ticker, f.numeric_value, p.end_date
+ORDER BY p.end_date DESC, f.numeric_value DESC
+LIMIT 20`,
     },
     {
-      name: 'Asset allocation',
-      query: `MATCH (h:Holding)-[:HAS_ASSET_CLASS]->(ac:AssetClass)
-RETURN ac.name, sum(h.current_value) as total_value
-ORDER BY total_value DESC`,
+      name: 'Apple balance sheet by quarter',
+      query: `MATCH (f:Fact {has_dimensions: false})-[:FACT_HAS_ELEMENT]->(el:Element),
+      (f)-[:FACT_HAS_ENTITY]->(e:Entity),
+      (f)-[:FACT_HAS_PERIOD]->(p:Period)
+WHERE e.ticker = 'AAPL'
+  AND el.qname IN ['us-gaap:Assets', 'us-gaap:Liabilities', 'us-gaap:StockholdersEquity']
+  AND p.period_type = 'instant'
+RETURN DISTINCT el.name, f.numeric_value, p.end_date
+ORDER BY p.end_date DESC, el.name
+LIMIT 15`,
     },
     {
-      name: 'Performance metrics',
-      query: `MATCH (p:Portfolio)
-RETURN p.name, p.total_value, p.total_gain_loss, p.return_percentage
-ORDER BY p.return_percentage DESC`,
+      name: 'Companies by industry',
+      query: `MATCH (e:Entity)
+WHERE e.industry IS NOT NULL
+RETURN e.industry, count(e) AS company_count
+ORDER BY company_count DESC
+LIMIT 15`,
     },
     {
-      name: 'Dividend income',
-      query: `MATCH (d:Dividend)-[:FROM_HOLDING]->(h:Holding)
-RETURN h.symbol, d.date, d.amount, d.type
-ORDER BY d.date DESC LIMIT 20`,
-    },
-    {
-      name: 'Risk analysis',
-      query: `MATCH (h:Holding)
-WHERE h.beta IS NOT NULL
-RETURN h.symbol, h.beta, h.volatility, h.sharpe_ratio
-ORDER BY h.beta DESC LIMIT 20`,
+      name: 'Revenue by segment (dimensional)',
+      query: `MATCH (f:Fact {has_dimensions: true})-[:FACT_HAS_ELEMENT]->(el:Element {qname: 'us-gaap:Revenues'}),
+      (f)-[:FACT_HAS_ENTITY]->(e:Entity),
+      (f)-[:FACT_HAS_DIMENSION]->(d:Dimension),
+      (f)-[:FACT_HAS_PERIOD]->(p:Period)
+WHERE e.ticker = 'NVDA' AND p.duration_type = 'annual'
+RETURN DISTINCT d.member_uri, f.numeric_value, p.end_date
+ORDER BY p.end_date DESC
+LIMIT 20`,
     },
   ],
-  examplesLabel: 'Example Investment Queries:',
-  noSelectionError: 'No portfolio selected. Please select a portfolio first.',
+  examplesLabel: 'Example Cypher Queries:',
+  noSelectionError: 'No graph selected. Please select a graph first.',
 }
 
 export default function ConsolePageContent() {
