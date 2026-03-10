@@ -428,44 +428,27 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                 </summary>
                 <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
                   <code>
-                    {`import asyncio
-from robosystems_client import RoboSystemsClient
-from robosystems_client.api.query.execute_cypher_query import asyncio as execute_cypher_query
-from robosystems_client.models.cypher_query_request import CypherQueryRequest
+                    {`from robosystems_client.extensions import (
+    RoboSystemsExtensions,
+    RoboSystemsExtensionConfig,
+)
 
-async def query_repository():
-    # Initialize the client with API key authentication
-    client = RoboSystemsClient(
-        base_url="${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}",
-        token="`}
+# Initialize the client with API key authentication
+config = RoboSystemsExtensionConfig(
+    base_url="${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}",
+    headers={"X-API-Key": "`}
                     <ApiKeyDisplay>{displayApiKey}</ApiKeyDisplay>
-                    {`",
-        auth_header_name="X-API-Key",
-        prefix=""  # No prefix needed for API key
-    )
+                    {`"},
+)
+client = RoboSystemsExtensions(config)
 
-    # Create the query request
-    query_request = CypherQueryRequest(
-        query="MATCH (n) RETURN n LIMIT 10",
-        parameters={}
-    )
+# Execute a Cypher query
+response = client.query.query("${repository}", "MATCH (n) RETURN n LIMIT 10")
 
-    # Execute the query
-    response = await execute_cypher_query(
-        graph_id="${repository}",
-        client=client,
-        body=query_request
-    )
-
-    # Process results
-    if response and response.data:
-        for record in response.data:
-            print(record)
-
-    return response
-
-# Run the async function
-asyncio.run(query_repository())`}
+# Process results
+print(f"Rows: {response.row_count}, Time: {response.execution_time_ms}ms")
+for record in response.data:
+    print(record)`}
                   </code>
                 </pre>
               </details>
@@ -477,48 +460,30 @@ asyncio.run(query_repository())`}
                 </summary>
                 <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
                   <code>
-                    {`import * as SDK from '@robosystems/core';
+                    {`import { client } from '@robosystems/client/client';
+import { executeCypherQuery } from '@robosystems/client';
 
 // Configure the client with API key authentication
-SDK.client.setConfig({
+client.setConfig({
   baseUrl: '${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}',
-  credentials: 'omit', // Don't send cookies when using API key
   headers: {
     'X-API-Key': '`}
                     <ApiKeyDisplay>{displayApiKey}</ApiKeyDisplay>
-                    {`'
-  }
+                    {`',
+  },
 });
 
-// Execute the query
-async function queryRepository() {
-  try {
-    const response = await SDK.executeCypherQuery({
-      path: {
-        graph_id: '${repository}'
-      },
-      body: {
-        query: 'MATCH (n) RETURN n LIMIT 10',
-        parameters: {}
-      }
-    });
+// Execute a Cypher query
+const { data } = await executeCypherQuery({
+  path: { graph_id: '${repository}' },
+  body: { query: 'MATCH (n) RETURN n LIMIT 10' },
+});
 
-    // Process results
-    if (response.data && response.data.success) {
-      response.data.data.forEach((record: any) => {
-        console.log(record);
-      });
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Query failed:', error);
-    throw error;
-  }
-}
-
-// Call the function
-await queryRepository();`}
+// Process results
+console.log(\`Rows: \${data.row_count}, Time: \${data.execution_time_ms}ms\`);
+for (const record of data.data) {
+  console.log(record);
+}`}
                   </code>
                 </pre>
               </details>
