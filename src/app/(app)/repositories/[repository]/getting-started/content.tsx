@@ -44,6 +44,25 @@ function ProgressiveText({
   return <>{displayedText}</>
 }
 
+function ApiKeyDisplay({
+  children,
+  keyCreated,
+  isTypingKey,
+  onTypingComplete,
+}: {
+  children: string
+  keyCreated: boolean
+  isTypingKey: boolean
+  onTypingComplete: () => void
+}) {
+  if (!keyCreated || !isTypingKey) {
+    return <>{children}</>
+  }
+  return (
+    <ProgressiveText text={children} speed={8} onComplete={onTypingComplete} />
+  )
+}
+
 export function ApiKeysContent({ repository }: ApiKeysContentProps) {
   const router = useRouter()
   const { setCurrentGraph } = useGraphContext()
@@ -100,20 +119,6 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
   }
 
   const displayApiKey = apiKey || 'YOUR_API_KEY_HERE'
-
-  // Component to render API key with typing animation
-  const ApiKeyDisplay = ({ children }: { children: string }) => {
-    if (!keyCreated || !isTypingKey) {
-      return <>{children}</>
-    }
-    return (
-      <ProgressiveText
-        text={children}
-        speed={8}
-        onComplete={() => setIsTypingKey(false)}
-      />
-    )
-  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
@@ -377,7 +382,13 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       "args": ["-y", "@robosystems/mcp"],
       "env": {
         "ROBOSYSTEMS_API_KEY": "`}
-                <ApiKeyDisplay>{displayApiKey}</ApiKeyDisplay>
+                <ApiKeyDisplay
+                  keyCreated={keyCreated}
+                  isTypingKey={isTypingKey}
+                  onTypingComplete={() => setIsTypingKey(false)}
+                >
+                  {displayApiKey}
+                </ApiKeyDisplay>
                 {`",
         "ROBOSYSTEMS_API_URL": "${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}",
         "ROBOSYSTEMS_GRAPH_ID": "${repository}"
@@ -409,7 +420,13 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                   <code>
                     {`curl -X POST "${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}/v1/graphs/${repository}/query" \\
   -H "X-API-Key: `}
-                    <ApiKeyDisplay>{displayApiKey}</ApiKeyDisplay>
+                    <ApiKeyDisplay
+                      keyCreated={keyCreated}
+                      isTypingKey={isTypingKey}
+                      onTypingComplete={() => setIsTypingKey(false)}
+                    >
+                      {displayApiKey}
+                    </ApiKeyDisplay>
                     {`" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -437,7 +454,13 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
 config = RoboSystemsExtensionConfig(
     base_url="${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}",
     headers={"X-API-Key": "`}
-                    <ApiKeyDisplay>{displayApiKey}</ApiKeyDisplay>
+                    <ApiKeyDisplay
+                      keyCreated={keyCreated}
+                      isTypingKey={isTypingKey}
+                      onTypingComplete={() => setIsTypingKey(false)}
+                    >
+                      {displayApiKey}
+                    </ApiKeyDisplay>
                     {`"},
 )
 client = RoboSystemsExtensions(config)
@@ -468,7 +491,13 @@ client.setConfig({
   baseUrl: '${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}',
   headers: {
     'X-API-Key': '`}
-                    <ApiKeyDisplay>{displayApiKey}</ApiKeyDisplay>
+                    <ApiKeyDisplay
+                      keyCreated={keyCreated}
+                      isTypingKey={isTypingKey}
+                      onTypingComplete={() => setIsTypingKey(false)}
+                    >
+                      {displayApiKey}
+                    </ApiKeyDisplay>
                     {`',
   },
 });
