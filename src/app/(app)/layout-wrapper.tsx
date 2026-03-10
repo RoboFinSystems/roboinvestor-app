@@ -1,13 +1,13 @@
 'use client'
 
 import { EntitySelectorDropdown } from '@/components/EntitySelectorDropdown'
-import SupportModal from '@/components/app/SupportModal'
 import {
   CoreNavbar,
   CoreSidebar,
   CURRENT_APP,
   GraphFilters,
   onlyRepositories,
+  SupportModal,
   useGraphContext,
   useOrg,
 } from '@/lib/core'
