@@ -522,8 +522,8 @@ for (const record of data.data) {
           <div className="rounded-lg bg-zinc-100 p-4 dark:bg-zinc-800">
             <p className="text-sm text-zinc-700 dark:text-zinc-300">
               <strong>Note:</strong> Your API key works across all subscribed
-              repositories. Queries consume credits based on your subscription
-              plan.
+              repositories. Queries are included with your subscription. Agent
+              calls consume credits.
             </p>
           </div>
         </div>
