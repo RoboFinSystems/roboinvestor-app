@@ -8,6 +8,7 @@ import {
   SettingsPageHeader,
 } from '@/lib/core'
 import { useAuth } from '@/lib/core/auth-components'
+import { useToast } from '@/lib/core/hooks/use-toast'
 import { customTheme } from '@/lib/core/theme'
 import type { User } from '@/lib/core/types'
 import { Button } from 'flowbite-react'
@@ -22,6 +23,7 @@ export interface UserProps {
 
 const UserSettingsPageContent: FC<UserProps> = function ({ user, onRefresh }) {
   const { resendVerificationEmail } = useAuth()
+  const { showSuccess, showError, ToastContainer } = useToast()
   const [resendLoading, setResendLoading] = useState(false)
   const [resendSuccess, setResendSuccess] = useState(false)
   const [resendError, setResendError] = useState(false)
@@ -49,6 +51,7 @@ const UserSettingsPageContent: FC<UserProps> = function ({ user, onRefresh }) {
 
   return (
     <>
+      <ToastContainer />
       <div className="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4">
         <SettingsPageHeader title="User settings" homeHref="/home" />
       </div>
@@ -96,8 +99,14 @@ const UserSettingsPageContent: FC<UserProps> = function ({ user, onRefresh }) {
           }}
           theme={customTheme}
           onRefresh={onRefresh}
+          onSuccess={showSuccess}
+          onError={showError}
         />
-        <PasswordInformationCard theme={customTheme} />
+        <PasswordInformationCard
+          theme={customTheme}
+          onSuccess={showSuccess}
+          onError={showError}
+        />
         <ApiKeysCard theme={customTheme} />
       </SettingsContainer>
     </>
