@@ -11,9 +11,9 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'RoboInvestor',
+  title: 'RoboInvestor | Portfolio Management Agent',
   description:
-    'A comprehensive financial reporting app for private companies to securely share financial reports with shareholders and stakeholders. Built with React, Tailwind CSS, and Flowbite, it provides features such as customizable reports, user permissions, and real-time collaboration.',
+    'AI-powered portfolio management agent. Analyze holdings, track performance, and surface investment insights across your portfolio.',
   icons: {
     icon: '/images/logos/roboinvestor.png',
   },

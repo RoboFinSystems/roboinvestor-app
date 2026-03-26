@@ -3,6 +3,7 @@ import {
   HiGlobeAlt,
   HiHome,
   HiOutlineOfficeBuilding,
+  HiSearch,
   HiTerminal,
 } from 'react-icons/hi'
 import { TbTrendingUp } from 'react-icons/tb'
@@ -50,12 +51,17 @@ export const getNavigationItems = ({
       ]
     : []
 
-  const consoleItem: SidebarItemData[] = hasAnyGraph
+  const graphToolItems: SidebarItemData[] = hasAnyGraph
     ? [
         {
           icon: HiTerminal,
           label: 'Console',
           href: '/console',
+        },
+        {
+          icon: HiSearch,
+          label: 'Search',
+          href: '/search',
         },
       ]
     : []
@@ -68,7 +74,12 @@ export const getNavigationItems = ({
     },
   ]
 
-  return [...baseItems, ...entityItems, ...consoleItem, ...alwaysVisibleItems]
+  return [
+    ...baseItems,
+    ...entityItems,
+    ...graphToolItems,
+    ...alwaysVisibleItems,
+  ]
 }
 
 // Default export for backward compatibility
