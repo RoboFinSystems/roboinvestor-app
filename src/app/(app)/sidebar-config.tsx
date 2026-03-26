@@ -51,7 +51,7 @@ export const getNavigationItems = ({
       ]
     : []
 
-  const consoleItem: SidebarItemData[] = hasAnyGraph
+  const graphToolItems: SidebarItemData[] = hasAnyGraph
     ? [
         {
           icon: HiTerminal,
@@ -74,7 +74,12 @@ export const getNavigationItems = ({
     },
   ]
 
-  return [...baseItems, ...entityItems, ...consoleItem, ...alwaysVisibleItems]
+  return [
+    ...baseItems,
+    ...entityItems,
+    ...graphToolItems,
+    ...alwaysVisibleItems,
+  ]
 }
 
 // Default export for backward compatibility
