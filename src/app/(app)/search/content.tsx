@@ -12,7 +12,6 @@ const REPO_CONFIG: SearchConfig = {
     entity: true,
     formType: true,
     fiscalYear: true,
-
   },
 }
 
