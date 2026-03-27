@@ -266,7 +266,9 @@ export function EntitySelectorDropdown() {
                   {/* Create New Entity — redirects to platform via SSO */}
                   <div className="border-t-2 border-gray-300 dark:border-gray-600">
                     <button
-                      onClick={() => navigateToApp('robosystems', '/graphs/new')}
+                      onClick={() =>
+                        navigateToApp('robosystems', '/graphs/new')
+                      }
                       className="flex w-full items-center justify-center px-4 py-3 text-sm font-medium text-blue-600 transition-colors hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-700"
                     >
                       + Create New Entity
