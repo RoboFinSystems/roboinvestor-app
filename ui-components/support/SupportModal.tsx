@@ -10,6 +10,7 @@ import {
   TextInput,
 } from 'flowbite-react'
 import { useRef, useState } from 'react'
+import { customTheme } from '../../theme'
 import {
   TurnstileWidget,
   type TurnstileWidgetRef,
@@ -108,7 +109,7 @@ export default function SupportModal({
   }
 
   return (
-    <Modal show={isOpen} onClose={handleClose} size="lg">
+    <Modal show={isOpen} onClose={handleClose} size="lg" theme={customTheme.modal}>
       <ModalHeader>Contact Support</ModalHeader>
       <ModalBody>
         {submitStatus === 'success' ? (
@@ -165,7 +166,7 @@ export default function SupportModal({
 
             {isTurnstileEnabled() &&
               process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-                <div className="flex justify-center">
+                <div className="flex min-h-[75px] items-center justify-center">
                   <TurnstileWidget
                     ref={turnstileRef}
                     siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
