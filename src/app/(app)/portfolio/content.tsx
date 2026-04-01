@@ -117,6 +117,7 @@ const PortfolioPageContent: FC = function () {
   const [holdings, setHoldings] = useState<Holding[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [holdingsLoading, setHoldingsLoading] = useState(false)
+  const [holdingsError, setHoldingsError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
@@ -136,6 +137,9 @@ const PortfolioPageContent: FC = function () {
     cost_basis: '',
   })
   const [creatingSecurity, setCreatingSecurity] = useState(false)
+  const [securityModalError, setSecurityModalError] = useState<string | null>(
+    null
+  )
 
   // Get the first roboinvestor graph
   const investorGraph = graphState.graphs.find(GraphFilters.roboinvestor)
@@ -151,8 +155,8 @@ const PortfolioPageContent: FC = function () {
       setError(null)
       const data = await apiFetch(`/v1/investor/${graphId}/portfolios`)
       setPortfolios(data.portfolios || [])
-    } catch (err: any) {
-      setError(err.message || 'Failed to load portfolios')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load portfolios')
     } finally {
       setIsLoading(false)
     }
@@ -163,12 +167,16 @@ const PortfolioPageContent: FC = function () {
       if (!graphId) return
       try {
         setHoldingsLoading(true)
+        setHoldingsError(null)
         const data = await apiFetch(
           `/v1/investor/${graphId}/portfolios/${portfolioId}/holdings`
         )
         setHoldings(data.holdings || [])
-      } catch {
+      } catch (err) {
         setHoldings([])
+        setHoldingsError(
+          err instanceof Error ? err.message : 'Failed to load holdings'
+        )
       } finally {
         setHoldingsLoading(false)
       }
@@ -204,8 +212,10 @@ const PortfolioPageContent: FC = function () {
       setShowCreateModal(false)
       setCreateForm({ name: '', description: '', strategy: '' })
       setSelectedPortfolio(portfolio)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create portfolio')
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to create portfolio'
+      )
     } finally {
       setCreating(false)
     }
@@ -215,6 +225,7 @@ const PortfolioPageContent: FC = function () {
     if (!graphId || !selectedPortfolio || !securityForm.name.trim()) return
     try {
       setCreatingSecurity(true)
+      setSecurityModalError(null)
 
       // 1. Create the security
       const security = await apiFetch(`/v1/investor/${graphId}/securities`, {
@@ -246,6 +257,7 @@ const PortfolioPageContent: FC = function () {
       }
 
       setShowSecurityModal(false)
+      setSecurityModalError(null)
       setSecurityForm({
         name: '',
         security_type: 'common_stock',
@@ -257,8 +269,10 @@ const PortfolioPageContent: FC = function () {
       })
       // Reload holdings
       loadHoldings(selectedPortfolio.id)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create security')
+    } catch (err) {
+      setSecurityModalError(
+        err instanceof Error ? err.message : 'Failed to create security'
+      )
     } finally {
       setCreatingSecurity(false)
     }
@@ -389,12 +403,25 @@ const PortfolioPageContent: FC = function () {
                   <Button
                     size="sm"
                     color="teal"
-                    onClick={() => setShowSecurityModal(true)}
+                    onClick={() => {
+                      setSecurityModalError(null)
+                      setShowSecurityModal(true)
+                    }}
                   >
                     <HiPlus className="mr-2 h-4 w-4" />
                     Add Security
                   </Button>
                 </div>
+
+                {holdingsError && (
+                  <Alert
+                    theme={customTheme.alert}
+                    color="failure"
+                    icon={HiExclamationCircle}
+                  >
+                    {holdingsError}
+                  </Alert>
+                )}
 
                 {holdingsLoading ? (
                   <div className="flex justify-center py-8">
@@ -575,6 +602,15 @@ const PortfolioPageContent: FC = function () {
         <ModalHeader>Add Security</ModalHeader>
         <ModalBody>
           <div className="space-y-4">
+            {securityModalError && (
+              <Alert
+                theme={customTheme.alert}
+                color="failure"
+                icon={HiExclamationCircle}
+              >
+                {securityModalError}
+              </Alert>
+            )}
             <div>
               <Label htmlFor="sec-name">Security Name</Label>
               <TextInput
