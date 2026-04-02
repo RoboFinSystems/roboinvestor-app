@@ -31,6 +31,7 @@ import {
   HiCurrencyDollar,
   HiExclamationCircle,
   HiOfficeBuilding,
+  HiPencil,
   HiPlus,
   HiViewGrid,
 } from 'react-icons/hi'
@@ -132,6 +133,7 @@ const PortfolioPageContent: FC = function () {
     security_type: 'common_stock',
     security_subtype: '',
     source_graph_id: '',
+    entity_id: '',
     quantity: '',
     quantity_type: 'shares',
     cost_basis: '',
@@ -140,10 +142,45 @@ const PortfolioPageContent: FC = function () {
   const [securityModalError, setSecurityModalError] = useState<string | null>(
     null
   )
+  const [linkedEntities, setLinkedEntities] = useState<
+    Array<{ id: string; name: string; source_graph_id: string | null }>
+  >([])
+  const [loadingEntities, setLoadingEntities] = useState(false)
+
+  // Edit security modal
+  const [showEditSecurityModal, setShowEditSecurityModal] = useState(false)
+  const [editSecurityId, setEditSecurityId] = useState<string | null>(null)
+  const [editSecurityName, setEditSecurityName] = useState('')
+  const [editEntityId, setEditEntityId] = useState('')
+  const [editSourceGraphId, setEditSourceGraphId] = useState('')
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
 
   // Get the first roboinvestor graph
   const investorGraph = graphState.graphs.find(GraphFilters.roboinvestor)
   const graphId = investorGraph?.graphId
+
+  const loadLinkedEntities = useCallback(async () => {
+    if (!graphId) return
+    try {
+      setLoadingEntities(true)
+      const data = await apiFetch(
+        `/v1/ledger/${graphId}/entities?source=linked`
+      )
+      setLinkedEntities(
+        (data || []).map((e: any) => ({
+          id: e.id,
+          name: e.name,
+          source_graph_id: e.source_graph_id || null,
+        }))
+      )
+    } catch {
+      // Silently fail — linked entities are optional
+      setLinkedEntities([])
+    } finally {
+      setLoadingEntities(false)
+    }
+  }, [graphId])
 
   const loadPortfolios = useCallback(async () => {
     if (!graphId) {
@@ -154,13 +191,17 @@ const PortfolioPageContent: FC = function () {
       setIsLoading(true)
       setError(null)
       const data = await apiFetch(`/v1/investor/${graphId}/portfolios`)
-      setPortfolios(data.portfolios || [])
+      const list = data.portfolios || []
+      setPortfolios(list)
+      if (list.length > 0 && !selectedPortfolio) {
+        setSelectedPortfolio(list[0])
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load portfolios')
     } finally {
       setIsLoading(false)
     }
-  }, [graphId])
+  }, [graphId, selectedPortfolio])
 
   const loadHoldings = useCallback(
     async (portfolioId: string) => {
@@ -183,6 +224,52 @@ const PortfolioPageContent: FC = function () {
     },
     [graphId]
   )
+
+  const openEditSecurity = useCallback(
+    (securityId: string, securityName: string) => {
+      setEditSecurityId(securityId)
+      setEditSecurityName(securityName)
+      setEditEntityId('')
+      setEditSourceGraphId('')
+      setEditError(null)
+      loadLinkedEntities()
+      setShowEditSecurityModal(true)
+    },
+    [loadLinkedEntities]
+  )
+
+  const handleEditSecurity = useCallback(async () => {
+    if (!graphId || !editSecurityId) return
+    try {
+      setSavingEdit(true)
+      setEditError(null)
+      const updates: Record<string, string | null> = {}
+      if (editEntityId) updates.entity_id = editEntityId
+      if (editSourceGraphId.trim())
+        updates.source_graph_id = editSourceGraphId.trim()
+
+      await apiFetch(`/v1/investor/${graphId}/securities/${editSecurityId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates),
+      })
+
+      setShowEditSecurityModal(false)
+      if (selectedPortfolio) loadHoldings(selectedPortfolio.id)
+    } catch (err) {
+      setEditError(
+        err instanceof Error ? err.message : 'Failed to update security'
+      )
+    } finally {
+      setSavingEdit(false)
+    }
+  }, [
+    graphId,
+    editSecurityId,
+    editEntityId,
+    editSourceGraphId,
+    selectedPortfolio,
+    loadHoldings,
+  ])
 
   useEffect(() => {
     loadPortfolios()
@@ -234,6 +321,7 @@ const PortfolioPageContent: FC = function () {
           name: securityForm.name.trim(),
           security_type: securityForm.security_type,
           security_subtype: securityForm.security_subtype.trim() || null,
+          entity_id: securityForm.entity_id || null,
           source_graph_id: securityForm.source_graph_id.trim() || null,
         }),
       })
@@ -263,6 +351,7 @@ const PortfolioPageContent: FC = function () {
         security_type: 'common_stock',
         security_subtype: '',
         source_graph_id: '',
+        entity_id: '',
         quantity: '',
         quantity_type: 'shares',
         cost_basis: '',
@@ -405,6 +494,7 @@ const PortfolioPageContent: FC = function () {
                     color="teal"
                     onClick={() => {
                       setSecurityModalError(null)
+                      loadLinkedEntities()
                       setShowSecurityModal(true)
                     }}
                   >
@@ -478,6 +568,7 @@ const PortfolioPageContent: FC = function () {
                               <TableHeadCell>Quantity</TableHeadCell>
                               <TableHeadCell>Cost Basis</TableHeadCell>
                               <TableHeadCell>Current Value</TableHeadCell>
+                              <TableHeadCell className="w-12"></TableHeadCell>
                             </TableHead>
                             <TableBody className="divide-y">
                               {h.securities.map((s) => (
@@ -509,6 +600,19 @@ const PortfolioPageContent: FC = function () {
                                     ) : (
                                       <span className="text-gray-400">--</span>
                                     )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <button
+                                      onClick={() =>
+                                        openEditSecurity(
+                                          s.security_id,
+                                          s.security_name
+                                        )
+                                      }
+                                      className="rounded p-1 text-gray-400 hover:text-teal-500"
+                                    >
+                                      <HiPencil className="h-4 w-4" />
+                                    </button>
                                   </TableCell>
                                 </TableRow>
                               ))}
@@ -658,6 +762,49 @@ const PortfolioPageContent: FC = function () {
               />
             </div>
             <div>
+              <Label htmlFor="sec-entity">Company (optional)</Label>
+              {loadingEntities ? (
+                <div className="flex items-center gap-2 py-2">
+                  <Spinner size="sm" />
+                  <span className="text-sm text-gray-400">
+                    Loading companies...
+                  </span>
+                </div>
+              ) : linkedEntities.length > 0 ? (
+                <select
+                  id="sec-entity"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={securityForm.entity_id}
+                  onChange={(e) => {
+                    const entityId = e.target.value
+                    const entity = linkedEntities.find(
+                      (ent) => ent.id === entityId
+                    )
+                    setSecurityForm((f) => ({
+                      ...f,
+                      entity_id: entityId,
+                      source_graph_id:
+                        entity?.source_graph_id || f.source_graph_id,
+                    }))
+                  }}
+                >
+                  <option value="">No company linked</option>
+                  {linkedEntities.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="py-2 text-sm text-gray-400">
+                  No companies have shared reports with you yet.
+                </p>
+              )}
+              <p className="mt-1 text-xs text-gray-400">
+                Companies appear here after they share a report with your graph
+              </p>
+            </div>
+            <div>
               <Label htmlFor="sec-graph">Source Graph ID (optional)</Label>
               <TextInput
                 id="sec-graph"
@@ -671,7 +818,7 @@ const PortfolioPageContent: FC = function () {
                 }
               />
               <p className="mt-1 text-xs text-gray-400">
-                Links this security to a company&apos;s graph
+                Pre-associate to a company graph before a report is shared
               </p>
             </div>
             <hr className="border-gray-200 dark:border-gray-700" />
@@ -740,6 +887,87 @@ const PortfolioPageContent: FC = function () {
             Add
           </Button>
           <Button color="gray" onClick={() => setShowSecurityModal(false)}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+      {/* Edit Security Modal */}
+      <Modal
+        show={showEditSecurityModal}
+        onClose={() => setShowEditSecurityModal(false)}
+        size="md"
+      >
+        <ModalHeader>Link Security — {editSecurityName}</ModalHeader>
+        <ModalBody>
+          <div className="space-y-4">
+            {editError && (
+              <Alert
+                theme={customTheme.alert}
+                color="failure"
+                icon={HiExclamationCircle}
+              >
+                {editError}
+              </Alert>
+            )}
+            <div>
+              <Label htmlFor="edit-entity">Company</Label>
+              {loadingEntities ? (
+                <div className="flex items-center gap-2 py-2">
+                  <Spinner size="sm" />
+                  <span className="text-sm text-gray-400">Loading...</span>
+                </div>
+              ) : linkedEntities.length > 0 ? (
+                <select
+                  id="edit-entity"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  value={editEntityId}
+                  onChange={(e) => {
+                    const entityId = e.target.value
+                    const entity = linkedEntities.find(
+                      (ent) => ent.id === entityId
+                    )
+                    setEditEntityId(entityId)
+                    if (entity?.source_graph_id) {
+                      setEditSourceGraphId(entity.source_graph_id)
+                    }
+                  }}
+                >
+                  <option value="">No company linked</option>
+                  {linkedEntities.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="py-2 text-sm text-gray-400">
+                  No companies have shared reports with you yet.
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="edit-graph">Source Graph ID</Label>
+              <TextInput
+                id="edit-graph"
+                placeholder="e.g., kg19d46a8029980520"
+                value={editSourceGraphId}
+                onChange={(e) => setEditSourceGraphId(e.target.value)}
+              />
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="teal"
+            onClick={handleEditSecurity}
+            disabled={
+              savingEdit || (!editEntityId && !editSourceGraphId.trim())
+            }
+          >
+            {savingEdit ? <Spinner size="sm" className="mr-2" /> : null}
+            Save
+          </Button>
+          <Button color="gray" onClick={() => setShowEditSecurityModal(false)}>
             Cancel
           </Button>
         </ModalFooter>
