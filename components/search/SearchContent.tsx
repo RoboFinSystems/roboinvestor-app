@@ -14,6 +14,7 @@ import {
   Select,
   Spinner,
   TextInput,
+  ToggleSwitch,
 } from 'flowbite-react'
 import { useCallback, useEffect, useState } from 'react'
 import { HiChevronDown, HiChevronUp, HiSearch } from 'react-icons/hi'
@@ -38,6 +39,7 @@ export function SearchContent({ config }: { config: SearchConfig }) {
   const [entity, setEntity] = useState('')
   const [formType, setFormType] = useState('')
   const [fiscalYear, setFiscalYear] = useState('')
+  const [semantic, setSemantic] = useState(false)
 
   // Results state
   const [results, setResults] = useState<SearchHit[]>([])
@@ -110,6 +112,7 @@ export function SearchContent({ config }: { config: SearchConfig }) {
           const parsed = parseInt(fiscalYear, 10)
           if (Number.isFinite(parsed)) body.fiscal_year = parsed
         }
+        if (semantic) body.semantic = true
 
         const res = await SDK.searchDocuments({
           path: { graph_id: graphId },
@@ -131,7 +134,7 @@ export function SearchContent({ config }: { config: SearchConfig }) {
         setLoading(false)
       }
     },
-    [graphId, query, sourceType, entity, formType, fiscalYear]
+    [graphId, query, sourceType, entity, formType, fiscalYear, semantic]
   )
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -170,7 +173,8 @@ export function SearchContent({ config }: { config: SearchConfig }) {
     filters.entity ||
     filters.formType ||
     filters.fiscalYear ||
-    filters.sourceType
+    filters.sourceType ||
+    filters.semantic
 
   if (!graphId) {
     return (
@@ -248,6 +252,13 @@ export function SearchContent({ config }: { config: SearchConfig }) {
                   <HiChevronDown className="h-4 w-4" />
                 )}
               </button>
+            )}
+            {filters.semantic && (
+              <ToggleSwitch
+                checked={semantic}
+                onChange={setSemantic}
+                label="Semantic search"
+              />
             )}
           </div>
 
