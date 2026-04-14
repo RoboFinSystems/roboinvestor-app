@@ -2,7 +2,7 @@
 
 import {
   customTheme,
-  getAuthHeader,
+  extensions,
   GraphFilters,
   useGraphContext,
 } from '@/lib/core'
@@ -36,9 +36,6 @@ import {
   HiViewGrid,
 } from 'react-icons/hi'
 
-const API_URL =
-  process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'http://localhost:8000'
-
 interface Portfolio {
   id: string
   name: string
@@ -70,22 +67,73 @@ interface Holding {
   position_count: number
 }
 
-async function apiFetch(path: string, options: globalThis.RequestInit = {}) {
-  const authHeader = getAuthHeader()
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authHeader ? { Authorization: authHeader } : {}),
-      ...((options.headers as Record<string, string>) || {}),
-    },
-  })
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error(body.detail || `API error ${res.status}`)
+// Map the camelCase shapes returned by `extensions.investor.*` / GraphQL
+// into the snake_case local view models the JSX below already consumes.
+// Keeping the mapping localized here avoids rewriting the render tree.
+
+type RawPortfolio = {
+  id: string
+  name: string
+  description: string | null
+  strategy: string | null
+  inceptionDate: string | null
+  baseCurrency: string
+  createdAt: string
+  updatedAt: string
+}
+
+type RawHoldingSecurity = {
+  securityId: string
+  securityName: string
+  securityType: string
+  quantity: number
+  quantityType: string
+  costBasisDollars: number
+  currentValueDollars: number | null
+}
+
+type RawHolding = {
+  entityId: string
+  entityName: string
+  sourceGraphId: string | null
+  securities: RawHoldingSecurity[]
+  totalCostBasisDollars: number
+  totalCurrentValueDollars: number | null
+  positionCount: number
+}
+
+function toPortfolio(p: RawPortfolio | Record<string, unknown>): Portfolio {
+  const r = p as RawPortfolio
+  return {
+    id: r.id,
+    name: r.name,
+    description: r.description ?? null,
+    strategy: r.strategy ?? null,
+    inception_date: r.inceptionDate ?? null,
+    base_currency: r.baseCurrency,
+    created_at: r.createdAt,
+    updated_at: r.updatedAt,
   }
-  if (res.status === 204) return null
-  return res.json()
+}
+
+function toHolding(h: RawHolding): Holding {
+  return {
+    entity_id: h.entityId,
+    entity_name: h.entityName,
+    source_graph_id: h.sourceGraphId ?? null,
+    securities: (h.securities ?? []).map((s) => ({
+      security_id: s.securityId,
+      security_name: s.securityName,
+      security_type: s.securityType,
+      quantity: s.quantity,
+      quantity_type: s.quantityType,
+      cost_basis_dollars: s.costBasisDollars,
+      current_value_dollars: s.currentValueDollars ?? null,
+    })),
+    total_cost_basis_dollars: h.totalCostBasisDollars,
+    total_current_value_dollars: h.totalCurrentValueDollars ?? null,
+    position_count: h.positionCount,
+  }
 }
 
 const formatCurrency = (amount: number) =>
@@ -164,14 +212,14 @@ const PortfolioPageContent: FC = function () {
     if (!graphId) return
     try {
       setLoadingEntities(true)
-      const data = await apiFetch(
-        `/v1/ledger/${graphId}/entities?source=linked`
-      )
+      const entitiesList = await extensions.ledger.listEntities(graphId, {
+        source: 'linked',
+      })
       setLinkedEntities(
-        (data || []).map((e: any) => ({
+        entitiesList.map((e) => ({
           id: e.id,
           name: e.name,
-          source_graph_id: e.source_graph_id || null,
+          source_graph_id: e.sourceGraphId ?? null,
         }))
       )
     } catch {
@@ -190,8 +238,8 @@ const PortfolioPageContent: FC = function () {
     try {
       setIsLoading(true)
       setError(null)
-      const data = await apiFetch(`/v1/investor/${graphId}/portfolios`)
-      const list = data.portfolios || []
+      const data = await extensions.investor.listPortfolios(graphId)
+      const list = (data?.portfolios ?? []).map(toPortfolio)
       setPortfolios(list)
       if (list.length > 0 && !selectedPortfolio) {
         setSelectedPortfolio(list[0])
@@ -209,10 +257,8 @@ const PortfolioPageContent: FC = function () {
       try {
         setHoldingsLoading(true)
         setHoldingsError(null)
-        const data = await apiFetch(
-          `/v1/investor/${graphId}/portfolios/${portfolioId}/holdings`
-        )
-        setHoldings(data.holdings || [])
+        const data = await extensions.investor.getHoldings(graphId, portfolioId)
+        setHoldings(((data?.holdings as RawHolding[]) ?? []).map(toHolding))
       } catch (err) {
         setHoldings([])
         setHoldingsError(
@@ -248,10 +294,7 @@ const PortfolioPageContent: FC = function () {
       if (editSourceGraphId.trim())
         updates.source_graph_id = editSourceGraphId.trim()
 
-      await apiFetch(`/v1/investor/${graphId}/securities/${editSecurityId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(updates),
-      })
+      await extensions.investor.updateSecurity(graphId, editSecurityId, updates)
 
       setShowEditSecurityModal(false)
       if (selectedPortfolio) loadHoldings(selectedPortfolio.id)
@@ -287,14 +330,12 @@ const PortfolioPageContent: FC = function () {
     if (!graphId || !createForm.name.trim()) return
     try {
       setCreating(true)
-      const portfolio = await apiFetch(`/v1/investor/${graphId}/portfolios`, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: createForm.name.trim(),
-          description: createForm.description.trim() || null,
-          strategy: createForm.strategy.trim() || null,
-        }),
+      const raw = await extensions.investor.createPortfolio(graphId, {
+        name: createForm.name.trim(),
+        description: createForm.description.trim() || null,
+        strategy: createForm.strategy.trim() || null,
       })
+      const portfolio = toPortfolio(raw)
       setPortfolios((prev) => [...prev, portfolio])
       setShowCreateModal(false)
       setCreateForm({ name: '', description: '', strategy: '' })
@@ -315,15 +356,12 @@ const PortfolioPageContent: FC = function () {
       setSecurityModalError(null)
 
       // 1. Create the security
-      const security = await apiFetch(`/v1/investor/${graphId}/securities`, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: securityForm.name.trim(),
-          security_type: securityForm.security_type,
-          security_subtype: securityForm.security_subtype.trim() || null,
-          entity_id: securityForm.entity_id || null,
-          source_graph_id: securityForm.source_graph_id.trim() || null,
-        }),
+      const security = await extensions.investor.createSecurity(graphId, {
+        name: securityForm.name.trim(),
+        security_type: securityForm.security_type,
+        security_subtype: securityForm.security_subtype.trim() || null,
+        entity_id: securityForm.entity_id || null,
+        source_graph_id: securityForm.source_graph_id.trim() || null,
       })
 
       // 2. Create the position if quantity was provided
@@ -332,15 +370,12 @@ const PortfolioPageContent: FC = function () {
           ? Math.round(parseFloat(securityForm.cost_basis) * 100)
           : 0
 
-        await apiFetch(`/v1/investor/${graphId}/positions`, {
-          method: 'POST',
-          body: JSON.stringify({
-            portfolio_id: selectedPortfolio.id,
-            security_id: security.id,
-            quantity: parseFloat(securityForm.quantity),
-            quantity_type: securityForm.quantity_type,
-            cost_basis: costBasisCents,
-          }),
+        await extensions.investor.createPosition(graphId, {
+          portfolio_id: selectedPortfolio.id,
+          security_id: (security as { id: string }).id,
+          quantity: parseFloat(securityForm.quantity),
+          quantity_type: securityForm.quantity_type,
+          cost_basis: costBasisCents,
         })
       }
 
