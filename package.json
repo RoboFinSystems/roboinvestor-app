@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.1000.0",
-    "@robosystems/client": "0.2.44",
+    "@robosystems/client": "0.3.1",
     "flowbite": "^3.1",
     "flowbite-react": "^0.12.5",
     "lru-cache": "^11.2.6",
@@ -52,6 +52,7 @@
     "react-dom": "^19",
     "react-icons": "^4",
     "react-markdown": "^10",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3"
   },
   "devDependencies": {
