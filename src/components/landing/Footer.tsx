@@ -87,7 +87,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#platform"
+                  href="#schema"
                   className="text-gray-400 transition-colors hover:text-white"
                 >
                   Platform
@@ -95,10 +95,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#ecosystem"
+                  href="#ai-analysis"
                   className="text-gray-400 transition-colors hover:text-white"
                 >
-                  Ecosystem
+                  Console
                 </Link>
               </li>
             </ul>

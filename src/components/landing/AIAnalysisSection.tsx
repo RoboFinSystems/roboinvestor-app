@@ -1,7 +1,10 @@
+import FloatingElementsVariant from './FloatingElementsVariant'
+
 export default function AIAnalysisSection() {
   return (
     <section id="ai-analysis" className="relative bg-black py-20">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-black"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-emerald-900/30 via-teal-900/20 to-black"></div>
+      <FloatingElementsVariant variant="ai-analysis" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 text-center">
           <div className="mb-4 inline-block rounded-full bg-emerald-500/20 px-4 py-1 text-sm font-semibold text-emerald-400">
@@ -26,7 +29,8 @@ export default function AIAnalysisSection() {
               <div className="rounded-lg bg-black/30 p-4">
                 <div className="mb-2 text-sm text-teal-300">You ask:</div>
                 <p className="italic">
-                  "What's my portfolio's exposure to interest rate risk?"
+                  "Compare net income for Apple, Microsoft, and NVIDIA over the
+                  last three years"
                 </p>
               </div>
               <div className="flex justify-center">
@@ -45,16 +49,17 @@ export default function AIAnalysisSection() {
                 </svg>
               </div>
               <div className="rounded-lg bg-black/30 p-4">
-                <div className="mb-2 text-sm text-green-300">AI analyzes:</div>
-                <ul className="space-y-1 text-sm">
-                  <li>
-                    • Sector allocation to rate-sensitive holdings (Financials,
-                    REITs, Utilities)
-                  </li>
-                  <li>• Duration analysis of bond positions</li>
-                  <li>• Historical performance during rate changes</li>
-                  <li>• Recommended hedging strategies</li>
-                </ul>
+                <div className="mb-2 text-sm text-green-300">AI generates:</div>
+                <pre className="overflow-x-auto text-xs text-gray-400">
+                  {`MATCH (f:Fact)-[:FACT_HAS_ELEMENT]->
+  (el:Element {qname: 'us-gaap:NetIncomeLoss'}),
+  (f)-[:FACT_HAS_ENTITY]->(e:Entity),
+  (f)-[:FACT_HAS_PERIOD]->(p:Period)
+WHERE e.ticker IN ['AAPL','MSFT','NVDA']
+  AND p.duration_type = 'annual'
+RETURN e.ticker, f.numeric_value, p.end_date
+ORDER BY p.end_date DESC`}
+                </pre>
               </div>
             </div>
           </div>
@@ -69,8 +74,8 @@ export default function AIAnalysisSection() {
                 Natural Language Understanding
               </h4>
               <p className="text-sm text-gray-300">
-                Claude AI interprets your question and identifies relevant
-                portfolio data, securities, and analysis requirements
+                Claude AI parses your question, identifies the companies,
+                metrics, and time periods you care about
               </p>
             </div>
 
@@ -79,11 +84,11 @@ export default function AIAnalysisSection() {
                 <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-sm">
                   2
                 </span>
-                Graph-Powered Discovery
+                Text-to-Cypher Translation
               </h4>
               <p className="text-sm text-gray-300">
-                AI traverses your investment knowledge graph to find related
-                holdings, sectors, and market relationships
+                Your question is automatically converted into a precise Cypher
+                graph query against the SEC XBRL knowledge graph
               </p>
             </div>
 
@@ -92,11 +97,12 @@ export default function AIAnalysisSection() {
                 <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm">
                   3
                 </span>
-                Risk-Aware Analysis
+                XBRL Data Traversal
               </h4>
               <p className="text-sm text-gray-300">
-                Built-in financial guardrails ensure analysis considers risk
-                metrics, diversification, and regulatory constraints
+                The graph engine traverses relationships across filings,
+                periods, entities, and financial facts to retrieve structured
+                data
               </p>
             </div>
 
@@ -105,11 +111,11 @@ export default function AIAnalysisSection() {
                 <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm">
                   4
                 </span>
-                Actionable Insights
+                Summarized Results
               </h4>
               <p className="text-sm text-gray-300">
-                Receive specific recommendations with supporting data, charts,
-                and drill-down capabilities
+                Claude interprets the query results and delivers a clear
+                narrative with the raw data available for further analysis
               </p>
             </div>
           </div>
@@ -123,22 +129,22 @@ export default function AIAnalysisSection() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-lg border border-gray-800 bg-zinc-900/50 p-4">
               <p className="text-sm text-gray-300">
-                "Show my top performers this quarter"
+                "How many companies are in the graph?"
               </p>
             </div>
             <div className="rounded-lg border border-gray-800 bg-zinc-900/50 p-4">
               <p className="text-sm text-gray-300">
-                "What dividends am I expecting next month?"
+                "Show NVIDIA annual revenue for the last 3 years"
               </p>
             </div>
             <div className="rounded-lg border border-gray-800 bg-zinc-900/50 p-4">
               <p className="text-sm text-gray-300">
-                "Compare my tech holdings to the S&P 500"
+                "What was Apple's quarterly balance sheet?"
               </p>
             </div>
             <div className="rounded-lg border border-gray-800 bg-zinc-900/50 p-4">
               <p className="text-sm text-gray-300">
-                "Suggest rebalancing for my target allocation"
+                "Show revenue by segment for NVDA"
               </p>
             </div>
           </div>
@@ -173,7 +179,7 @@ export default function AIAnalysisSection() {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Connect Claude Desktop via MCP for local portfolio analysis
+            Connect Claude Desktop or Cursor via MCP for deeper analysis
           </div>
         </div>
       </div>
