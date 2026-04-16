@@ -1,7 +1,6 @@
 'use client'
 
 import AIAnalysisSection from '@/components/landing/AIAnalysisSection'
-import OpenSourceSection from '@/components/landing/EcosystemSection'
 import FeaturesSection from '@/components/landing/FeaturesSection'
 import FinalCTA from '@/components/landing/FinalCTA'
 import Footer from '@/components/landing/Footer'
@@ -19,7 +18,6 @@ export default function LandingPageContent() {
         <FeaturesSection />
         <InvestorSchemaSection />
         <AIAnalysisSection />
-        <OpenSourceSection />
         <FinalCTA />
       </main>
 

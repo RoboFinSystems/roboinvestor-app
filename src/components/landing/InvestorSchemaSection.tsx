@@ -1,7 +1,10 @@
+import FloatingElementsVariant from './FloatingElementsVariant'
+
 export default function InvestorSchemaSection() {
   return (
     <section id="schema" className="relative bg-black py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <FloatingElementsVariant variant="schema" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 text-center">
           <h2 className="font-heading mb-6 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
             Powered by RoboSystems
@@ -13,7 +16,7 @@ export default function InvestorSchemaSection() {
           </p>
         </div>
 
-        <div className="mb-12 rounded-2xl border border-gray-800 bg-gradient-to-b from-zinc-900 to-black p-8">
+        <div className="mb-12 rounded-2xl border border-gray-800 bg-linear-to-b from-zinc-900 to-black p-8">
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Data Sources */}
             <div>
@@ -21,56 +24,64 @@ export default function InvestorSchemaSection() {
                 Data Sources
               </h3>
               <div className="space-y-4">
-                <div className="rounded-lg border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 p-4">
+                <div className="rounded-lg border border-emerald-500/30 bg-linear-to-br from-emerald-500/10 to-teal-500/10 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
+                      <span className="text-xs font-bold text-white">ME</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">
+                        Manual Entry
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        Private Markets
+                      </div>
+                    </div>
+                  </div>
+                  <ul className="space-y-1 text-xs text-gray-400">
+                    <li>• PE &amp; VC positions</li>
+                    <li>• SAFEs, convertible notes</li>
+                    <li>• LLC units &amp; LP interests</li>
+                  </ul>
+                </div>
+
+                <div className="rounded-lg border border-teal-500/30 bg-linear-to-br from-teal-500/10 to-cyan-500/10 p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
+                      <span className="text-xs font-bold text-white">SEC</span>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">
+                        SEC Repository
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        Public Filings
+                      </div>
+                    </div>
+                  </div>
+                  <ul className="space-y-1 text-xs text-gray-400">
+                    <li>• XBRL financial facts</li>
+                    <li>• 10,000+ public companies</li>
+                    <li>• 10-K, 10-Q, and 8-K filings</li>
+                  </ul>
+                </div>
+
+                <div className="rounded-lg border border-cyan-500/30 bg-linear-to-br from-cyan-500/10 to-blue-500/10 p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600">
                       <span className="text-xs font-bold text-white">PL</span>
                     </div>
                     <div>
                       <div className="font-semibold text-white">Plaid</div>
-                      <div className="text-xs text-gray-400">Brokerage</div>
+                      <div className="text-xs text-gray-400">
+                        Brokerage Sync
+                      </div>
                     </div>
                   </div>
                   <ul className="space-y-1 text-xs text-gray-400">
                     <li>• Investment accounts</li>
-                    <li>• Holdings & positions</li>
-                    <li>• Transaction history</li>
-                  </ul>
-                </div>
-
-                <div className="rounded-lg border border-teal-500/30 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
-                      <span className="text-xs font-bold text-white">RS</span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-white">
-                        Shared Repository
-                      </div>
-                      <div className="text-xs text-gray-400">Market Data</div>
-                    </div>
-                  </div>
-                  <ul className="space-y-1 text-xs text-gray-400">
-                    <li>• Point-in-time factors</li>
-                    <li>• Historical OHLCV</li>
-                    <li>• Real-time quotes</li>
-                  </ul>
-                </div>
-
-                <div className="rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600">
-                      <span className="text-xs font-bold text-white">FI</span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-white">FIGI</div>
-                      <div className="text-xs text-gray-400">Securities</div>
-                    </div>
-                  </div>
-                  <ul className="space-y-1 text-xs text-gray-400">
-                    <li>• Security identifiers</li>
-                    <li>• Exchange mappings</li>
-                    <li>• Instrument types</li>
+                    <li>• Holdings &amp; positions</li>
+                    <li className="text-yellow-500/80">• Coming soon</li>
                   </ul>
                 </div>
               </div>
@@ -83,7 +94,7 @@ export default function InvestorSchemaSection() {
               </h3>
               <div className="relative mx-auto mt-8 h-72 w-72">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-full w-full rounded-full border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-600/10 to-teal-600/10">
+                  <div className="h-full w-full rounded-full border-2 border-emerald-500/30 bg-linear-to-br from-emerald-600/10 to-teal-600/10">
                     <div className="flex h-full items-center justify-center">
                       <div className="text-center">
                         <div className="mb-1 text-sm font-semibold text-white">
@@ -107,19 +118,17 @@ export default function InvestorSchemaSection() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    Portfolios, positions, allocations, benchmarks
+                    Portfolios, positions, holdings
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {['Portfolio', 'Position', 'Benchmark'].map(
-                      (comp, cidx) => (
-                        <span
-                          key={cidx}
-                          className="rounded bg-emerald-900/50 px-2 py-0.5 text-xs text-emerald-300"
-                        >
-                          {comp}
-                        </span>
-                      )
-                    )}
+                    {['Portfolio', 'Position', 'Holding'].map((comp, cidx) => (
+                      <span
+                        key={cidx}
+                        className="rounded bg-emerald-900/50 px-2 py-0.5 text-xs text-emerald-300"
+                      >
+                        {comp}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
@@ -130,33 +139,31 @@ export default function InvestorSchemaSection() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    Instruments, market data, dividends
+                    Instruments with entity linking
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {['Security', 'MarketData', 'Dividend'].map(
-                      (comp, cidx) => (
-                        <span
-                          key={cidx}
-                          className="rounded bg-teal-900/50 px-2 py-0.5 text-xs text-teal-300"
-                        >
-                          {comp}
-                        </span>
-                      )
-                    )}
+                    {['Security', 'Entity', 'EntityLink'].map((comp, cidx) => (
+                      <span
+                        key={cidx}
+                        className="rounded bg-teal-900/50 px-2 py-0.5 text-xs text-teal-300"
+                      >
+                        {comp}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
                 <div className="rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3">
                   <div className="mb-1 flex items-center gap-2">
                     <span className="font-semibold text-cyan-300">
-                      Activity Layer
+                      SEC Data Layer
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    Trades, risk metrics, performance
+                    XBRL filings, financial facts
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {['Trade', 'Risk', 'Performance'].map((comp, cidx) => (
+                    {['Report', 'Fact', 'Element'].map((comp, cidx) => (
                       <span
                         key={cidx}
                         className="rounded bg-cyan-900/50 px-2 py-0.5 text-xs text-cyan-300"
@@ -175,7 +182,7 @@ export default function InvestorSchemaSection() {
                 Applications
               </h3>
               <div className="space-y-4">
-                <div className="rounded-lg border border-gray-800 bg-gradient-to-br from-zinc-900 to-emerald-950/20 p-4">
+                <div className="rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 to-emerald-950/20 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
                       <svg
@@ -197,11 +204,11 @@ export default function InvestorSchemaSection() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Portfolio tracking and investment analysis
+                    Portfolio management and SEC research console
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-gray-800 bg-gradient-to-br from-zinc-900 to-teal-950/20 p-4">
+                <div className="rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 to-teal-950/20 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
                       <svg
@@ -214,14 +221,38 @@ export default function InvestorSchemaSection() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
                         />
                       </svg>
                     </div>
-                    <div className="font-semibold text-white">AI Agents</div>
+                    <div className="font-semibold text-white">MCP Tools</div>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Claude AI with MCP-powered analysis
+                    Claude Desktop &amp; Cursor via @robosystems/mcp
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 to-cyan-950/20 p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600">
+                      <svg
+                        className="h-4 w-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                        />
+                      </svg>
+                    </div>
+                    <div className="font-semibold text-white">API Access</div>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    Python, TypeScript, and REST clients
                   </p>
                 </div>
               </div>
@@ -231,8 +262,8 @@ export default function InvestorSchemaSection() {
 
         {/* Bottom Feature Cards */}
         <div className="grid gap-6 md:grid-cols-3">
-          <div className="group rounded-xl border border-gray-800 bg-gradient-to-br from-emerald-500/10 to-zinc-900 p-6 transition-all hover:border-emerald-500/50">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+          <div className="group rounded-xl border border-gray-800 bg-linear-to-br from-emerald-500/10 to-zinc-900 p-6 transition-all hover:border-emerald-500/50">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-teal-500">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -256,8 +287,8 @@ export default function InvestorSchemaSection() {
             </p>
           </div>
 
-          <div className="group rounded-xl border border-gray-800 bg-gradient-to-br from-teal-500/10 to-zinc-900 p-6 transition-all hover:border-teal-500/50">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500">
+          <div className="group rounded-xl border border-gray-800 bg-linear-to-br from-teal-500/10 to-zinc-900 p-6 transition-all hover:border-teal-500/50">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-teal-500 to-cyan-500">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -281,8 +312,8 @@ export default function InvestorSchemaSection() {
             </p>
           </div>
 
-          <div className="group rounded-xl border border-gray-800 bg-gradient-to-br from-cyan-500/10 to-zinc-900 p-6 transition-all hover:border-cyan-500/50">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500">
+          <div className="group rounded-xl border border-gray-800 bg-linear-to-br from-cyan-500/10 to-zinc-900 p-6 transition-all hover:border-cyan-500/50">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-cyan-500 to-blue-500">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"

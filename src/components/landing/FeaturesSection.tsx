@@ -1,3 +1,5 @@
+import FloatingElementsVariant from './FloatingElementsVariant'
+
 export default function FeaturesSection() {
   const features = [
     {
@@ -16,9 +18,9 @@ export default function FeaturesSection() {
           />
         </svg>
       ),
-      title: 'Position Management',
+      title: 'Portfolio Management',
       description:
-        'Track holdings with cost basis, market value, and unrealized gains across all accounts',
+        'Create portfolios, track positions with cost basis, and view holdings grouped by company',
       color: 'emerald',
     },
     {
@@ -33,13 +35,13 @@ export default function FeaturesSection() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
           />
         </svg>
       ),
-      title: 'Trade History',
+      title: 'Private Security Types',
       description:
-        'Complete transaction log with buy/sell trades, settlement dates, and commission tracking',
+        'Track PE and VC instruments: LLC units, LP interests, SAFEs, KISSes, convertible notes, and warrants',
       color: 'teal',
     },
     {
@@ -54,13 +56,13 @@ export default function FeaturesSection() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
           />
         </svg>
       ),
-      title: 'Risk Metrics',
+      title: 'SEC Research Console',
       description:
-        'Beta, volatility, VaR, and portfolio risk assessments with market correlation analysis',
+        'Ask questions in plain English — AI generates Cypher queries across 10,000+ public company XBRL filings',
       color: 'cyan',
     },
     {
@@ -75,13 +77,13 @@ export default function FeaturesSection() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
           />
         </svg>
       ),
-      title: 'Dividend Income',
+      title: 'Cross-Graph Intelligence',
       description:
-        'Track dividend payments, ex-dates, and yield analysis with reinvestment planning',
+        'Link private portfolio companies to their public SEC filing graphs for unified AI analysis',
       color: 'green',
     },
     {
@@ -96,13 +98,13 @@ export default function FeaturesSection() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+            d="M13 10V3L4 14h7v7l9-11h-7z"
           />
         </svg>
       ),
-      title: 'Benchmark Comparison',
+      title: 'MCP Protocol',
       description:
-        'Compare portfolio performance against S&P 500, custom indices, and peer strategies',
+        'Connect Claude Desktop, Cursor, and other AI tools directly to your investment graph',
       color: 'orange',
     },
     {
@@ -123,7 +125,7 @@ export default function FeaturesSection() {
       ),
       title: 'AI Research Console',
       description:
-        'Claude-powered natural language queries for deep portfolio analysis and insights',
+        'Claude-powered natural language queries with deep research mode for investment analysis',
       color: 'purple',
     },
   ]
@@ -144,9 +146,10 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="relative bg-gradient-to-b from-black to-zinc-900 py-16 sm:py-24"
+      className="relative bg-linear-to-b from-black to-zinc-900 py-16 sm:py-24"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <FloatingElementsVariant variant="features" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
           <h2 className="font-heading mb-6 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
@@ -160,7 +163,7 @@ export default function FeaturesSection() {
         {/* Framework vs Application Comparison */}
         <div className="mb-16 grid gap-8 lg:grid-cols-2">
           {/* Traditional Apps */}
-          <div className="rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900/50 to-zinc-900 p-8">
+          <div className="rounded-2xl border border-gray-700 bg-linear-to-br from-gray-900/50 to-zinc-900 p-8">
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-500/20">
                 <svg
@@ -228,7 +231,7 @@ export default function FeaturesSection() {
           </div>
 
           {/* RoboInvestor Framework */}
-          <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-900/20 to-zinc-900 p-8">
+          <div className="rounded-2xl border border-emerald-500/30 bg-linear-to-br from-emerald-900/20 to-zinc-900 p-8">
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/20">
                 <svg
@@ -310,7 +313,7 @@ export default function FeaturesSection() {
           {features.map((feature, idx) => (
             <div
               key={idx}
-              className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br p-6 transition-all duration-300 ${colorClasses[feature.color as keyof typeof colorClasses]}`}
+              className={`group relative overflow-hidden rounded-2xl border bg-linear-to-br p-6 transition-all duration-300 ${colorClasses[feature.color as keyof typeof colorClasses]}`}
             >
               <div
                 className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-${feature.color}-500/20`}

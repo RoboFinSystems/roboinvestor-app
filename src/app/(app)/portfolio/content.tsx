@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  customTheme,
-  extensions,
-  GraphFilters,
-  useGraphContext,
-} from '@/lib/core'
+import { clients, customTheme, GraphFilters, useGraphContext } from '@/lib/core'
 import {
   Alert,
   Badge,
@@ -67,7 +62,7 @@ interface Holding {
   position_count: number
 }
 
-// Map the camelCase shapes returned by `extensions.investor.*` / GraphQL
+// Map the camelCase shapes returned by `clients.investor.*` / GraphQL
 // into the snake_case local view models the JSX below already consumes.
 // Keeping the mapping localized here avoids rewriting the render tree.
 
@@ -212,7 +207,7 @@ const PortfolioPageContent: FC = function () {
     if (!graphId) return
     try {
       setLoadingEntities(true)
-      const entitiesList = await extensions.ledger.listEntities(graphId, {
+      const entitiesList = await clients.ledger.listEntities(graphId, {
         source: 'linked',
       })
       setLinkedEntities(
@@ -238,7 +233,7 @@ const PortfolioPageContent: FC = function () {
     try {
       setIsLoading(true)
       setError(null)
-      const data = await extensions.investor.listPortfolios(graphId)
+      const data = await clients.investor.listPortfolios(graphId)
       const list = (data?.portfolios ?? []).map(toPortfolio)
       setPortfolios(list)
       if (list.length > 0 && !selectedPortfolio) {
@@ -257,7 +252,7 @@ const PortfolioPageContent: FC = function () {
       try {
         setHoldingsLoading(true)
         setHoldingsError(null)
-        const data = await extensions.investor.getHoldings(graphId, portfolioId)
+        const data = await clients.investor.getHoldings(graphId, portfolioId)
         setHoldings(((data?.holdings as RawHolding[]) ?? []).map(toHolding))
       } catch (err) {
         setHoldings([])
@@ -294,7 +289,7 @@ const PortfolioPageContent: FC = function () {
       if (editSourceGraphId.trim())
         updates.source_graph_id = editSourceGraphId.trim()
 
-      await extensions.investor.updateSecurity(graphId, editSecurityId, updates)
+      await clients.investor.updateSecurity(graphId, editSecurityId, updates)
 
       setShowEditSecurityModal(false)
       if (selectedPortfolio) loadHoldings(selectedPortfolio.id)
@@ -330,7 +325,7 @@ const PortfolioPageContent: FC = function () {
     if (!graphId || !createForm.name.trim()) return
     try {
       setCreating(true)
-      const raw = await extensions.investor.createPortfolio(graphId, {
+      const raw = await clients.investor.createPortfolio(graphId, {
         name: createForm.name.trim(),
         description: createForm.description.trim() || null,
         strategy: createForm.strategy.trim() || null,
@@ -356,7 +351,7 @@ const PortfolioPageContent: FC = function () {
       setSecurityModalError(null)
 
       // 1. Create the security
-      const security = await extensions.investor.createSecurity(graphId, {
+      const security = await clients.investor.createSecurity(graphId, {
         name: securityForm.name.trim(),
         security_type: securityForm.security_type,
         security_subtype: securityForm.security_subtype.trim() || null,
@@ -370,7 +365,7 @@ const PortfolioPageContent: FC = function () {
           ? Math.round(parseFloat(securityForm.cost_basis) * 100)
           : 0
 
-        await extensions.investor.createPosition(graphId, {
+        await clients.investor.createPosition(graphId, {
           portfolio_id: selectedPortfolio.id,
           security_id: (security as { id: string }).id,
           quantity: parseFloat(securityForm.quantity),
