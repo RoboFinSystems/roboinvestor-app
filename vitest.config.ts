@@ -8,6 +8,10 @@ const __dirname = path.dirname(__filename)
 
 const srcDir = path.resolve(__dirname, 'src')
 const clientMock = path.resolve(srcDir, '__mocks__/@robosystems/client.js')
+const clientClientsMock = path.resolve(
+  srcDir,
+  '__mocks__/@robosystems/client-clients.js'
+)
 const clientExtensionsMock = path.resolve(
   srcDir,
   '__mocks__/@robosystems/client-extensions.js'
@@ -31,6 +35,7 @@ export default defineConfig({
     alias: {
       '@': srcDir,
       'react-markdown': reactMarkdownMock,
+      '@robosystems/client/clients': clientClientsMock,
       '@robosystems/client/extensions': clientExtensionsMock,
       '@robosystems/client/sdk': clientSdkMock,
       '@robosystems/client': clientMock,
