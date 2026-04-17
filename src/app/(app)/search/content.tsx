@@ -12,6 +12,7 @@ const REPO_CONFIG: SearchConfig = {
     entity: true,
     formType: true,
     fiscalYear: true,
+    semantic: true,
   },
 }
 
@@ -19,7 +20,7 @@ const USER_GRAPH_CONFIG: SearchConfig = {
   title: 'Document Search',
   description: 'Search uploaded documents and AI memories',
   placeholder: 'Search your documents...',
-  filters: { sourceType: true },
+  filters: { sourceType: true, semantic: true },
 }
 
 export function SearchPageContent() {
