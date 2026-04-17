@@ -48,7 +48,7 @@ npm run format:check # Check code formatting
 
 **RoboInvestor-Specific Features:**
 
-- Console configured with investment-specific sample queries and `@roboinvestor/mcp` integration
+- Console configured with investment-specific sample queries and `@robosystems/mcp` integration for AI analytics
 - Portfolio page (coming soon placeholder with planned features)
 - Graph creation enforces `roboinvestor` schema extension
 - Entity browser with multi-graph traversal

@@ -4,7 +4,7 @@
     {
       "label": "RoboInvestor Dev",
       "type": "shell",
-      "command": "npm run dev${input:bundler} -- --port ${input:port}",
+      "command": "npm run dev${input:bundler} -- --port ${input:portRI}",
       "problemMatcher": []
     },
     {
@@ -146,10 +146,9 @@
   ],
   "inputs": [
     {
-      "id": "port",
-      "type": "pickString",
+      "id": "portRI",
+      "type": "promptString",
       "description": "Select which port to run on:",
-      "options": ["3000", "3001", "3002", "3003"],
       "default": "3002"
     },
     {

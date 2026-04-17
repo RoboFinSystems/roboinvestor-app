@@ -83,7 +83,7 @@ export default function FeaturesSection() {
       ),
       title: 'Cross-Graph Intelligence',
       description:
-        'Link private portfolio companies to their public SEC filing graphs for unified AI analysis',
+        'Query private portfolio data alongside public SEC filings in a single AI workflow',
       color: 'green',
     },
     {
@@ -302,7 +302,7 @@ export default function FeaturesSection() {
                 Apache 2.0 Licensed
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Use commercially, modify freely, patent protection included
+                Open source — fork it, self-host it, make it yours.
               </p>
             </div>
           </div>
