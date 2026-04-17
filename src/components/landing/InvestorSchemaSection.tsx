@@ -118,10 +118,10 @@ export default function InvestorSchemaSection() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    Portfolios, positions, holdings
+                    Portfolios, positions, trades
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {['Portfolio', 'Position', 'Holding'].map((comp, cidx) => (
+                    {['Portfolio', 'Position', 'Trade'].map((comp, cidx) => (
                       <span
                         key={cidx}
                         className="rounded bg-emerald-900/50 px-2 py-0.5 text-xs text-emerald-300"
@@ -142,7 +142,7 @@ export default function InvestorSchemaSection() {
                     Instruments with entity linking
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {['Security', 'Entity', 'EntityLink'].map((comp, cidx) => (
+                    {['Security', 'Entity'].map((comp, cidx) => (
                       <span
                         key={cidx}
                         className="rounded bg-teal-900/50 px-2 py-0.5 text-xs text-teal-300"
@@ -228,7 +228,7 @@ export default function InvestorSchemaSection() {
                     <div className="font-semibold text-white">MCP Tools</div>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Claude Desktop &amp; Cursor via @robosystems/mcp
+                    AI analytics in Claude Desktop via @robosystems/mcp
                   </p>
                 </div>
 
@@ -279,11 +279,10 @@ export default function InvestorSchemaSection() {
               </svg>
             </div>
             <h3 className="mb-2 text-lg font-semibold text-white">
-              Real-Time Sync
+              Daily Sync
             </h3>
             <p className="text-sm text-gray-400">
-              Automated data synchronization from brokerage accounts and market
-              feeds
+              Daily updates from brokerage accounts and market feeds
             </p>
           </div>
 
