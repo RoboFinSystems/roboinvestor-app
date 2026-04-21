@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.1000.0",
-    "@robosystems/client": "0.3.7",
+    "@robosystems/client": "0.3.8",
     "flowbite": "^3.1",
     "flowbite-react": "^0.12.5",
     "lru-cache": "^11.2.6",
@@ -56,7 +56,7 @@
     "tailwind-merge": "^3"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^16.2.1",
+    "@next/eslint-plugin-next": "^16.2.2",
     "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/typography": "^0.5",
     "@testing-library/jest-dom": "^6",
