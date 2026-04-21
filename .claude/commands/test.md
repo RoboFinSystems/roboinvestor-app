@@ -26,9 +26,11 @@ For single-layer commands (below), output is short enough that `| tail -30` alon
 ## Key Commands
 
 **Full suite:**
+
 - `npm run test:all` — tests + format (auto-write) + lint (auto-fix) + typecheck + cfn-lint
 
 **Iteration (one layer at a time):**
+
 - `npx vitest run <path>` — run a single test file (fastest feedback)
 - `npm run test` — all vitest tests, no other checks
 - `npm run typecheck` — `tsc --noEmit` only
