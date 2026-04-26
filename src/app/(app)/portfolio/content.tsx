@@ -325,10 +325,12 @@ const PortfolioPageContent: FC = function () {
     if (!graphId || !createForm.name.trim()) return
     try {
       setCreating(true)
-      const raw = await clients.investor.createPortfolio(graphId, {
-        name: createForm.name.trim(),
-        description: createForm.description.trim() || null,
-        strategy: createForm.strategy.trim() || null,
+      const raw = await clients.investor.createPortfolioBlock(graphId, {
+        portfolio: {
+          name: createForm.name.trim(),
+          description: createForm.description.trim() || null,
+          strategy: createForm.strategy.trim() || null,
+        },
       })
       const portfolio = toPortfolio(raw)
       setPortfolios((prev) => [...prev, portfolio])
@@ -359,19 +361,28 @@ const PortfolioPageContent: FC = function () {
         source_graph_id: securityForm.source_graph_id.trim() || null,
       })
 
-      // 2. Create the position if quantity was provided
+      // 2. Add the position via portfolio block update if quantity was provided
       if (securityForm.quantity) {
         const costBasisCents = securityForm.cost_basis
           ? Math.round(parseFloat(securityForm.cost_basis) * 100)
           : 0
 
-        await clients.investor.createPosition(graphId, {
-          portfolio_id: selectedPortfolio.id,
-          security_id: (security as { id: string }).id,
-          quantity: parseFloat(securityForm.quantity),
-          quantity_type: securityForm.quantity_type,
-          cost_basis: costBasisCents,
-        })
+        await clients.investor.updatePortfolioBlock(
+          graphId,
+          selectedPortfolio.id,
+          {
+            positions: {
+              add: [
+                {
+                  security_id: (security as { id: string }).id,
+                  quantity: parseFloat(securityForm.quantity),
+                  quantity_type: securityForm.quantity_type,
+                  cost_basis: costBasisCents,
+                },
+              ],
+            },
+          }
+        )
       }
 
       setShowSecurityModal(false)
