@@ -14,20 +14,23 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 
 ### Available Now
 
+- **Investment Dashboard**: Portfolio overview with key metrics and quick actions
+- **Portfolio Management**: Create portfolios, track positions and holdings, manage cost basis
+- **Securities Management**: Track stocks, bonds, and other securities with mutual-handshake cross-graph linking to issuer entities
 - **AI Console**: Natural language and Cypher query terminal with streaming results and MCP integration
-- **Entity Browser**: Search and manage entities across graphs with relationships
+- **Entity Browser**: Search and manage entities (native + linked from portfolio companies) across graphs
+- **Shared Repository Access**: Subscribe to and query SEC XBRL filings for public-company holdings
+- **Document Search**: Full-text and semantic search across connected sources
 - **Graph Creation**: Wizard-based portfolio graph setup with schema selection
 - **API Keys**: Secure programmatic access with key creation and rotation
 - **Settings**: Profile and password management
 
 ### Roadmap
 
-- **Investment Dashboard**: Personalized portfolio overview with key metrics and AI insights
-- **Securities Management**: Track stocks, bonds, and other securities with market data
-- **Portfolio Tracking**: Position tracking, performance, and cost basis
 - **Asset Allocation**: Visualization by sector, asset class, and geography
 - **Risk Analytics**: Beta, volatility, Sharpe ratio, and correlation analysis
 - **Dividend Tracking**: Yield monitoring and reinvestment tracking
+- **Performance Analytics**: TWR, IRR, and benchmark comparisons
 
 ## Quick Start
 
