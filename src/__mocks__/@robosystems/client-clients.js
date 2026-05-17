@@ -7,7 +7,7 @@ export const clients = {
     streamQuery: vi.fn(),
     close: vi.fn(),
   },
-  agent: {
+  operator: {
     query: vi.fn(),
     analyzeFinancials: vi.fn(),
     close: vi.fn(),
@@ -45,7 +45,7 @@ export const SSEClient = vi.fn().mockImplementation(() => ({
   close: vi.fn(),
 }))
 
-export const AgentClient = vi.fn().mockImplementation(() => ({
+export const OperatorClient = vi.fn().mockImplementation(() => ({
   query: vi.fn(),
   analyzeFinancials: vi.fn(),
   close: vi.fn(),
@@ -61,7 +61,7 @@ export const InvestorClient = vi.fn().mockImplementation(() => ({
 
 export const RoboSystemsClients = vi.fn().mockImplementation(() => ({
   query: QueryClient(),
-  agent: AgentClient(),
+  operator: OperatorClient(),
   operations: OperationClient(),
   ledger: LedgerClient(),
   investor: InvestorClient(),
@@ -82,7 +82,7 @@ export const EventType = {
 export const executeQuery = vi.fn()
 export const monitorOperation = vi.fn()
 export const streamQuery = vi.fn()
-export const agentQuery = vi.fn()
+export const operatorQuery = vi.fn()
 export const analyzeFinancials = vi.fn()
 
 export const useSDKClients = vi.fn().mockReturnValue({
