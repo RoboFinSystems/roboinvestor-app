@@ -3,6 +3,7 @@
 import type {
   LibraryArc,
   LibraryClient,
+  LibraryElement,
   LibraryStructure,
   LibraryTaxonomy,
 } from '@robosystems/client/clients'
@@ -207,6 +208,71 @@ function buildForest(arcs: LibraryArc[]): TreeNode[] {
   return roots.map((id) => node(id, null, null, new Set()))
 }
 
+/** Fetch every (active) element of a taxonomy, paging past the cap. */
+async function fetchAllElements(
+  client: LibraryClient,
+  graphId: string,
+  taxonomyId: string
+): Promise<LibraryElement[]> {
+  const all: LibraryElement[] = []
+  let offset = 0
+  for (let page = 0; page < 50; page++) {
+    const rows = await client.listLibraryElements(graphId, {
+      taxonomyId,
+      limit: FETCH_PAGE,
+      offset,
+    })
+    all.push(...rows)
+    if (rows.length < FETCH_PAGE) break
+    offset += FETCH_PAGE
+  }
+  return all
+}
+
+/**
+ * Assemble a forest from a Chart of Accounts element list. A CoA has no
+ * presentation/calc arcs (those are an rs-gaap/fac construct) — its tree is the
+ * account parent/sub-account structure carried on ``parentId``. Roots are
+ * elements with no parent (or whose parent isn't in the set).
+ */
+function buildCoaForest(elements: LibraryElement[]): TreeNode[] {
+  const byId = new Map(elements.map((e) => [e.id, e]))
+  const childrenOf = new Map<string, LibraryElement[]>()
+  const roots: LibraryElement[] = []
+  for (const e of elements) {
+    const pid = e.parentId
+    if (pid && byId.has(pid)) {
+      const kids = childrenOf.get(pid) ?? []
+      kids.push(e)
+      childrenOf.set(pid, kids)
+    } else {
+      roots.push(e)
+    }
+  }
+  const byName = (a: LibraryElement, b: LibraryElement) =>
+    (a.name ?? a.qname ?? '').localeCompare(b.name ?? b.qname ?? '')
+  const node = (e: LibraryElement, seen: Set<string>): TreeNode => {
+    const self: TreeNode = {
+      id: e.id,
+      qname: e.qname ?? null,
+      name: e.name ?? null,
+      trait: e.trait ?? null,
+      isAbstract: e.isAbstract ?? false,
+      weight: null,
+      order: null,
+      children: [],
+    }
+    if (seen.has(e.id)) return self // cycle guard
+    const next = new Set(seen)
+    next.add(e.id)
+    self.children = (childrenOf.get(e.id) ?? [])
+      .sort(byName)
+      .map((c) => node(c, next))
+    return self
+  }
+  return roots.sort(byName).map((r) => node(r, new Set()))
+}
+
 /** Node ids deeper than INITIAL_EXPAND_DEPTH — collapsed on first render. */
 function deepNodeIds(forest: TreeNode[]): Set<string> {
   const out = new Set<string>()
@@ -223,6 +289,7 @@ export function LibraryHierarchy({
   graphId,
   taxonomies,
   baseStandard,
+  selectedTaxonomyId,
   selectedElementId,
   onSelectElement,
 }: {
@@ -232,6 +299,8 @@ export function LibraryHierarchy({
   taxonomies: LibraryTaxonomy[]
   /** Base reporting standard whose hierarchy to show (e.g. "rs-gaap", "fac"). */
   baseStandard: string | null
+  /** The selected taxonomy id — drives the Chart-of-Accounts parent_id tree. */
+  selectedTaxonomyId: string | null
   selectedElementId: string | null
   onSelectElement: (id: string) => void
 }) {
@@ -249,6 +318,17 @@ export function LibraryHierarchy({
   const [structuresTaxonomyId, setStructuresTaxonomyId] = useState<
     string | null
   >(null)
+  const [coaElements, setCoaElements] = useState<LibraryElement[]>([])
+
+  // A Chart of Accounts has no presentation/calc arcs — its hierarchy is the
+  // account parent/sub-account tree carried on each element's parentId. Detect
+  // it from the selected taxonomy's type and render that tree instead.
+  const isCoa = useMemo(
+    () =>
+      taxonomies.find((t) => t.id === selectedTaxonomyId)?.taxonomyType ===
+      'chart_of_accounts',
+    [taxonomies, selectedTaxonomyId]
+  )
 
   // Resolve the taxonomy that owns this arc type for the chosen base standard.
   const arcTaxonomy = useMemo(() => {
@@ -295,6 +375,7 @@ export function LibraryHierarchy({
 
   // Load arcs for the selected taxonomy + arc type (+ optional structure scope).
   useEffect(() => {
+    if (isCoa) return // CoA uses the parentId tree below, not arcs.
     if (!arcTaxonomy) {
       setArcs([])
       setState('ready')
@@ -326,9 +407,45 @@ export function LibraryHierarchy({
     return () => {
       cancelled = true
     }
-  }, [client, graphId, arcTaxonomy, arcType, structureId, structuresTaxonomyId])
+  }, [
+    client,
+    graphId,
+    arcTaxonomy,
+    arcType,
+    structureId,
+    structuresTaxonomyId,
+    isCoa,
+  ])
 
-  const forest = useMemo(() => buildForest(arcs), [arcs])
+  // Load Chart-of-Accounts elements and build the parentId tree.
+  useEffect(() => {
+    if (!isCoa || !selectedTaxonomyId) {
+      setCoaElements([])
+      return
+    }
+    let cancelled = false
+    setState('loading')
+    setError(null)
+    fetchAllElements(client, graphId, selectedTaxonomyId)
+      .then((rows) => {
+        if (cancelled) return
+        setCoaElements(rows)
+        setState('ready')
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setError(err instanceof Error ? err.message : 'Failed to load accounts')
+        setState('error')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [client, graphId, isCoa, selectedTaxonomyId])
+
+  const forest = useMemo(
+    () => (isCoa ? buildCoaForest(coaElements) : buildForest(arcs)),
+    [isCoa, coaElements, arcs]
+  )
 
   // Reset the collapse state to the default expand depth on each new forest.
   useEffect(() => {
@@ -343,7 +460,7 @@ export function LibraryHierarchy({
       return next
     })
 
-  const showWeights = arcType === 'calculation'
+  const showWeights = !isCoa && arcType === 'calculation'
 
   return (
     <section className="col-span-12 min-h-0 md:col-span-5">
@@ -355,43 +472,45 @@ export function LibraryHierarchy({
           <h2 className="font-heading text-lg font-semibold text-gray-900 dark:text-white">
             Hierarchy
           </h2>
-          <div className="flex flex-wrap items-center gap-2">
-            <div
-              className="flex overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
-              role="group"
-              aria-label="Arc type"
-            >
-              {ARC_TYPES.map((t) => (
-                <button
-                  key={t.value}
-                  onClick={() => setArcType(t.value)}
-                  aria-pressed={arcType === t.value}
-                  className={`px-3 py-1 text-xs font-medium transition-colors ${
-                    arcType === t.value
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            {structures.length > 0 && (
-              <Select
-                sizing="sm"
-                value={structureId ?? ''}
-                onChange={(e) => setStructureId(e.target.value || null)}
-                aria-label="Structure"
+          {!isCoa && (
+            <div className="flex flex-wrap items-center gap-2">
+              <div
+                className="flex overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+                role="group"
+                aria-label="Arc type"
               >
-                <option value="">All structures</option>
-                {structures.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
+                {ARC_TYPES.map((t) => (
+                  <button
+                    key={t.value}
+                    onClick={() => setArcType(t.value)}
+                    aria-pressed={arcType === t.value}
+                    className={`px-3 py-1 text-xs font-medium transition-colors ${
+                      arcType === t.value
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
                 ))}
-              </Select>
-            )}
-          </div>
+              </div>
+              {structures.length > 0 && (
+                <Select
+                  sizing="sm"
+                  value={structureId ?? ''}
+                  onChange={(e) => setStructureId(e.target.value || null)}
+                  aria-label="Structure"
+                >
+                  <option value="">All structures</option>
+                  {structures.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </div>
+          )}
         </div>
 
         {state === 'loading' && (
@@ -404,7 +523,7 @@ export function LibraryHierarchy({
             {error}
           </Alert>
         )}
-        {state === 'ready' && !arcTaxonomy && (
+        {state === 'ready' && !isCoa && !arcTaxonomy && (
           <Alert color="info" icon={HiInformationCircle}>
             No {ARC_TYPES.find((t) => t.value === arcType)?.label.toLowerCase()}{' '}
             hierarchy is published for{' '}
@@ -412,9 +531,14 @@ export function LibraryHierarchy({
             .
           </Alert>
         )}
-        {state === 'ready' && arcTaxonomy && forest.length === 0 && (
+        {state === 'ready' && !isCoa && arcTaxonomy && forest.length === 0 && (
           <p className="text-sm text-gray-500 dark:text-gray-400">
             No arcs in this hierarchy.
+          </p>
+        )}
+        {state === 'ready' && isCoa && forest.length === 0 && (
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            No accounts in this chart of accounts.
           </p>
         )}
 

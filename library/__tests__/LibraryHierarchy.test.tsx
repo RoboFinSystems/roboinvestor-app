@@ -5,11 +5,13 @@ import { LibraryHierarchy } from '../components/LibraryHierarchy'
 type MockClient = {
   listLibraryStructures: ReturnType<typeof vi.fn>
   listLibraryTaxonomyArcs: ReturnType<typeof vi.fn>
+  listLibraryElements: ReturnType<typeof vi.fn>
 }
 
 const makeClient = (overrides: Partial<MockClient> = {}): MockClient => ({
   listLibraryStructures: vi.fn().mockResolvedValue([]),
   listLibraryTaxonomyArcs: vi.fn().mockResolvedValue({ arcs: [], count: 0 }),
+  listLibraryElements: vi.fn().mockResolvedValue([]),
   ...overrides,
 })
 
@@ -23,6 +25,7 @@ const baseProps = {
   graphId: 'library',
   taxonomies,
   baseStandard: 'rs-gaap',
+  selectedTaxonomyId: 'tax-rsgaap',
   selectedElementId: null,
   onSelectElement: vi.fn(),
 }
@@ -85,6 +88,47 @@ describe('LibraryHierarchy', () => {
       ).toBeInTheDocument()
     )
     // No owning taxonomy → never tries to load arcs.
+    expect(client.listLibraryTaxonomyArcs).not.toHaveBeenCalled()
+  })
+
+  it('builds the tree from parentId for a chart of accounts', async () => {
+    const client = makeClient({
+      listLibraryElements: vi.fn().mockResolvedValue([
+        {
+          id: 'p',
+          qname: 'native:Assets',
+          name: 'Assets',
+          trait: 'asset',
+          isAbstract: false,
+          parentId: null,
+        },
+        {
+          id: 'c',
+          qname: 'native:Cash',
+          name: 'Cash',
+          trait: 'asset',
+          isAbstract: false,
+          parentId: 'p',
+        },
+      ]),
+    })
+
+    render(
+      <LibraryHierarchy
+        {...baseProps}
+        taxonomies={
+          [{ id: 'tax-coa', taxonomyType: 'chart_of_accounts' }] as any
+        }
+        selectedTaxonomyId="tax-coa"
+        baseStandard={null}
+        client={client as any}
+      />
+    )
+
+    await waitFor(() => expect(screen.getByText('Assets')).toBeInTheDocument())
+    expect(screen.getByText('Cash')).toBeInTheDocument()
+    // CoA walks parentId via listLibraryElements, never presentation arcs.
+    expect(client.listLibraryElements).toHaveBeenCalled()
     expect(client.listLibraryTaxonomyArcs).not.toHaveBeenCalled()
   })
 
