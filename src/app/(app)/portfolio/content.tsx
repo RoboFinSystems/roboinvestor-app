@@ -1,6 +1,12 @@
 'use client'
 
-import { clients, customTheme, GraphFilters, useGraphContext } from '@/lib/core'
+import {
+  clients,
+  customTheme,
+  GraphFilters,
+  PageHeader,
+  useGraphContext,
+} from '@/lib/core'
 import {
   Alert,
   Badge,
@@ -431,29 +437,21 @@ const PortfolioPageContent: FC = function () {
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 p-3">
-            <HiViewGrid className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-gray-900 dark:text-white">
-              Portfolio
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Manage your investment portfolios and holdings
-            </p>
-          </div>
-        </div>
-        <Button
-          color="teal"
-          onClick={() => setShowCreateModal(true)}
-          disabled={isLoading}
-        >
-          <HiPlus className="mr-2 h-4 w-4" />
-          New Portfolio
-        </Button>
-      </div>
+      <PageHeader
+        icon={HiViewGrid}
+        title="Portfolio"
+        subtitle="Manage your investment portfolios and holdings"
+        actions={
+          <Button
+            color="teal"
+            onClick={() => setShowCreateModal(true)}
+            disabled={isLoading}
+          >
+            <HiPlus className="mr-2 h-4 w-4" />
+            New Portfolio
+          </Button>
+        }
+      />
 
       {error && (
         <Alert

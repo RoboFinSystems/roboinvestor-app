@@ -4,6 +4,7 @@ import {
   customTheme,
   GraphFilters,
   onlyRepositories,
+  PageHeader,
   PageLayout,
   useGraphContext,
 } from '@/lib/core'
@@ -75,19 +76,11 @@ const HomePageContent: FC = function () {
   return (
     <PageLayout>
       {/* Welcome Header */}
-      <div className="flex items-center gap-4">
-        <div className="rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 p-3">
-          <HiHome className="h-8 w-8 text-white" />
-        </div>
-        <div>
-          <h1 className="font-heading text-3xl font-bold text-gray-900 dark:text-white">
-            Welcome to RoboInvestor
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            AI-powered investment intelligence platform
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        icon={HiHome}
+        title="Welcome to RoboInvestor"
+        subtitle="AI-powered investment intelligence platform"
+      />
 
       {hasEntityGraph ? (
         <>

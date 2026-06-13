@@ -2,6 +2,7 @@
 
 import {
   customTheme,
+  PageHeader,
   useGraphContext,
   useServiceOfferings,
   useToast,
@@ -125,22 +126,13 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       <ToastContainer />
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-start gap-4">
-          <div className="from-primary-500 to-secondary-600 rounded-lg bg-gradient-to-br p-3">
-            <HiDatabase className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-              {repoOffering?.name || repository.toUpperCase()} Repository
-            </h1>
-            <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-              {repoOffering?.description ||
-                'Curated graph database ready to query'}
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        icon={HiDatabase}
+        title={`${repoOffering?.name || repository.toUpperCase()} Repository`}
+        subtitle={
+          repoOffering?.description || 'Curated graph database ready to query'
+        }
+      />
 
       {/* What's Included */}
       <Card theme={customTheme.card}>
