@@ -1,3 +1,4 @@
+import { clients } from '@robosystems/client/clients'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { LibraryHierarchy } from '../components/LibraryHierarchy'
@@ -23,6 +24,7 @@ const baseProps = {
   graphId: 'library',
   taxonomies,
   baseStandard: 'rs-gaap',
+  selectedTaxonomyId: 'tax-rsgaap',
   selectedElementId: null,
   onSelectElement: vi.fn(),
 }
@@ -86,6 +88,103 @@ describe('LibraryHierarchy', () => {
     )
     // No owning taxonomy → never tries to load arcs.
     expect(client.listLibraryTaxonomyArcs).not.toHaveBeenCalled()
+  })
+
+  it('renders the backend account tree for a chart of accounts', async () => {
+    const spy = vi.spyOn(clients.ledger, 'getAccountTree').mockResolvedValue({
+      roots: [
+        {
+          id: 'p',
+          code: '1000',
+          name: 'Assets',
+          trait: 'asset',
+          children: [
+            {
+              id: 'c',
+              code: '1010',
+              name: 'Cash',
+              trait: 'asset',
+              children: [],
+            },
+          ],
+        },
+      ],
+      totalAccounts: 2,
+    } as never)
+
+    const client = makeClient()
+    render(
+      <LibraryHierarchy
+        {...baseProps}
+        taxonomies={
+          [{ id: 'tax-coa', taxonomyType: 'chart_of_accounts' }] as any
+        }
+        selectedTaxonomyId="tax-coa"
+        baseStandard={null}
+        client={client as any}
+      />
+    )
+
+    await waitFor(() => expect(screen.getByText('Assets')).toBeInTheDocument())
+    expect(screen.getByText('Cash')).toBeInTheDocument()
+    // CoA uses the backend account tree (code-ordered, active-only), not arcs.
+    expect(spy).toHaveBeenCalled()
+    expect(client.listLibraryTaxonomyArcs).not.toHaveBeenCalled()
+    spy.mockRestore()
+  })
+
+  it('orders CoA roots by AccountType, not by name', async () => {
+    // Names are deliberately reverse-alphabetical to the AccountType order:
+    // the Bank account is named "Zzz Checking" (sorts last by name) and the
+    // Expense account "Aaa Expense" (sorts first by name). Correct behavior
+    // is AccountType-first — Bank (0) before Expense (12) — so "Zzz Checking"
+    // must render BEFORE "Aaa Expense". A name-only sort (or an
+    // ACCOUNT_TYPE_ORDER typo that drops Bank's precedence) flips them.
+    const spy = vi.spyOn(clients.ledger, 'getAccountTree').mockResolvedValue({
+      roots: [
+        {
+          id: 'exp',
+          code: 'Aaa Expense',
+          name: 'Aaa Expense',
+          trait: 'expense',
+          accountType: 'Expense',
+          children: [],
+        },
+        {
+          id: 'bank',
+          code: 'Zzz Checking',
+          name: 'Zzz Checking',
+          trait: 'asset',
+          accountType: 'Bank',
+          children: [],
+        },
+      ],
+      totalAccounts: 2,
+    } as never)
+
+    const client = makeClient()
+    render(
+      <LibraryHierarchy
+        {...baseProps}
+        taxonomies={
+          [{ id: 'tax-coa', taxonomyType: 'chart_of_accounts' }] as any
+        }
+        selectedTaxonomyId="tax-coa"
+        baseStandard={null}
+        client={client as any}
+      />
+    )
+
+    await waitFor(() =>
+      expect(screen.getByText('Zzz Checking')).toBeInTheDocument()
+    )
+    const text = screen.getByRole('tree').textContent ?? ''
+    const bankIdx = text.indexOf('Zzz Checking')
+    const expenseIdx = text.indexOf('Aaa Expense')
+    expect(bankIdx).toBeGreaterThanOrEqual(0)
+    expect(expenseIdx).toBeGreaterThanOrEqual(0)
+    expect(bankIdx).toBeLessThan(expenseIdx)
+    spy.mockRestore()
   })
 
   it('resolves the presentation taxonomy and renders a tree from arcs', async () => {
