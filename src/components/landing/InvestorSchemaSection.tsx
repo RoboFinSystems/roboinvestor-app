@@ -24,9 +24,9 @@ export default function InvestorSchemaSection() {
                 Data Sources
               </h3>
               <div className="space-y-4">
-                <div className="rounded-lg border border-emerald-500/30 bg-linear-to-br from-emerald-500/10 to-teal-500/10 p-4">
+                <div className="border-primary-500/30 from-primary-500/10 to-secondary-500/10 rounded-lg border bg-linear-to-br p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
+                    <div className="bg-primary-600 flex h-8 w-8 items-center justify-center rounded-lg">
                       <span className="text-xs font-bold text-white">ME</span>
                     </div>
                     <div>
@@ -45,9 +45,9 @@ export default function InvestorSchemaSection() {
                   </ul>
                 </div>
 
-                <div className="rounded-lg border border-teal-500/30 bg-linear-to-br from-teal-500/10 to-cyan-500/10 p-4">
+                <div className="border-secondary-500/30 from-secondary-500/10 to-accent-500/10 rounded-lg border bg-linear-to-br p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
+                    <div className="bg-secondary-600 flex h-8 w-8 items-center justify-center rounded-lg">
                       <span className="text-xs font-bold text-white">SEC</span>
                     </div>
                     <div>
@@ -66,9 +66,9 @@ export default function InvestorSchemaSection() {
                   </ul>
                 </div>
 
-                <div className="rounded-lg border border-cyan-500/30 bg-linear-to-br from-cyan-500/10 to-blue-500/10 p-4">
+                <div className="border-accent-500/30 from-accent-500/10 rounded-lg border bg-linear-to-br to-blue-500/10 p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600">
+                    <div className="bg-accent-600 flex h-8 w-8 items-center justify-center rounded-lg">
                       <span className="text-xs font-bold text-white">PL</span>
                     </div>
                     <div>
@@ -94,7 +94,7 @@ export default function InvestorSchemaSection() {
               </h3>
               <div className="relative mx-auto mt-8 h-72 w-72">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-full w-full rounded-full border-2 border-emerald-500/30 bg-linear-to-br from-emerald-600/10 to-teal-600/10">
+                  <div className="border-primary-500/30 from-primary-600/10 to-secondary-600/10 h-full w-full rounded-full border-2 bg-linear-to-br">
                     <div className="flex h-full items-center justify-center">
                       <div className="text-center">
                         <div className="mb-1 text-sm font-semibold text-white">
@@ -111,9 +111,9 @@ export default function InvestorSchemaSection() {
               </div>
 
               <div className="mt-8 space-y-3">
-                <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3">
+                <div className="border-primary-500/30 bg-primary-950/20 rounded-lg border p-3">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="font-semibold text-emerald-300">
+                    <span className="text-primary-300 font-semibold">
                       Portfolio Layer
                     </span>
                   </div>
@@ -124,7 +124,7 @@ export default function InvestorSchemaSection() {
                     {['Portfolio', 'Position', 'Trade'].map((comp, cidx) => (
                       <span
                         key={cidx}
-                        className="rounded bg-emerald-900/50 px-2 py-0.5 text-xs text-emerald-300"
+                        className="bg-primary-900/50 text-primary-300 rounded px-2 py-0.5 text-xs"
                       >
                         {comp}
                       </span>
@@ -132,9 +132,9 @@ export default function InvestorSchemaSection() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-teal-500/30 bg-teal-950/20 p-3">
+                <div className="border-secondary-500/30 bg-secondary-950/20 rounded-lg border p-3">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="font-semibold text-teal-300">
+                    <span className="text-secondary-300 font-semibold">
                       Securities Layer
                     </span>
                   </div>
@@ -145,7 +145,7 @@ export default function InvestorSchemaSection() {
                     {['Security', 'Entity'].map((comp, cidx) => (
                       <span
                         key={cidx}
-                        className="rounded bg-teal-900/50 px-2 py-0.5 text-xs text-teal-300"
+                        className="bg-secondary-900/50 text-secondary-300 rounded px-2 py-0.5 text-xs"
                       >
                         {comp}
                       </span>
@@ -153,9 +153,9 @@ export default function InvestorSchemaSection() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-cyan-500/30 bg-cyan-950/20 p-3">
+                <div className="border-accent-500/30 bg-accent-950/20 rounded-lg border p-3">
                   <div className="mb-1 flex items-center gap-2">
-                    <span className="font-semibold text-cyan-300">
+                    <span className="text-accent-300 font-semibold">
                       SEC Data Layer
                     </span>
                   </div>
@@ -166,7 +166,7 @@ export default function InvestorSchemaSection() {
                     {['Report', 'Fact', 'Element'].map((comp, cidx) => (
                       <span
                         key={cidx}
-                        className="rounded bg-cyan-900/50 px-2 py-0.5 text-xs text-cyan-300"
+                        className="bg-accent-900/50 text-accent-300 rounded px-2 py-0.5 text-xs"
                       >
                         {comp}
                       </span>
@@ -182,9 +182,9 @@ export default function InvestorSchemaSection() {
                 Applications
               </h3>
               <div className="space-y-4">
-                <div className="rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 to-emerald-950/20 p-4">
+                <div className="to-primary-950/20 rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
+                    <div className="bg-primary-600 flex h-8 w-8 items-center justify-center rounded-lg">
                       <svg
                         className="h-4 w-4 text-white"
                         fill="none"
@@ -208,9 +208,9 @@ export default function InvestorSchemaSection() {
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 to-teal-950/20 p-4">
+                <div className="to-secondary-950/20 rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600">
+                    <div className="bg-secondary-600 flex h-8 w-8 items-center justify-center rounded-lg">
                       <svg
                         className="h-4 w-4 text-white"
                         fill="none"
@@ -232,9 +232,9 @@ export default function InvestorSchemaSection() {
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 to-cyan-950/20 p-4">
+                <div className="to-accent-950/20 rounded-lg border border-gray-800 bg-linear-to-br from-zinc-900 p-4">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-600">
+                    <div className="bg-accent-600 flex h-8 w-8 items-center justify-center rounded-lg">
                       <svg
                         className="h-4 w-4 text-white"
                         fill="none"
@@ -262,8 +262,8 @@ export default function InvestorSchemaSection() {
 
         {/* Bottom Feature Cards */}
         <div className="grid gap-6 md:grid-cols-3">
-          <div className="group rounded-xl border border-gray-800 bg-linear-to-br from-emerald-500/10 to-zinc-900 p-6 transition-all hover:border-emerald-500/50">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-teal-500">
+          <div className="group from-primary-500/10 hover:border-primary-500/50 rounded-xl border border-gray-800 bg-linear-to-br to-zinc-900 p-6 transition-all">
+            <div className="from-primary-500 to-secondary-500 mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -286,8 +286,8 @@ export default function InvestorSchemaSection() {
             </p>
           </div>
 
-          <div className="group rounded-xl border border-gray-800 bg-linear-to-br from-teal-500/10 to-zinc-900 p-6 transition-all hover:border-teal-500/50">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-teal-500 to-cyan-500">
+          <div className="group from-secondary-500/10 hover:border-secondary-500/50 rounded-xl border border-gray-800 bg-linear-to-br to-zinc-900 p-6 transition-all">
+            <div className="from-secondary-500 to-accent-500 mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
@@ -311,8 +311,8 @@ export default function InvestorSchemaSection() {
             </p>
           </div>
 
-          <div className="group rounded-xl border border-gray-800 bg-linear-to-br from-cyan-500/10 to-zinc-900 p-6 transition-all hover:border-cyan-500/50">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-cyan-500 to-blue-500">
+          <div className="group from-accent-500/10 hover:border-accent-500/50 rounded-xl border border-gray-800 bg-linear-to-br to-zinc-900 p-6 transition-all">
+            <div className="from-accent-500 mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br to-blue-500">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"

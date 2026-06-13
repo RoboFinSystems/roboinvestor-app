@@ -1,12 +1,16 @@
 'use client'
 
 import type { Entity } from '@/lib/core'
-import { customTheme, GraphFilters, SDK, useGraphContext } from '@/lib/core'
+import {
+  customTheme,
+  GraphFilters,
+  PageHeader,
+  SDK,
+  useGraphContext,
+} from '@/lib/core'
 import {
   Alert,
   Badge,
-  Breadcrumb,
-  BreadcrumbItem,
   Card,
   Spinner,
   Table,
@@ -19,12 +23,7 @@ import {
 } from 'flowbite-react'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
-import {
-  HiExclamationCircle,
-  HiHome,
-  HiOfficeBuilding,
-  HiSearch,
-} from 'react-icons/hi'
+import { HiExclamationCircle, HiOfficeBuilding, HiSearch } from 'react-icons/hi'
 
 interface EntityWithGraph extends Entity {
   _graphId: string
@@ -121,21 +120,11 @@ const EntitiesListPageContent: FC = function () {
     <>
       <div className="block items-center justify-between border-b border-gray-200 p-4 sm:flex dark:border-gray-700">
         <div className="mb-1 w-full">
-          <div className="mb-4">
-            <Breadcrumb className="mb-5">
-              <BreadcrumbItem href="/home">
-                <div className="flex items-center gap-x-3">
-                  <HiHome className="text-xl" />
-                  <span className="dark:text-white">Home</span>
-                </div>
-              </BreadcrumbItem>
-              <BreadcrumbItem href="/entities">Entities</BreadcrumbItem>
-              <BreadcrumbItem>List</BreadcrumbItem>
-            </Breadcrumb>
-            <h1 className="font-heading text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-              All Entities ({entities.length})
-            </h1>
-          </div>
+          <PageHeader
+            icon={HiOfficeBuilding}
+            title={`All Entities (${entities.length})`}
+            className="mb-4"
+          />
           <div className="block items-center gap-4 sm:flex">
             <div className="mb-4 flex flex-1 sm:mb-0">
               <div className="relative w-full">

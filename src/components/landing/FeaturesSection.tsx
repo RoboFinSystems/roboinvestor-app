@@ -132,11 +132,11 @@ export default function FeaturesSection() {
 
   const colorClasses = {
     emerald:
-      'from-emerald-500/20 to-teal-500/20 border-emerald-500/30 hover:border-emerald-500/50 text-emerald-400',
-    teal: 'from-teal-500/20 to-cyan-500/20 border-teal-500/30 hover:border-teal-500/50 text-teal-400',
-    cyan: 'from-cyan-500/20 to-blue-500/20 border-cyan-500/30 hover:border-cyan-500/50 text-cyan-400',
+      'from-primary-500/20 to-secondary-500/20 border-primary-500/30 hover:border-primary-500/50 text-primary-400',
+    teal: 'from-secondary-500/20 to-accent-500/20 border-secondary-500/30 hover:border-secondary-500/50 text-secondary-400',
+    cyan: 'from-accent-500/20 to-blue-500/20 border-accent-500/30 hover:border-accent-500/50 text-accent-400',
     green:
-      'from-green-500/20 to-emerald-500/20 border-green-500/30 hover:border-green-500/50 text-green-400',
+      'from-green-500/20 to-primary-500/20 border-green-500/30 hover:border-green-500/50 text-green-400',
     orange:
       'from-orange-500/20 to-amber-500/20 border-orange-500/30 hover:border-orange-500/50 text-orange-400',
     purple:
@@ -231,11 +231,11 @@ export default function FeaturesSection() {
           </div>
 
           {/* RoboInvestor Framework */}
-          <div className="rounded-2xl border border-emerald-500/30 bg-linear-to-br from-emerald-900/20 to-zinc-900 p-8">
+          <div className="border-primary-500/30 from-primary-900/20 rounded-2xl border bg-linear-to-br to-zinc-900 p-8">
             <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/20">
+              <div className="bg-primary-500/20 flex h-12 w-12 items-center justify-center rounded-lg">
                 <svg
-                  className="h-6 w-6 text-emerald-400"
+                  className="text-primary-400 h-6 w-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -255,7 +255,7 @@ export default function FeaturesSection() {
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-semibold text-emerald-400">
+                <div className="bg-primary-500/20 text-primary-400 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                   1
                 </div>
                 <div>
@@ -269,7 +269,7 @@ export default function FeaturesSection() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-semibold text-emerald-400">
+                <div className="bg-primary-500/20 text-primary-400 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                   2
                 </div>
                 <div>
@@ -283,7 +283,7 @@ export default function FeaturesSection() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-semibold text-emerald-400">
+                <div className="bg-primary-500/20 text-primary-400 mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
                   3
                 </div>
                 <div>
@@ -297,8 +297,8 @@ export default function FeaturesSection() {
               </div>
             </div>
 
-            <div className="mt-6 rounded-lg bg-emerald-950/50 p-4">
-              <div className="text-sm font-semibold text-emerald-400">
+            <div className="bg-primary-950/50 mt-6 rounded-lg p-4">
+              <div className="text-primary-400 text-sm font-semibold">
                 Apache 2.0 Licensed
               </div>
               <p className="mt-1 text-xs text-gray-400">

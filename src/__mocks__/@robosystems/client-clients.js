@@ -18,6 +18,7 @@ export const clients = {
   },
   ledger: {
     close: vi.fn(),
+    getAccountTree: vi.fn().mockResolvedValue({ roots: [], totalAccounts: 0 }),
   },
   investor: {
     close: vi.fn(),

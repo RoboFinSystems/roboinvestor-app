@@ -3,11 +3,11 @@ import FloatingElementsVariant from './FloatingElementsVariant'
 export default function AIAnalysisSection() {
   return (
     <section id="ai-analysis" className="relative bg-black py-20">
-      <div className="absolute inset-0 bg-linear-to-br from-emerald-900/30 via-teal-900/20 to-black"></div>
+      <div className="from-primary-900/30 via-secondary-900/20 absolute inset-0 bg-linear-to-br to-black"></div>
       <FloatingElementsVariant variant="ai-analysis" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 text-center">
-          <div className="mb-4 inline-block rounded-full bg-emerald-500/20 px-4 py-1 text-sm font-semibold text-emerald-400">
+          <div className="bg-primary-500/20 text-primary-400 mb-4 inline-block rounded-full px-4 py-1 text-sm font-semibold">
             Intelligent Analysis
           </div>
           <h2 className="font-heading mb-6 text-4xl font-bold text-white md:text-5xl">
@@ -21,13 +21,13 @@ export default function AIAnalysisSection() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Query Example */}
-          <div className="rounded-xl border border-teal-500/30 bg-zinc-900/50 p-8">
+          <div className="border-secondary-500/30 rounded-xl border bg-zinc-900/50 p-8">
             <h3 className="mb-6 text-2xl font-bold text-white">
               From Question to Insight in Seconds
             </h3>
             <div className="space-y-4 text-gray-300">
               <div className="rounded-lg bg-black/30 p-4">
-                <div className="mb-2 text-sm text-teal-300">You ask:</div>
+                <div className="text-secondary-300 mb-2 text-sm">You ask:</div>
                 <p className="italic">
                   "Compare net income for Apple, Microsoft, and NVIDIA over the
                   last three years"
@@ -35,7 +35,7 @@ export default function AIAnalysisSection() {
               </div>
               <div className="flex justify-center">
                 <svg
-                  className="h-8 w-8 text-emerald-400"
+                  className="text-primary-400 h-8 w-8"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -66,9 +66,9 @@ ORDER BY p.end_date DESC`}
 
           {/* Analysis Steps */}
           <div className="space-y-6">
-            <div className="rounded-lg border border-teal-500/30 bg-zinc-900/50 p-6">
+            <div className="border-secondary-500/30 rounded-lg border bg-zinc-900/50 p-6">
               <h4 className="mb-3 flex items-center text-lg font-semibold text-white">
-                <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm">
+                <span className="bg-secondary-500 mr-3 flex h-8 w-8 items-center justify-center rounded-full text-sm">
                   1
                 </span>
                 Natural Language Understanding
@@ -92,9 +92,9 @@ ORDER BY p.end_date DESC`}
               </p>
             </div>
 
-            <div className="rounded-lg border border-teal-500/30 bg-zinc-900/50 p-6">
+            <div className="border-secondary-500/30 rounded-lg border bg-zinc-900/50 p-6">
               <h4 className="mb-3 flex items-center text-lg font-semibold text-white">
-                <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm">
+                <span className="bg-secondary-500 mr-3 flex h-8 w-8 items-center justify-center rounded-full text-sm">
                   3
                 </span>
                 XBRL Data Traversal
@@ -106,9 +106,9 @@ ORDER BY p.end_date DESC`}
               </p>
             </div>
 
-            <div className="rounded-lg border border-emerald-500/30 bg-zinc-900/50 p-6">
+            <div className="border-primary-500/30 rounded-lg border bg-zinc-900/50 p-6">
               <h4 className="mb-3 flex items-center text-lg font-semibold text-white">
-                <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm">
+                <span className="bg-primary-500 mr-3 flex h-8 w-8 items-center justify-center rounded-full text-sm">
                   4
                 </span>
                 Summarized Results
@@ -153,21 +153,21 @@ ORDER BY p.end_date DESC`}
         <div className="mt-12 text-center">
           <p className="mb-4 text-gray-300">
             Powered by{' '}
-            <span className="font-semibold text-emerald-400">Claude AI</span>{' '}
+            <span className="text-primary-400 font-semibold">Claude AI</span>{' '}
             and{' '}
             <a
               href="https://robosystems.ai/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-emerald-400 hover:text-emerald-300"
+              className="text-primary-400 hover:text-primary-300 font-semibold"
             >
               RoboSystems'
             </a>{' '}
             knowledge graph platform
           </p>
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-900/40 px-6 py-3 text-sm text-gray-300">
+          <div className="bg-primary-900/40 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm text-gray-300">
             <svg
-              className="h-5 w-5 text-emerald-400"
+              className="text-primary-400 h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

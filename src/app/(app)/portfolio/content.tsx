@@ -1,6 +1,12 @@
 'use client'
 
-import { clients, customTheme, GraphFilters, useGraphContext } from '@/lib/core'
+import {
+  clients,
+  customTheme,
+  GraphFilters,
+  PageHeader,
+  useGraphContext,
+} from '@/lib/core'
 import {
   Alert,
   Badge,
@@ -431,29 +437,21 @@ const PortfolioPageContent: FC = function () {
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 p-3">
-            <HiViewGrid className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-gray-900 dark:text-white">
-              Portfolio
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Manage your investment portfolios and holdings
-            </p>
-          </div>
-        </div>
-        <Button
-          color="teal"
-          onClick={() => setShowCreateModal(true)}
-          disabled={isLoading}
-        >
-          <HiPlus className="mr-2 h-4 w-4" />
-          New Portfolio
-        </Button>
-      </div>
+      <PageHeader
+        icon={HiViewGrid}
+        title="Portfolio"
+        subtitle="Manage your investment portfolios and holdings"
+        actions={
+          <Button
+            color="secondary"
+            onClick={() => setShowCreateModal(true)}
+            disabled={isLoading}
+          >
+            <HiPlus className="mr-2 h-4 w-4" />
+            New Portfolio
+          </Button>
+        }
+      />
 
       {error && (
         <Alert
@@ -479,7 +477,7 @@ const PortfolioPageContent: FC = function () {
             <p className="mb-4 text-gray-500 dark:text-gray-400">
               Create your first portfolio to start tracking investments.
             </p>
-            <Button color="teal" onClick={() => setShowCreateModal(true)}>
+            <Button color="secondary" onClick={() => setShowCreateModal(true)}>
               <HiPlus className="mr-2 h-4 w-4" />
               Create Portfolio
             </Button>
@@ -498,7 +496,7 @@ const PortfolioPageContent: FC = function () {
                 theme={customTheme.card}
                 className={`cursor-pointer transition-all ${
                   selectedPortfolio?.id === p.id
-                    ? 'ring-2 ring-teal-500'
+                    ? 'ring-secondary-500 ring-2'
                     : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600'
                 }`}
                 onClick={() => setSelectedPortfolio(p)}
@@ -532,7 +530,7 @@ const PortfolioPageContent: FC = function () {
                   </h2>
                   <Button
                     size="sm"
-                    color="teal"
+                    color="secondary"
                     onClick={() => {
                       setSecurityModalError(null)
                       loadLinkedEntities()
@@ -575,7 +573,7 @@ const PortfolioPageContent: FC = function () {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <HiOfficeBuilding className="h-5 w-5 text-teal-500" />
+                              <HiOfficeBuilding className="text-secondary-500 h-5 w-5" />
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 {h.entity_name}
                               </h3>
@@ -650,7 +648,7 @@ const PortfolioPageContent: FC = function () {
                                           s.security_name
                                         )
                                       }
-                                      className="rounded p-1 text-gray-400 hover:text-teal-500"
+                                      className="hover:text-secondary-500 rounded p-1 text-gray-400"
                                     >
                                       <HiPencil className="h-4 w-4" />
                                     </button>
@@ -725,7 +723,7 @@ const PortfolioPageContent: FC = function () {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="teal"
+            color="secondary"
             onClick={handleCreate}
             disabled={creating || !createForm.name.trim()}
           >
@@ -772,7 +770,7 @@ const PortfolioPageContent: FC = function () {
               <Label htmlFor="sec-type">Security Type</Label>
               <select
                 id="sec-type"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="focus:border-secondary-500 focus:ring-secondary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 value={securityForm.security_type}
                 onChange={(e) =>
                   setSecurityForm((f) => ({
@@ -814,7 +812,7 @@ const PortfolioPageContent: FC = function () {
               ) : linkedEntities.length > 0 ? (
                 <select
                   id="sec-entity"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="focus:border-secondary-500 focus:ring-secondary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   value={securityForm.entity_id}
                   onChange={(e) => {
                     const entityId = e.target.value
@@ -886,7 +884,7 @@ const PortfolioPageContent: FC = function () {
                 <Label htmlFor="sec-qty-type">Unit</Label>
                 <select
                   id="sec-qty-type"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="focus:border-secondary-500 focus:ring-secondary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   value={securityForm.quantity_type}
                   onChange={(e) =>
                     setSecurityForm((f) => ({
@@ -920,7 +918,7 @@ const PortfolioPageContent: FC = function () {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="teal"
+            color="secondary"
             onClick={handleCreateSecurity}
             disabled={creatingSecurity || !securityForm.name.trim()}
           >
@@ -960,7 +958,7 @@ const PortfolioPageContent: FC = function () {
               ) : linkedEntities.length > 0 ? (
                 <select
                   id="edit-entity"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="focus:border-secondary-500 focus:ring-secondary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   value={editEntityId}
                   onChange={(e) => {
                     const entityId = e.target.value
@@ -999,7 +997,7 @@ const PortfolioPageContent: FC = function () {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="teal"
+            color="secondary"
             onClick={handleEditSecurity}
             disabled={
               savingEdit || (!editEntityId && !editSourceGraphId.trim())

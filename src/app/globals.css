@@ -114,6 +114,26 @@
 @config '../../tailwind.config.ts';
 
 /*
+  Flowbite's plugin defines --color-primary-* (its default blue) via @theme,
+  which wins over the JS @config's `primary`. (secondary/accent aren't defined
+  by Flowbite, so those tokens apply fine.) Re-declare the brand primary here as
+  a CSS @theme override so it actually takes effect. RoboInvestor = emerald.
+*/
+@theme {
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+  --color-primary-950: #022c22;
+}
+
+/*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
