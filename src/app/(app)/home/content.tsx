@@ -45,8 +45,8 @@ const quickActions = [
     description: 'API & account',
     icon: HiCog,
     href: '/settings',
-    gradient: 'from-blue-500 to-indigo-600',
-    shadowColor: 'hover:shadow-blue-500/10',
+    gradient: 'from-primary-500 to-indigo-600',
+    shadowColor: 'hover:shadow-primary-500/10',
   },
 ]
 
@@ -213,7 +213,7 @@ const HomePageContent: FC = function () {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 h-2 w-2 rounded-full bg-blue-500"></div>
+                  <div className="bg-primary-500 mt-0.5 h-2 w-2 rounded-full"></div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       MCP Protocol
@@ -225,7 +225,7 @@ const HomePageContent: FC = function () {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 h-2 w-2 rounded-full bg-purple-500"></div>
+                  <div className="bg-secondary-500 mt-0.5 h-2 w-2 rounded-full"></div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       Open Source

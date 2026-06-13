@@ -127,7 +127,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-start gap-4">
-          <div className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 p-3">
+          <div className="from-primary-500 to-secondary-600 rounded-lg bg-gradient-to-br p-3">
             <HiDatabase className="h-8 w-8 text-white" />
           </div>
           <div>
@@ -250,8 +250,8 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       <Card theme={customTheme.card} id="console-access">
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/30">
-              <HiTerminal className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <div className="bg-secondary-100 dark:bg-secondary-900/30 rounded-lg p-2">
+              <HiTerminal className="text-secondary-600 dark:text-secondary-400 h-5 w-5" />
             </div>
             <div className="flex-1">
               <h3 className="font-heading text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -304,8 +304,8 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       <Card theme={customTheme.card} id="api-access" ref={codeExamplesRef}>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-              <HiKey className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-2">
+              <HiKey className="text-primary-600 dark:text-primary-400 h-5 w-5" />
             </div>
             <div className="flex-1">
               <h3 className="font-heading text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -318,7 +318,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                   href={`${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}/docs`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   View Full API Documentation →
                 </a>
