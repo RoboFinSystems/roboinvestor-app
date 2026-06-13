@@ -30,23 +30,23 @@ const quickActions = [
     description: 'AI analysis terminal',
     icon: HiTerminal,
     href: '/console',
-    gradient: 'from-emerald-500 to-teal-600',
-    shadowColor: 'hover:shadow-emerald-500/10',
+    gradient: 'from-primary-500 to-secondary-600',
+    shadowColor: 'hover:shadow-primary-500/10',
   },
   {
     title: 'Portfolio',
     description: 'View holdings',
     icon: HiChartPie,
     href: '/portfolio',
-    gradient: 'from-teal-500 to-cyan-600',
-    shadowColor: 'hover:shadow-teal-500/10',
+    gradient: 'from-secondary-500 to-accent-600',
+    shadowColor: 'hover:shadow-secondary-500/10',
   },
   {
     title: 'Settings',
     description: 'API & account',
     icon: HiCog,
     href: '/settings',
-    gradient: 'from-primary-500 to-indigo-600',
+    gradient: 'from-primary-500 to-accent-600',
     shadowColor: 'hover:shadow-primary-500/10',
   },
 ]
@@ -117,8 +117,8 @@ const HomePageContent: FC = function () {
             {/* Getting Started Card */}
             <Card theme={customTheme.card} className="lg:col-span-2">
               <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-lg bg-emerald-500/20 p-2">
-                  <HiTrendingUp className="h-5 w-5 text-emerald-500" />
+                <div className="bg-primary-500/20 rounded-lg p-2">
+                  <HiTrendingUp className="text-primary-500 h-5 w-5" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   Getting Started
@@ -170,7 +170,7 @@ const HomePageContent: FC = function () {
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500"></div>
+                  <div className="bg-primary-500 mt-0.5 h-2 w-2 rounded-full"></div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       AI-Powered Analysis
@@ -182,7 +182,7 @@ const HomePageContent: FC = function () {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 h-2 w-2 rounded-full bg-teal-500"></div>
+                  <div className="bg-secondary-500 mt-0.5 h-2 w-2 rounded-full"></div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       Knowledge Graph
@@ -194,7 +194,7 @@ const HomePageContent: FC = function () {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 h-2 w-2 rounded-full bg-cyan-500"></div>
+                  <div className="bg-accent-500 mt-0.5 h-2 w-2 rounded-full"></div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       Interactive Console
@@ -235,7 +235,7 @@ const HomePageContent: FC = function () {
                   href="https://github.com/RoboFinSystems/roboinvestor-app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400"
+                  className="text-primary-600 hover:text-primary-500 dark:text-primary-400 flex items-center gap-2 text-sm transition-colors"
                 >
                   <svg
                     className="h-4 w-4"
@@ -289,10 +289,10 @@ const HomePageContent: FC = function () {
             <Link href="/console">
               <Card
                 theme={customTheme.card}
-                className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
+                className="group hover:shadow-primary-500/10 cursor-pointer transition-all duration-300 hover:shadow-lg"
               >
                 <div className="flex items-center gap-4">
-                  <div className="rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 p-3">
+                  <div className="from-primary-500 to-secondary-600 rounded-lg bg-gradient-to-br p-3">
                     <HiTerminal className="h-6 w-6 text-white" />
                   </div>
                   <div>
@@ -316,8 +316,8 @@ const HomePageContent: FC = function () {
           >
             <div className="space-y-4 p-6">
               <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-emerald-100 p-3 dark:bg-emerald-900">
-                  <HiPlus className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                <div className="bg-primary-100 dark:bg-primary-900 rounded-lg p-3">
+                  <HiPlus className="text-primary-600 dark:text-primary-400 h-6 w-6" />
                 </div>
                 <h3 className="font-heading text-xl font-bold text-gray-900 dark:text-white">
                   Create Your First Graph

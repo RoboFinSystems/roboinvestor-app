@@ -206,7 +206,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Button
-              color="purple"
+              color="secondary"
               onClick={handleOpenConsole}
               className="h-auto flex-col items-start gap-2 py-4"
             >
@@ -285,7 +285,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             </ul>
           </div>
 
-          <Button color="purple" onClick={handleOpenConsole} size="lg">
+          <Button color="secondary" onClick={handleOpenConsole} size="lg">
             <HiTerminal className="mr-2 h-5 w-5" />
             Open Console
           </Button>
@@ -319,7 +319,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           </div>
 
           <Button
-            color="blue"
+            color="primary"
             onClick={generateApiKey}
             disabled={isCreatingKey}
           >
