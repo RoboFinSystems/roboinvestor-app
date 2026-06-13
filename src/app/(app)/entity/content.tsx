@@ -1,9 +1,9 @@
 'use client'
 
-import { customTheme, useEntity, useGraphContext } from '@/lib/core'
-import { Alert, Badge, Breadcrumb, BreadcrumbItem, Card } from 'flowbite-react'
+import { customTheme, PageHeader, useEntity, useGraphContext } from '@/lib/core'
+import { Alert, Badge, Card } from 'flowbite-react'
 import { type FC } from 'react'
-import { HiHome, HiOfficeBuilding } from 'react-icons/hi'
+import { HiOfficeBuilding } from 'react-icons/hi'
 
 const EntityInfoPageContent: FC = function () {
   const { state: graphState } = useGraphContext()
@@ -15,24 +15,14 @@ const EntityInfoPageContent: FC = function () {
 
   return (
     <>
-      <div className="mb-4 grid grid-cols-1 gap-y-6 px-4 pt-6 xl:grid-cols-2 xl:gap-4 dark:border-gray-700">
-        <div className="col-span-full xl:mb-2">
-          <Breadcrumb className="mb-5">
-            <BreadcrumbItem href="/home">
-              <div className="flex items-center gap-x-3">
-                <HiHome className="text-xl" />
-                <span className="dark:text-white">Home</span>
-              </div>
-            </BreadcrumbItem>
-            <BreadcrumbItem href="/entities">Entities</BreadcrumbItem>
-            <BreadcrumbItem>Details</BreadcrumbItem>
-          </Breadcrumb>
-          <div className="flex items-center justify-between">
-            <h1 className="font-heading text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
-              Entity Details
-            </h1>
-          </div>
-        </div>
+      <div className="mb-4 px-4 pt-6">
+        <PageHeader
+          icon={HiOfficeBuilding}
+          title="Entity Details"
+          subtitle={
+            currentEntity?.name || 'View entity information and settings'
+          }
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-y-4 px-4 pb-1">
