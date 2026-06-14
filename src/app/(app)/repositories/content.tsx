@@ -1,13 +1,13 @@
 'use client'
 
-import { ActiveSubscriptions, BrowseRepositories } from '@/lib/core'
+import { ActiveSubscriptions, BrowseRepositories, PageLayout } from '@/lib/core'
 import { useRouter } from 'next/navigation'
 
 export function RepositoriesContent() {
   const router = useRouter()
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-6">
+    <PageLayout>
       <ActiveSubscriptions
         onOpenConsole={() => router.push('/console')}
         onGettingStarted={(repoId) =>
@@ -16,7 +16,7 @@ export function RepositoriesContent() {
         onBrowse={() => router.push('/repositories/browse')}
         emptyState={<BrowseRepositoriesContent />}
       />
-    </div>
+    </PageLayout>
   )
 }
 

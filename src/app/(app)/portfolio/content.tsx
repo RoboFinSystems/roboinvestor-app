@@ -7,6 +7,7 @@ import {
   GraphFilters,
   LoadingState,
   PageHeader,
+  PageLayout,
   useGraphContext,
 } from '@/lib/core'
 import {
@@ -419,7 +420,7 @@ const PortfolioPageContent: FC = function () {
   // No graph with roboinvestor extension
   if (!graphId && !isLoading) {
     return (
-      <div className="mx-auto max-w-7xl space-y-6 p-6">
+      <PageLayout>
         <Card theme={customTheme.card}>
           <EmptyState
             icon={HiViewGrid}
@@ -433,12 +434,12 @@ const PortfolioPageContent: FC = function () {
             className="py-8"
           />
         </Card>
-      </div>
+      </PageLayout>
     )
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-6">
+    <PageLayout>
       {/* Header */}
       <PageHeader
         icon={HiViewGrid}
@@ -1011,7 +1012,7 @@ const PortfolioPageContent: FC = function () {
           </Button>
         </ModalFooter>
       </Modal>
-    </div>
+    </PageLayout>
   )
 }
 
