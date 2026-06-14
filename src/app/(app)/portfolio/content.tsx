@@ -4,6 +4,7 @@ import {
   clients,
   customTheme,
   GraphFilters,
+  LoadingState,
   PageHeader,
   useGraphContext,
 } from '@/lib/core'
@@ -464,9 +465,7 @@ const PortfolioPageContent: FC = function () {
       )}
 
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Spinner size="xl" />
-        </div>
+        <LoadingState size="xl" />
       ) : portfolios.length === 0 ? (
         <Card theme={customTheme.card} className="text-center">
           <div className="py-8">
@@ -553,9 +552,7 @@ const PortfolioPageContent: FC = function () {
                 )}
 
                 {holdingsLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Spinner size="lg" />
-                  </div>
+                  <LoadingState className="py-8" />
                 ) : holdings.length === 0 ? (
                   <Card theme={customTheme.card} className="text-center">
                     <div className="py-6">

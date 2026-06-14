@@ -4,6 +4,7 @@ import type { Entity } from '@/lib/core'
 import {
   customTheme,
   GraphFilters,
+  LoadingState,
   PageHeader,
   SDK,
   useGraphContext,
@@ -12,7 +13,6 @@ import {
   Alert,
   Badge,
   Card,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -159,9 +159,7 @@ const EntitiesListPageContent: FC = function () {
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden shadow">
               {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <Spinner size="lg" />
-                </div>
+                <LoadingState />
               ) : entities.length === 0 ? (
                 <div className="p-8 text-center">
                   <Card theme={customTheme.card}>
