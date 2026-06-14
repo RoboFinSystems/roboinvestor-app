@@ -3,6 +3,7 @@
 import {
   customTheme,
   PageHeader,
+  PageLayout,
   useGraphContext,
   useServiceOfferings,
   useToast,
@@ -122,7 +123,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
   const displayApiKey = apiKey || 'YOUR_API_KEY_HERE'
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-6">
+    <PageLayout>
       <ToastContainer />
 
       {/* Header */}
@@ -520,6 +521,6 @@ for (const record of data.data) {
           </div>
         </div>
       </Card>
-    </div>
+    </PageLayout>
   )
 }
