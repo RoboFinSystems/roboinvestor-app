@@ -3,6 +3,7 @@
 import {
   clients,
   customTheme,
+  EmptyState,
   GraphFilters,
   LoadingState,
   PageHeader,
@@ -419,17 +420,18 @@ const PortfolioPageContent: FC = function () {
   if (!graphId && !isLoading) {
     return (
       <div className="mx-auto max-w-7xl space-y-6 p-6">
-        <Card theme={customTheme.card} className="text-center">
-          <div className="py-8">
-            <HiViewGrid className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-            <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-              No Portfolio Graph
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              Create a graph with the <code>roboinvestor</code> schema extension
-              to get started with portfolio management.
-            </p>
-          </div>
+        <Card theme={customTheme.card}>
+          <EmptyState
+            icon={HiViewGrid}
+            title="No Portfolio Graph"
+            description={
+              <>
+                Create a graph with the <code>roboinvestor</code> schema
+                extension to get started with portfolio management.
+              </>
+            }
+            className="py-8"
+          />
         </Card>
       </div>
     )
@@ -467,20 +469,22 @@ const PortfolioPageContent: FC = function () {
       {isLoading ? (
         <LoadingState size="xl" />
       ) : portfolios.length === 0 ? (
-        <Card theme={customTheme.card} className="text-center">
-          <div className="py-8">
-            <HiViewGrid className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-            <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
-              No Portfolios Yet
-            </h2>
-            <p className="mb-4 text-gray-500 dark:text-gray-400">
-              Create your first portfolio to start tracking investments.
-            </p>
-            <Button color="secondary" onClick={() => setShowCreateModal(true)}>
-              <HiPlus className="mr-2 h-4 w-4" />
-              Create Portfolio
-            </Button>
-          </div>
+        <Card theme={customTheme.card}>
+          <EmptyState
+            icon={HiViewGrid}
+            title="No Portfolios Yet"
+            description="Create your first portfolio to start tracking investments."
+            className="py-8"
+            action={
+              <Button
+                color="secondary"
+                onClick={() => setShowCreateModal(true)}
+              >
+                <HiPlus className="mr-2 h-4 w-4" />
+                Create Portfolio
+              </Button>
+            }
+          />
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
@@ -554,14 +558,13 @@ const PortfolioPageContent: FC = function () {
                 {holdingsLoading ? (
                   <LoadingState className="py-8" />
                 ) : holdings.length === 0 ? (
-                  <Card theme={customTheme.card} className="text-center">
-                    <div className="py-6">
-                      <HiOfficeBuilding className="mx-auto mb-3 h-10 w-10 text-gray-400" />
-                      <p className="text-gray-500 dark:text-gray-400">
-                        No holdings yet. Add entities, securities, and positions
-                        via the API to see them here.
-                      </p>
-                    </div>
+                  <Card theme={customTheme.card}>
+                    <EmptyState
+                      icon={HiOfficeBuilding}
+                      title="No holdings yet"
+                      description="Add entities, securities, and positions via the API to see them here."
+                      className="py-6"
+                    />
                   </Card>
                 ) : (
                   <div className="space-y-4">

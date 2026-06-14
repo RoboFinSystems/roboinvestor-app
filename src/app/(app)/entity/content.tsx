@@ -1,6 +1,12 @@
 'use client'
 
-import { customTheme, PageHeader, useEntity, useGraphContext } from '@/lib/core'
+import {
+  customTheme,
+  EmptyState,
+  PageHeader,
+  useEntity,
+  useGraphContext,
+} from '@/lib/core'
 import { Alert, Badge, Card } from 'flowbite-react'
 import { type FC } from 'react'
 import { HiOfficeBuilding } from 'react-icons/hi'
@@ -28,26 +34,24 @@ const EntityInfoPageContent: FC = function () {
       <div className="grid grid-cols-1 gap-y-4 px-4 pb-1">
         {!currentEntity ? (
           <Card theme={customTheme.card}>
-            <div className="py-8 text-center">
-              <HiOfficeBuilding className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-              <h3 className="font-heading mb-4 text-xl font-bold dark:text-white">
-                No Entity Selected
-              </h3>
-              <p className="mb-4 text-gray-500 dark:text-gray-400">
-                Please select an entity from the Entity selector in the header
-                to view its details.
-              </p>
-              {!graphState.currentGraphId && (
-                <Alert
-                  theme={customTheme.alert}
-                  color="info"
-                  className="mt-4 text-left"
-                >
-                  <span className="font-medium">No graph selected.</span> Please
-                  select a graph first.
-                </Alert>
-              )}
-            </div>
+            <EmptyState
+              icon={HiOfficeBuilding}
+              title="No Entity Selected"
+              description="Please select an entity from the Entity selector in the header to view its details."
+              className="py-8"
+              action={
+                !graphState.currentGraphId && (
+                  <Alert
+                    theme={customTheme.alert}
+                    color="info"
+                    className="text-left"
+                  >
+                    <span className="font-medium">No graph selected.</span>{' '}
+                    Please select a graph first.
+                  </Alert>
+                )
+              }
+            />
           </Card>
         ) : (
           <>
