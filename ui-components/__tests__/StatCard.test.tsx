@@ -26,4 +26,21 @@ describe('StatCard', () => {
     const { container } = render(<StatCard label="Node Labels" value={7} />)
     expect(container.querySelector('svg')).not.toBeInTheDocument()
   })
+
+  it('marks the icon as decorative (aria-hidden)', () => {
+    const { container } = render(
+      <StatCard label="Total Graphs" value={3} icon={HiDatabase} />
+    )
+    expect(container.querySelector('svg')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    )
+  })
+
+  it('forwards className to the Card wrapper', () => {
+    const { container } = render(
+      <StatCard label="Total Graphs" value={3} className="col-span-2" />
+    )
+    expect(container.querySelector('.col-span-2')).toBeInTheDocument()
+  })
 })
