@@ -1,0 +1,32 @@
+{
+  "pkg": "@robosystems/core",
+  "globalName": "RobosystemsCore",
+  "projectId": "9c82a8ad-64a8-4b37-b248-83a94def7729",
+  "shape": "package",
+  "srcDir": ".",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".ds-compiled.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "extraFonts": ["../../../.design-sync/ds-fonts.css"],
+  "runtimeFontPrefixes": ["JetBrains"],
+  "componentSrcMap": {
+    "SupportModal": null,
+    "AuthCore": null,
+    "GraphFilters": null,
+    "LibraryClient": null,
+    "OperationClient": null,
+    "QueryClient": null,
+    "QueuedQueryError": null,
+    "RoboSystemsClients": null,
+    "SSEClient": null,
+    "AnimatedLogo": "ui-components/Logo.tsx",
+    "LogoBadge": "ui-components/Logo.tsx",
+    "ProgressiveText": "components/console/ProgressiveText.tsx"
+  },
+  "overrides": {
+    "ConfirmModal": {
+      "cardMode": "single",
+      "viewport": "560x440"
+    }
+  }
+}
