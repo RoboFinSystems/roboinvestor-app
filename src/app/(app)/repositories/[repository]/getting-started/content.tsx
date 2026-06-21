@@ -372,7 +372,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
   "mcpServers": {
     "robosystems": {
       "command": "npx",
-      "args": ["-y", "@robosystems/mcp"],
+      "args": ["-y", "@robosystems/mcp@latest"],
       "env": {
         "ROBOSYSTEMS_API_KEY": "`}
                 <ApiKeyDisplay
