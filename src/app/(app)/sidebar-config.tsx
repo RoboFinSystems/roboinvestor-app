@@ -1,5 +1,6 @@
 import type { SidebarItemData } from '@/lib/core'
 import {
+  HiDocumentText,
   HiGlobeAlt,
   HiHome,
   HiOutlineOfficeBuilding,
@@ -30,6 +31,11 @@ export const getNavigationItems = ({
       icon: HiHome,
       label: 'Home',
       href: '/home',
+    },
+    {
+      icon: HiDocumentText,
+      label: 'Research',
+      href: '/research',
     },
   ]
 

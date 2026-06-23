@@ -1,5 +1,12 @@
 interface FloatingElementsVariantProps {
-  variant?: 'default' | 'hero' | 'features' | 'schema' | 'ai-analysis' | 'final'
+  variant?:
+    | 'default'
+    | 'hero'
+    | 'features'
+    | 'schema'
+    | 'research'
+    | 'ai-analysis'
+    | 'final'
 }
 
 export default function FloatingElementsVariant({
@@ -28,6 +35,14 @@ export default function FloatingElementsVariant({
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="animate-float from-secondary-600/12 to-primary-600/12 absolute -top-20 right-1/4 h-[450px] w-[450px] rounded-full bg-linear-to-br blur-3xl"></div>
           <div className="animate-float-slow from-accent-600/8 to-secondary-600/8 absolute bottom-0 left-1/4 h-[400px] w-[400px] rounded-full bg-linear-to-br blur-3xl"></div>
+        </div>
+      )
+
+    case 'research':
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="animate-float-slow from-accent-600/12 to-primary-600/12 absolute -top-24 left-1/3 h-[480px] w-[480px] rounded-full bg-linear-to-br blur-3xl"></div>
+          <div className="animate-float-slower from-secondary-600/10 to-accent-600/10 absolute right-1/4 -bottom-24 h-[420px] w-[420px] rounded-full bg-linear-to-br blur-3xl"></div>
         </div>
       )
 
