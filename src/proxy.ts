@@ -16,6 +16,12 @@ export function proxy(request: NextRequest) {
     request.nextUrl.pathname === '/register' ||
     request.nextUrl.pathname.startsWith('/auth/')
 
+  // Public S3 bucket serving the research portal's catalog, briefs, images,
+  // video, and audio (produced by robosystems-content-machine). The research
+  // pages fetch these client-side, so the host is needed in connect-src too.
+  const RESEARCH_ASSETS =
+    'https://robosystems-marketing-assets.s3.amazonaws.com'
+
   // Comprehensive CSP configuration for modern web apps
   const cspDirectives = [
     "default-src 'self'",
@@ -45,7 +51,8 @@ export function proxy(request: NextRequest) {
       'https://cdnjs.cloudflare.com https://github.com https://avatars.githubusercontent.com ' +
       'https://raw.githubusercontent.com ' +
       'https://www.google-analytics.com https://www.googletagmanager.com ' +
-      'https://ssl.gstatic.com https://www.gstatic.com',
+      'https://ssl.gstatic.com https://www.gstatic.com ' +
+      RESEARCH_ASSETS,
 
     // Font sources - Allow Google Fonts and common CDNs
     "font-src 'self' data: " +
@@ -59,13 +66,15 @@ export function proxy(request: NextRequest) {
         'https://cloudflareinsights.com https://static.cloudflareinsights.com ' +
         'https://www.google-analytics.com https://analytics.google.com ' +
         'https://region1.google-analytics.com https://www.googletagmanager.com ' +
-        'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com'
+        'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com ' +
+        RESEARCH_ASSETS
       : "connect-src 'self' " +
         'https://api.robosystems.ai https://staging.api.robosystems.ai ' +
         'https://cloudflareinsights.com https://static.cloudflareinsights.com ' +
         'https://www.google-analytics.com https://analytics.google.com ' +
         'https://region1.google-analytics.com https://www.googletagmanager.com ' +
-        'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com',
+        'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com ' +
+        RESEARCH_ASSETS,
 
     // Frame sources - Allow Cloudflare CAPTCHA and common embeds
     "frame-src 'self' " +
@@ -74,7 +83,8 @@ export function proxy(request: NextRequest) {
 
     // Media sources - Allow video and audio from common hosts
     "media-src 'self' data: blob: " +
-      'https://cdn.jsdelivr.net https://unpkg.com',
+      'https://cdn.jsdelivr.net https://unpkg.com ' +
+      RESEARCH_ASSETS,
 
     // Object sources - Restrict to self for security
     "object-src 'none'",
