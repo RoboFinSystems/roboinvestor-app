@@ -9,6 +9,7 @@ export {
   getAllCoverage,
   getCoverage,
   getCoverageTickers,
+  youtubeId,
 } from './catalog'
 export { CoverageCard } from './CoverageCard'
 export { CoverageGrid } from './CoverageGrid'
