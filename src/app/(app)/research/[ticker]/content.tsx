@@ -1,13 +1,14 @@
 'use client'
+import { EmptyState, LoadingState, PageLayout } from '@/lib/core'
 import {
   ResearchArticle,
   fetchBrief,
   getCoverage,
   type CoverageItem,
 } from '@/lib/core/research'
-import { Spinner } from '@/lib/core/ui-components'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { HiArrowLeft, HiDocumentText } from 'react-icons/hi'
 
 export default function ResearchDetailContent({ ticker }: { ticker: string }) {
   const [item, setItem] = useState<CoverageItem | null | undefined>(undefined)
@@ -29,24 +30,35 @@ export default function ResearchDetailContent({ ticker }: { ticker: string }) {
     }
   }, [ticker])
 
-  if (item === undefined) return <Spinner size="xl" fullScreen />
+  if (item === undefined) {
+    return (
+      <PageLayout>
+        <LoadingState className="min-h-[60vh]" />
+      </PageLayout>
+    )
+  }
+
   if (item === null) {
     return (
-      <div className="p-8 text-gray-500 dark:text-gray-400">
-        No coverage found for {ticker.toUpperCase()}.
-      </div>
+      <PageLayout>
+        <EmptyState
+          icon={HiDocumentText}
+          title="No coverage found"
+          description={`We don't have a research report for ${ticker.toUpperCase()} yet.`}
+        />
+      </PageLayout>
     )
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <PageLayout>
       <Link
         href="/research"
-        className="mb-6 inline-block text-sm text-cyan-600 hover:underline dark:text-cyan-400"
+        className="text-primary-600 dark:text-primary-400 inline-flex items-center gap-1 text-sm hover:underline"
       >
-        ← All research
+        <HiArrowLeft className="h-4 w-4" /> All research
       </Link>
       <ResearchArticle item={item} briefMarkdown={brief} />
-    </div>
+    </PageLayout>
   )
 }

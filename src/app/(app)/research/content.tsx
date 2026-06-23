@@ -1,11 +1,12 @@
 'use client'
+import { LoadingState, PageHeader, PageLayout } from '@/lib/core'
 import {
   CoverageGrid,
   getAllCoverage,
   type CoverageItem,
 } from '@/lib/core/research'
-import { Spinner } from '@/lib/core/ui-components'
 import { useEffect, useState } from 'react'
+import { HiDocumentText } from 'react-icons/hi'
 
 export default function ResearchContent() {
   const [items, setItems] = useState<CoverageItem[] | null>(null)
@@ -17,15 +18,17 @@ export default function ResearchContent() {
   }, [])
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-        Research
-      </h1>
-      <p className="mb-8 text-sm text-gray-500 dark:text-gray-400">
-        Equity research from the filings — one company per report, every figure
-        traceable to an SEC filing. Not investment advice.
-      </p>
-      {items === null ? <Spinner size="xl" /> : <CoverageGrid items={items} />}
-    </div>
+    <PageLayout>
+      <PageHeader
+        icon={HiDocumentText}
+        title="Research"
+        subtitle="Equity research from the filings — every figure traceable to a source."
+      />
+      {items === null ? (
+        <LoadingState message="Loading research…" />
+      ) : (
+        <CoverageGrid items={items} />
+      )}
+    </PageLayout>
   )
 }
