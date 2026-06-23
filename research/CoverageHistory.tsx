@@ -24,9 +24,9 @@ export function CoverageHistory({ history }: { history: CoverageVersion[] }) {
               )}
             </span>
             <span className="flex gap-3 text-xs">
-              {h.assets.video && (
+              {(h.youtube_url || h.assets.video) && (
                 <a
-                  href={h.assets.video}
+                  href={h.youtube_url || h.assets.video}
                   className="text-cyan-600 hover:underline dark:text-cyan-400"
                 >
                   Video

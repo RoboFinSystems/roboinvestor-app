@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { youtubeId } from './catalog'
 import { CoverageHistory } from './CoverageHistory'
 import type { CoverageItem } from './types'
 
@@ -20,6 +21,8 @@ export function ResearchArticle({
   briefMarkdown?: string
 }) {
   const body = (briefMarkdown || '').replace(/^#\s.*(\r?\n)+/, '')
+  const ytId = youtubeId(item.youtube_url)
+  const podcastYtId = youtubeId(item.podcast_youtube_url)
   return (
     <article className="mx-auto max-w-3xl">
       <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -34,14 +37,27 @@ export function ResearchArticle({
         {item.title}
       </h1>
 
-      {item.assets.video && (
-        // eslint-disable-next-line jsx-a11y/media-has-caption
-        <video
-          controls
-          poster={item.assets.thumbnail}
-          src={item.assets.video}
-          className="mb-8 aspect-video w-full rounded-xl bg-black"
-        />
+      {ytId ? (
+        <div className="mb-8 aspect-video w-full overflow-hidden rounded-xl bg-black">
+          <iframe
+            className="h-full w-full"
+            src={`https://www.youtube.com/embed/${ytId}`}
+            title={item.title}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      ) : (
+        item.assets.video && (
+          // eslint-disable-next-line jsx-a11y/media-has-caption
+          <video
+            controls
+            poster={item.assets.thumbnail}
+            src={item.assets.video}
+            className="mb-8 aspect-video w-full rounded-xl bg-black"
+          />
+        )
       )}
 
       {body && (
@@ -50,13 +66,26 @@ export function ResearchArticle({
         </div>
       )}
 
-      {item.assets.podcast_mp3 && (
+      {(podcastYtId || item.assets.podcast_mp3) && (
         <section className="mt-10">
           <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
             Listen — Q&amp;A podcast
           </h2>
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-          <audio controls src={item.assets.podcast_mp3} className="w-full" />
+          {podcastYtId ? (
+            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
+              <iframe
+                className="h-full w-full"
+                src={`https://www.youtube.com/embed/${podcastYtId}`}
+                title={`${item.title} — Q&A podcast`}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          ) : (
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <audio controls src={item.assets.podcast_mp3} className="w-full" />
+          )}
         </section>
       )}
 
