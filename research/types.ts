@@ -16,6 +16,7 @@ export interface CoverageVersion {
   date?: string // ISO date the report was published
   title?: string
   legacy_ticker?: string // e.g. TCNNF for Trulieve before the NYSE uplisting
+  youtube_url?: string // captured by `just sync-youtube` (RSS title-match)
   assets: CoverageAssets
 }
 
@@ -30,6 +31,10 @@ export interface CoverageItem {
   coverage_label?: string | null
   date: string // ISO date of the latest version
   version: string // e.g. "2026-Q2"
+  // YouTube URLs captured by `just sync-youtube` — prefer these over the S3 MP4 (free egress).
+  youtube_url?: string
+  short_youtube_url?: string
+  podcast_youtube_url?: string
   assets: CoverageAssets
   history: CoverageVersion[]
 }
