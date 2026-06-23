@@ -7,7 +7,10 @@ import type { CoverageItem } from './types'
  * The full coverage report: native video, the brief rendered from markdown (its own
  * leading H1 is stripped — we render the title above it), the Q&A podcast, and the
  * continuing-coverage history. Works in a server component (SSR'd for SEO) or a client one.
- * Wrap in a `.dark` container for the marketing site's dark theme.
+ * Styled for a dark background — render inside a dark (`bg-black`/`.dark`) container.
+ * The prose styling mirrors the blog article body so research reads consistently with it
+ * (explicit `prose-invert` + element overrides rather than `dark:prose-invert`, which the
+ * Tailwind v4 + typography-plugin setup in these apps does not resolve from a `.dark` class).
  */
 export function ResearchArticle({
   item,
@@ -42,7 +45,7 @@ export function ResearchArticle({
       )}
 
       {body && (
-        <div className="prose prose-lg dark:prose-invert max-w-none">
+        <div className="prose prose-lg prose-invert prose-headings:font-heading prose-headings:font-bold prose-headings:text-white prose-p:text-gray-300 prose-p:leading-relaxed prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:text-cyan-300 prose-strong:text-white prose-strong:font-semibold prose-code:text-cyan-400 prose-code:bg-gray-800 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-800 prose-blockquote:border-l-cyan-500 prose-blockquote:text-gray-400 prose-blockquote:italic prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:marker:text-cyan-500 prose-table:border-gray-700 prose-th:bg-gray-900 prose-th:text-white prose-td:text-gray-300 max-w-none">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
         </div>
       )}
