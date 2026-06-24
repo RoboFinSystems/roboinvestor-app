@@ -16,11 +16,10 @@ export function proxy(request: NextRequest) {
     request.nextUrl.pathname === '/register' ||
     request.nextUrl.pathname.startsWith('/auth/')
 
-  // Public S3 bucket serving the research portal's catalog, briefs, images,
+  // CloudFront CDN serving the research portal's catalog, briefs, images,
   // video, and audio (produced by robosystems-content-machine). The research
   // pages fetch these client-side, so the host is needed in connect-src too.
-  const RESEARCH_ASSETS =
-    'https://robosystems-marketing-assets.s3.amazonaws.com'
+  const RESEARCH_ASSETS = 'https://assets.robosystems.ai'
 
   // Comprehensive CSP configuration for modern web apps
   const cspDirectives = [
