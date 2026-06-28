@@ -14,8 +14,6 @@ export const viewport: Viewport = {
 const TITLE = 'RoboInvestor | Portfolio Management Agent'
 const DESCRIPTION =
   'AI-powered portfolio management agent. Analyze holdings, track performance, and surface investment insights across your portfolio.'
-// Square brand logo as the OG fallback until a 1200×630 share image is designed.
-const OG_IMAGE = '/images/logos/roboinvestor.png'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://roboinvestor.ai'),
@@ -28,13 +26,13 @@ export const metadata: Metadata = {
     siteName: 'RoboInvestor',
     title: TITLE,
     description: DESCRIPTION,
-    images: [{ url: OG_IMAGE, width: 1024, height: 1024, alt: 'RoboInvestor' }],
+    // og:image comes from the generated app/opengraph-image.tsx (site-wide).
   },
   twitter: {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: [OG_IMAGE],
+    // twitter:image comes from the generated app/twitter-image.tsx (site-wide).
     site: '@robofinsystems',
     creator: '@robofinsystems',
   },
