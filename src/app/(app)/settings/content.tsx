@@ -1,20 +1,20 @@
 'use client'
 
-import { SettingsContainer } from '@/components/layouts/SettingsContainer'
+import type { User } from '@/lib/core'
 import {
   ApiKeysCard,
+  customTheme,
   GeneralInformationCard,
+  PageHeader,
+  PageLayout,
   PasswordInformationCard,
-  SettingsPageHeader,
 } from '@/lib/core'
 import { useAuth } from '@/lib/core/auth-components'
 import { useToast } from '@/lib/core/hooks/use-toast'
-import { customTheme } from '@/lib/core/theme'
-import type { User } from '@/lib/core/types'
 import { Button } from 'flowbite-react'
 import type { FC } from 'react'
 import { useState } from 'react'
-import { HiMail } from 'react-icons/hi'
+import { HiCog, HiMail } from 'react-icons/hi'
 
 export interface UserProps {
   user: User
@@ -50,12 +50,15 @@ const UserSettingsPageContent: FC<UserProps> = function ({ user, onRefresh }) {
   }
 
   return (
-    <>
+    <PageLayout>
       <ToastContainer />
-      <div className="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4">
-        <SettingsPageHeader title="User settings" homeHref="/home" />
-      </div>
-      <SettingsContainer>
+      <PageHeader
+        icon={HiCog}
+        title="User Settings"
+        subtitle="Manage your account, security, and API access"
+      />
+
+      <div className="space-y-6">
         {user.emailVerified === false && (
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50">
             <div className="flex items-center justify-between">
@@ -108,8 +111,8 @@ const UserSettingsPageContent: FC<UserProps> = function ({ user, onRefresh }) {
           onError={showError}
         />
         <ApiKeysCard theme={customTheme} />
-      </SettingsContainer>
-    </>
+      </div>
+    </PageLayout>
   )
 }
 
