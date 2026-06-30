@@ -102,11 +102,34 @@ node .design-sync/compile-css.mjs src/app/globals.css .design-sync/.cache/ds-com
 node .ds-sync/package-build.mjs --config .design-sync/config.json --node-modules ./node_modules --out ./ds-bundle
 node .design-sync/patch-bundle.mjs ./ds-bundle      # <-- do NOT skip
 node .ds-sync/package-validate.mjs ./ds-bundle
+node .design-sync/gen-manifest.mjs ./ds-bundle      # <-- do NOT skip (see below)
 ```
 
 No `node_modules/<pkg>` symlink and no `build:types` step are needed (both were
 `@robosystems/core`-only). Upload is the 12 cards under `components/landing/` to the
 RoboInvestor project, deleting the old `@core` card tree.
+
+## `_ds_manifest.json` — the card index (MUST upload manually)
+
+The pane's card grid is driven by `_ds_manifest.json`. The package-build CLI does
+NOT emit it; normally the claude.ai/design app's **server-side self-check** rebuilds
+it from the bundle. **That self-check does NOT fire on raw DesignSync file uploads**
+(confirmed 2026-06-29 — uploading the `_ds_needs_recompile` marker did nothing). So a
+CLI sync leaves the project's OLD manifest in place and the pane shows the previous
+components, every card reading **"file not found"** (their HTML was deleted).
+
+Fix / contract: after the build, run **`node .design-sync/gen-manifest.mjs ./ds-bundle`**
+(derives namespace + components from the `_ds_bundle.js` `@ds-bundle` header, cards
+from each HTML's `@dsCard` marker, tokens from `_ds_bundle.css`, fonts from
+`fonts/fonts.css`) and **include `_ds_manifest.json` in the upload write set**. Verify
+remotely with `get_file _ds_manifest.json` — `namespace` must be `RoboinvestorApp` and
+`cards` must list the `landing` HTML, not `@core`.
+
+## Sibling apps
+
+robosystems-app / roboledger-app still mirror `@robosystems/core` in THEIR design
+projects. This refocus is RoboInvestor-only; replicate the pattern for RoboLedger's
+own landing surface separately if/when desired (different brand: violet).
 
 ## Sibling apps
 
