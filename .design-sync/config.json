@@ -1,32 +1,43 @@
 {
-  "pkg": "@robosystems/core",
-  "globalName": "RobosystemsCore",
+  "pkg": "roboinvestor-app",
+  "globalName": "RoboinvestorApp",
   "projectId": "9c82a8ad-64a8-4b37-b248-83a94def7729",
   "shape": "package",
-  "srcDir": ".",
-  "tsconfig": "tsconfig.json",
-  "cssEntry": ".ds-compiled.css",
+  "srcDir": "src/components",
+  "entry": ".design-sync/entry.ts",
+  "tsconfig": ".design-sync/tsconfig.json",
+  "cssEntry": ".design-sync/.cache/ds-compiled.css",
   "readmeHeader": ".design-sync/conventions.md",
-  "extraFonts": ["../../../.design-sync/ds-fonts.css"],
+  "extraFonts": [".design-sync/ds-fonts.css"],
   "runtimeFontPrefixes": ["JetBrains"],
   "componentSrcMap": {
-    "SupportModal": null,
-    "AuthCore": null,
-    "GraphFilters": null,
-    "LibraryClient": null,
-    "OperationClient": null,
-    "QueryClient": null,
-    "QueuedQueryError": null,
-    "RoboSystemsClients": null,
-    "SSEClient": null,
-    "AnimatedLogo": "ui-components/Logo.tsx",
-    "LogoBadge": "ui-components/Logo.tsx",
-    "ProgressiveText": "components/console/ProgressiveText.tsx"
+    "HeroSection": "src/components/landing/HeroSection.tsx",
+    "Header": "src/components/landing/Header.tsx",
+    "Footer": "src/components/landing/Footer.tsx",
+    "FeaturesSection": "src/components/landing/FeaturesSection.tsx",
+    "EcosystemSection": "src/components/landing/EcosystemSection.tsx",
+    "ResearchSection": "src/components/landing/ResearchSection.tsx",
+    "AIAnalysisSection": "src/components/landing/AIAnalysisSection.tsx",
+    "InvestorSchemaSection": "src/components/landing/InvestorSchemaSection.tsx",
+    "FinalCTA": "src/components/landing/FinalCTA.tsx",
+    "ContactForm": "src/components/landing/ContactForm.tsx",
+    "ContactModal": "src/components/landing/ContactModal.tsx",
+    "FloatingElementsVariant": "src/components/landing/FloatingElementsVariant.tsx"
   },
   "overrides": {
-    "ConfirmModal": {
+    "ContactModal": {
       "cardMode": "single",
-      "viewport": "560x440"
+      "viewport": "640x600"
+    },
+    "HeroSection": {
+      "viewport": "1280x1000"
+    },
+    "Header": {
+      "cardMode": "single",
+      "viewport": "1280x200"
+    },
+    "FloatingElementsVariant": {
+      "viewport": "960x460"
     }
   }
 }
