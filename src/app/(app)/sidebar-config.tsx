@@ -32,6 +32,9 @@ export const getNavigationItems = ({
       label: 'Home',
       href: '/home',
     },
+  ]
+
+  const researchItems: SidebarItemData[] = [
     {
       icon: HiDocumentText,
       label: 'Research',
@@ -84,6 +87,7 @@ export const getNavigationItems = ({
     ...baseItems,
     ...entityItems,
     ...graphToolItems,
+    ...researchItems,
     ...alwaysVisibleItems,
   ]
 }
