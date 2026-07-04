@@ -55,7 +55,6 @@
     "tailwind-merge": "^3"
   },
   "overrides": {
-    "undici": "^8.5.0",
     "next": {
       "postcss": "^8.5.10"
     }
