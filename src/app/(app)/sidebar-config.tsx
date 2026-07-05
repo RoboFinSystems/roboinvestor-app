@@ -1,5 +1,6 @@
 import type { SidebarItemData } from '@/lib/core'
 import {
+  HiDocumentReport,
   HiDocumentText,
   HiGlobeAlt,
   HiHome,
@@ -14,6 +15,12 @@ interface NavigationOptions {
   hasEntityGraph: boolean
   /** User has any usable graph including shared repositories like SEC (for Console) */
   hasAnyGraph: boolean
+  /**
+   * Repository id of the selected shared repository when it exposes the filing
+   * viewer (i.e. the SEC repository), else null. Drives the "Reports" item, which
+   * is contextual to that repository being the active graph.
+   */
+  reportsRepositoryId?: string | null
 }
 
 /**
@@ -25,6 +32,7 @@ interface NavigationOptions {
 export const getNavigationItems = ({
   hasEntityGraph,
   hasAnyGraph,
+  reportsRepositoryId,
 }: NavigationOptions): SidebarItemData[] => {
   const baseItems: SidebarItemData[] = [
     {
@@ -75,6 +83,17 @@ export const getNavigationItems = ({
       ]
     : []
 
+  // The filing viewer, shown only while its repository (SEC) is the active graph.
+  const reportItems: SidebarItemData[] = reportsRepositoryId
+    ? [
+        {
+          icon: HiDocumentReport,
+          label: 'Reports',
+          href: `/repositories/${reportsRepositoryId}/reports`,
+        },
+      ]
+    : []
+
   const alwaysVisibleItems: SidebarItemData[] = [
     {
       icon: HiGlobeAlt,
@@ -87,6 +106,7 @@ export const getNavigationItems = ({
     ...baseItems,
     ...entityItems,
     ...graphToolItems,
+    ...reportItems,
     ...researchItems,
     ...alwaysVisibleItems,
   ]

@@ -12,7 +12,13 @@ import { createUserApiKey } from '@robosystems/client/sdk'
 import { Button, Card, Spinner } from 'flowbite-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { HiCheckCircle, HiDatabase, HiKey, HiTerminal } from 'react-icons/hi'
+import {
+  HiCheckCircle,
+  HiDatabase,
+  HiDocumentSearch,
+  HiKey,
+  HiTerminal,
+} from 'react-icons/hi'
 
 interface ApiKeysContentProps {
   repository: string
@@ -134,6 +140,36 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           repoOffering?.description || 'Curated graph database ready to query'
         }
       />
+
+      {/* Financial Statements Viewer — SEC filings rendered without a query */}
+      {repository === 'sec' && (
+        <Card theme={customTheme.card}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-2">
+                <HiDocumentSearch className="text-primary-600 dark:text-primary-400 h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-heading text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                  Financial Statements Viewer
+                </h3>
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                  Search a public company and read its filings as rendered
+                  financial statements — no query required.
+                </p>
+              </div>
+            </div>
+            <Button
+              color="primary"
+              onClick={() => router.push(`/repositories/${repository}/reports`)}
+              className="shrink-0"
+            >
+              <HiDocumentSearch className="mr-2 h-4 w-4" />
+              Browse Filings
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* What's Included */}
       <Card theme={customTheme.card}>
