@@ -134,6 +134,51 @@
 }
 
 /*
+  @robosystems/report-components renders XBRL financial statements with inline
+  styles keyed off `--rs-*` custom properties (each has a built-in fallback). Scope
+  those variables to `.rs-report-scope` so a rendered SEC report picks up the app
+  palette and font in both light and dark. The SEC report viewer wraps
+  `<ReportView>` in this class (see src/lib/sec). Only the `--rs-*` vars the library
+  actually reads are mapped here.
+*/
+.rs-report-scope {
+  --rs-font-sans: inherit;
+  --rs-font-heading: inherit;
+  --rs-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    monospace;
+
+  --rs-primary-50: var(--color-primary-50);
+  --rs-primary-100: var(--color-primary-100);
+  --rs-primary-300: var(--color-primary-300);
+  --rs-primary-500: var(--color-primary-500);
+  --rs-primary-700: var(--color-primary-700);
+  --rs-primary-800: var(--color-primary-800);
+
+  --rs-text: #18181b; /* zinc-900 */
+  --rs-muted: #71717a; /* zinc-500 */
+  --rs-border: #e4e4e7; /* zinc-200 */
+  --rs-border-strong: #a1a1aa; /* zinc-400 */
+  --rs-subtotal-bg: #fafafa; /* zinc-50 */
+  --rs-selected-bg: var(--color-primary-100);
+  --rs-panel-bg: #ffffff;
+  --rs-success: #047857; /* emerald-700 */
+  --rs-error: #dc2626; /* red-600 */
+}
+
+.dark .rs-report-scope {
+  --rs-text: #f4f4f5; /* zinc-100 */
+  --rs-muted: #a1a1aa; /* zinc-400 */
+  --rs-border: #3f3f46; /* zinc-700 */
+  --rs-border-strong: #52525b; /* zinc-600 */
+  --rs-subtotal-bg: #27272a; /* zinc-800 */
+  --rs-selected-bg: var(--color-primary-900);
+  --rs-panel-bg: #18181b; /* zinc-900 */
+  --rs-success: #34d399; /* emerald-400 */
+  --rs-error: #f87171; /* red-400 */
+}
+
+/*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
