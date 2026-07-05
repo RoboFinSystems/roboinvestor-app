@@ -1,11 +1,16 @@
 'use client'
 
 import type { Entity } from '@/lib/core'
-import { GraphFilters, useEntity, useGraphContext } from '@/lib/core'
+import {
+  GraphFilters,
+  onlyRepositories,
+  useEntity,
+  useGraphContext,
+} from '@/lib/core'
 import { useSSO } from '@/lib/core/auth-core/sso'
 import * as SDK from '@robosystems/client'
 import { useEffect, useMemo, useState } from 'react'
-import { HiChevronDown, HiOfficeBuilding } from 'react-icons/hi'
+import { HiChevronDown, HiDatabase, HiOfficeBuilding } from 'react-icons/hi'
 
 const API_URL =
   process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'http://localhost:8000'
@@ -13,12 +18,15 @@ const API_URL =
 /**
  * EntitySelectorDropdown for RoboInvestor
  *
- * Shows all entities across all roboinvestor graphs.
- * Selecting an entity automatically switches to its graph.
+ * Shows all entities across all roboinvestor graphs, plus any shared
+ * repositories the user has access to (e.g. the SEC graph). Selecting an
+ * entity switches to its graph; selecting a shared repository switches to it
+ * directly (repositories have no per-user entity) so Console and Search can
+ * be used against it.
  */
 export function EntitySelectorDropdown() {
   const { state: graphState, setCurrentGraph } = useGraphContext()
-  const { currentEntity, setCurrentEntity } = useEntity()
+  const { currentEntity, setCurrentEntity, clearEntity } = useEntity()
   const { navigateToApp } = useSSO(API_URL)
   const [isOpen, setIsOpen] = useState(false)
   const [entitiesByGraph, setEntitiesByGraph] = useState<Map<string, Entity[]>>(
@@ -29,6 +37,12 @@ export function EntitySelectorDropdown() {
   // Filter to only roboinvestor graphs
   const roboinvestorGraphs = useMemo(
     () => graphState.graphs.filter(GraphFilters.roboinvestor),
+    [graphState.graphs]
+  )
+
+  // Shared repositories the user has access to (e.g. SEC)
+  const repositories = useMemo(
+    () => graphState.graphs.filter(onlyRepositories),
     [graphState.graphs]
   )
 
@@ -99,9 +113,22 @@ export function EntitySelectorDropdown() {
     setCurrentEntity(entity)
   }
 
-  // Get current graph name
-  const currentGraph = roboinvestorGraphs.find(
-    (g) => g.graphId === graphState.currentGraphId
+  const handleRepositorySelect = async (graphId: string) => {
+    setIsOpen(false)
+
+    // Switch graph if different from current
+    if (graphId !== graphState.currentGraphId) {
+      await setCurrentGraph(graphId)
+    }
+
+    // Repositories have no per-user entity, so clear any entity selection
+    clearEntity()
+  }
+
+  // The current graph, when it is a shared repository (e.g. SEC)
+  const currentRepo = useMemo(
+    () => repositories.find((r) => r.graphId === graphState.currentGraphId),
+    [repositories, graphState.currentGraphId]
   )
 
   // Calculate total entities across all graphs
@@ -111,10 +138,18 @@ export function EntitySelectorDropdown() {
   )
 
   // Determine empty state
-  const hasNoGraphs = roboinvestorGraphs.length === 0
-  const hasNoEntities = !isLoading && totalEntities === 0
+  const hasNoGraphs =
+    roboinvestorGraphs.length === 0 && repositories.length === 0
+  const hasNothingToSelect =
+    !isLoading && totalEntities === 0 && repositories.length === 0
 
-  // If no graphs, link to platform to create one
+  // Label shown on the trigger button
+  const buttonLabel = currentRepo
+    ? currentRepo.graphName
+    : currentEntity?.name || 'Select Entity'
+  const ButtonIcon = currentRepo ? HiDatabase : HiOfficeBuilding
+
+  // If no graphs at all, link to platform to create one
   if (hasNoGraphs) {
     return (
       <button
@@ -129,16 +164,22 @@ export function EntitySelectorDropdown() {
     )
   }
 
+  // Repositories to list (exclude the one that is currently selected — it is
+  // shown in the "Current Selection" block instead)
+  const otherRepositories = repositories.filter(
+    (r) => r.graphId !== graphState.currentGraphId
+  )
+
   return (
     <div className="relative">
       <button
-        onClick={() => !hasNoEntities && setIsOpen(!isOpen)}
-        disabled={hasNoEntities}
+        onClick={() => !hasNothingToSelect && setIsOpen(!isOpen)}
+        disabled={hasNothingToSelect}
         className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:disabled:hover:bg-gray-700"
       >
-        <HiOfficeBuilding className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <ButtonIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
         <span className="font-medium text-gray-900 dark:text-gray-100">
-          {currentEntity?.name || 'Select Entity'}
+          {buttonLabel}
         </span>
         <HiChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400" />
       </button>
@@ -166,8 +207,35 @@ export function EntitySelectorDropdown() {
                 </div>
               ) : (
                 <>
+                  {/* Currently selected repository at the top */}
+                  {currentRepo && (
+                    <div className="border-b-2 border-gray-300 dark:border-gray-500">
+                      <div className="bg-blue-50 px-4 py-2 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                        Current Selection
+                      </div>
+                      <button
+                        onClick={() =>
+                          handleRepositorySelect(currentRepo.graphId)
+                        }
+                        className="flex w-full items-center gap-2 bg-blue-50 px-4 py-2 text-left hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/40"
+                      >
+                        <HiDatabase className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-300" />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                            {currentRepo.graphName}
+                          </span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                            Shared Repository
+                            {currentRepo.role && ` • ${currentRepo.role}`}
+                          </span>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Currently selected entity at the top */}
-                  {currentEntity &&
+                  {!currentRepo &&
+                    currentEntity &&
                     graphState.currentGraphId &&
                     (() => {
                       const currentGraphEntities =
@@ -262,6 +330,33 @@ export function EntitySelectorDropdown() {
                       </div>
                     )
                   })}
+
+                  {/* Shared repositories (e.g. SEC) — selectable for Console/Search */}
+                  {otherRepositories.length > 0 && (
+                    <div className="border-b border-gray-200 last:border-0 dark:border-gray-600">
+                      <div className="bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                        Shared Repositories
+                      </div>
+                      {otherRepositories.map((repo) => (
+                        <button
+                          key={repo.graphId}
+                          onClick={() => handleRepositorySelect(repo.graphId)}
+                          className="flex w-full items-center gap-2 px-4 py-2 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <HiDatabase className="h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500" />
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {repo.graphName}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              Shared Repository
+                              {repo.role && ` • ${repo.role}`}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Create New Entity — redirects to platform via SSO */}
                   <div className="border-t-2 border-gray-300 dark:border-gray-600">
