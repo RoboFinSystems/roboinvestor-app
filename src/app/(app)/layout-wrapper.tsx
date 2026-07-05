@@ -42,9 +42,22 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     [state.graphs]
   )
 
+  // Surface "Reports" only while the SEC shared repository is the active graph —
+  // it's the repository that exposes the filing viewer.
+  const reportsRepositoryId = useMemo(
+    () =>
+      currentGraph &&
+      onlyRepositories(currentGraph) &&
+      currentGraph.graphId === 'sec'
+        ? currentGraph.graphId
+        : null,
+    [currentGraph]
+  )
+
   const sidebarConfig = useRoboInvestorSidebarConfig({
     hasEntityGraph,
     hasAnyGraph,
+    reportsRepositoryId,
   })
 
   return (
