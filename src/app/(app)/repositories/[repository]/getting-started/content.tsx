@@ -326,7 +326,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           >
             {isCreatingKey ? (
               <>
-                <Spinner size="sm" className="mr-2" />
+                <Spinner size="sm" className="mr-2 text-white" />
                 Creating API Key...
               </>
             ) : (
