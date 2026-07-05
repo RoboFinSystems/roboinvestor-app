@@ -728,7 +728,9 @@ const PortfolioPageContent: FC = function () {
             onClick={handleCreate}
             disabled={creating || !createForm.name.trim()}
           >
-            {creating ? <Spinner size="sm" className="mr-2" /> : null}
+            {creating ? (
+              <Spinner size="sm" className="mr-2 text-white" />
+            ) : null}
             Create
           </Button>
           <Button color="gray" onClick={() => setShowCreateModal(false)}>
@@ -923,7 +925,9 @@ const PortfolioPageContent: FC = function () {
             onClick={handleCreateSecurity}
             disabled={creatingSecurity || !securityForm.name.trim()}
           >
-            {creatingSecurity ? <Spinner size="sm" className="mr-2" /> : null}
+            {creatingSecurity ? (
+              <Spinner size="sm" className="mr-2 text-white" />
+            ) : null}
             Add
           </Button>
           <Button color="gray" onClick={() => setShowSecurityModal(false)}>
@@ -1004,7 +1008,9 @@ const PortfolioPageContent: FC = function () {
               savingEdit || (!editEntityId && !editSourceGraphId.trim())
             }
           >
-            {savingEdit ? <Spinner size="sm" className="mr-2" /> : null}
+            {savingEdit ? (
+              <Spinner size="sm" className="mr-2 text-white" />
+            ) : null}
             Save
           </Button>
           <Button color="gray" onClick={() => setShowEditSecurityModal(false)}>
