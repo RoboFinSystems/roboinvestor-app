@@ -2,13 +2,13 @@
 
 import type { Entity } from '@/lib/core'
 import {
+  clients,
   GraphFilters,
   onlyRepositories,
   useEntity,
   useGraphContext,
 } from '@/lib/core'
 import { useSSO } from '@/lib/core/auth-core/sso'
-import * as SDK from '@robosystems/client'
 import { useEffect, useMemo, useState } from 'react'
 import { HiChevronDown, HiDatabase, HiOfficeBuilding } from 'react-icons/hi'
 
@@ -46,51 +46,42 @@ export function EntitySelectorDropdown() {
     [graphState.graphs]
   )
 
-  // Load entities for all roboinvestor graphs
+  // Load entities for all roboinvestor graphs via the ledger entity API — the
+  // same source roboledger uses. A previous raw Cypher `MATCH (e:Entity)` read
+  // only materialized graph nodes, so it missed entities that exist at the
+  // API/registry level but were never written as a node (e.g. a freshly created
+  // graph). That left such graphs entity-less and invisible in the selector.
+  // Exclude `linked` entities (portfolio holdings shared from other graphs) —
+  // those are holdings, not selection targets.
   useEffect(() => {
     const loadAllEntities = async () => {
       setIsLoading(true)
       const entitiesMap = new Map<string, Entity[]>()
 
-      for (const graph of roboinvestorGraphs) {
-        try {
-          const response = await SDK.executeCypherQuery({
-            path: { graph_id: graph.graphId },
-            query: { mode: 'sync' },
-            body: {
-              query: `MATCH (e:Entity)
-                      RETURN
-                        e.identifier as identifier,
-                        e.name as name,
-                        e.parent_entity_id as parentEntityId,
-                        e.is_parent as isParent
-                      ORDER BY e.name`,
-              parameters: {},
-            },
-          })
-
-          if (response.data) {
-            const data = response.data as any
-            const rows = data.data || []
-
-            const entities: Entity[] = rows.map((row: any) => ({
-              identifier: row.identifier || '',
-              name: row.name || row.identifier || 'Unnamed Entity',
-              parentEntityId: row.parentEntityId,
-              isParent: row.isParent,
-            }))
+      await Promise.all(
+        roboinvestorGraphs.map(async (graph) => {
+          try {
+            const list = await clients.ledger.listEntities(graph.graphId)
+            const entities: Entity[] = list
+              .filter((e) => e.source !== 'linked')
+              .map((e) => ({
+                identifier: e.id || '',
+                name: e.name || e.id || 'Unnamed Entity',
+                parentEntityId: e.parentEntityId ?? null,
+                isParent: e.isParent ?? null,
+              }))
 
             if (entities.length > 0) {
               entitiesMap.set(graph.graphId, entities)
             }
+          } catch (error) {
+            console.error(
+              `Failed to load entities for graph ${graph.graphId}:`,
+              error
+            )
           }
-        } catch (error) {
-          console.error(
-            `Failed to load entities for graph ${graph.graphId}:`,
-            error
-          )
-        }
-      }
+        })
+      )
 
       setEntitiesByGraph(entitiesMap)
       setIsLoading(false)
