@@ -215,6 +215,18 @@ const HomePageContent: FC = function () {
     },
   ]
 
+  // Match the explore grid's column count to the number of cards so they always
+  // stretch to fill the row (2 cards → 2 columns, 4 cards → 4 columns) rather
+  // than leaving empty space at a fixed 3-column layout.
+  const exploreGridCols =
+    {
+      1: 'grid-cols-1',
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    }[Math.min(exploreActions.length, 4)] ??
+    'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+
   return (
     <PageLayout>
       <PageHeader
@@ -350,7 +362,7 @@ const HomePageContent: FC = function () {
 
           {/* What you can do without a graph (Research, Repositories), plus
               repository tools when a shared repository is available. */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={`grid gap-4 ${exploreGridCols}`}>
             {exploreActions.map((action) => (
               <Link
                 key={action.title}
