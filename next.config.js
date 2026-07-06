@@ -9,10 +9,11 @@ const nextConfig = {
     // the `Host`/`x-forwarded-host` it sees. In prod the app runs on App Runner
     // behind CloudFront, whose origin is the raw `*.awsapprunner.com` host — so
     // Next always sees that host, never `roboinvestor.ai`, and every action
-    // (graph/entity/sidebar cookie persistence) 500s. Allow the public origins
-    // explicitly so the CSRF origin check passes behind the CDN.
+    // (graph/entity/sidebar cookie persistence) 500s. Allow the public origin
+    // explicitly so the CSRF origin check passes behind the CDN. www redirects
+    // to the apex, so only the apex is listed.
     serverActions: {
-      allowedOrigins: ['roboinvestor.ai', 'www.roboinvestor.ai'],
+      allowedOrigins: ['roboinvestor.ai'],
     },
   },
 }
