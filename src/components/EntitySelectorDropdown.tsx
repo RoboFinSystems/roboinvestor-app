@@ -2,13 +2,13 @@
 
 import type { Entity } from '@/lib/core'
 import {
+  clients,
   GraphFilters,
   onlyRepositories,
   useEntity,
   useGraphContext,
 } from '@/lib/core'
 import { useSSO } from '@/lib/core/auth-core/sso'
-import * as SDK from '@robosystems/client'
 import { useEffect, useMemo, useState } from 'react'
 import { HiChevronDown, HiDatabase, HiOfficeBuilding } from 'react-icons/hi'
 
@@ -46,51 +46,42 @@ export function EntitySelectorDropdown() {
     [graphState.graphs]
   )
 
-  // Load entities for all roboinvestor graphs
+  // Load entities for all roboinvestor graphs via the ledger entity API — the
+  // same source roboledger uses. A previous raw Cypher `MATCH (e:Entity)` read
+  // only materialized graph nodes, so it missed entities that exist at the
+  // API/registry level but were never written as a node (e.g. a freshly created
+  // graph). That left such graphs entity-less and invisible in the selector.
+  // Exclude `linked` entities (portfolio holdings shared from other graphs) —
+  // those are holdings, not selection targets.
   useEffect(() => {
     const loadAllEntities = async () => {
       setIsLoading(true)
       const entitiesMap = new Map<string, Entity[]>()
 
-      for (const graph of roboinvestorGraphs) {
-        try {
-          const response = await SDK.executeCypherQuery({
-            path: { graph_id: graph.graphId },
-            query: { mode: 'sync' },
-            body: {
-              query: `MATCH (e:Entity)
-                      RETURN
-                        e.identifier as identifier,
-                        e.name as name,
-                        e.parent_entity_id as parentEntityId,
-                        e.is_parent as isParent
-                      ORDER BY e.name`,
-              parameters: {},
-            },
-          })
-
-          if (response.data) {
-            const data = response.data as any
-            const rows = data.data || []
-
-            const entities: Entity[] = rows.map((row: any) => ({
-              identifier: row.identifier || '',
-              name: row.name || row.identifier || 'Unnamed Entity',
-              parentEntityId: row.parentEntityId,
-              isParent: row.isParent,
-            }))
+      await Promise.all(
+        roboinvestorGraphs.map(async (graph) => {
+          try {
+            const list = await clients.ledger.listEntities(graph.graphId)
+            const entities: Entity[] = list
+              .filter((e) => e.source !== 'linked')
+              .map((e) => ({
+                identifier: e.id || '',
+                name: e.name || e.id || 'Unnamed Entity',
+                parentEntityId: e.parentEntityId ?? null,
+                isParent: e.isParent ?? null,
+              }))
 
             if (entities.length > 0) {
               entitiesMap.set(graph.graphId, entities)
             }
+          } catch (error) {
+            console.error(
+              `Failed to load entities for graph ${graph.graphId}:`,
+              error
+            )
           }
-        } catch (error) {
-          console.error(
-            `Failed to load entities for graph ${graph.graphId}:`,
-            error
-          )
-        }
-      }
+        })
+      )
 
       setEntitiesByGraph(entitiesMap)
       setIsLoading(false)
@@ -125,10 +116,32 @@ export function EntitySelectorDropdown() {
     clearEntity()
   }
 
+  // Select a roboinvestor graph that has no entities yet. Switches to the graph
+  // and clears any entity selection so the rest of the app (Portfolio, Console)
+  // operates on it. Keeps freshly created graphs reachable from the selector
+  // even before an entity exists in them.
+  const handleGraphSelect = async (graphId: string) => {
+    setIsOpen(false)
+
+    if (graphId !== graphState.currentGraphId) {
+      await setCurrentGraph(graphId)
+    }
+
+    clearEntity()
+  }
+
   // The current graph, when it is a shared repository (e.g. SEC)
   const currentRepo = useMemo(
     () => repositories.find((r) => r.graphId === graphState.currentGraphId),
     [repositories, graphState.currentGraphId]
+  )
+
+  // The current graph, when it is a roboinvestor entity graph. It may not have
+  // an entity selected yet (e.g. a newly created graph with no Entity node).
+  const currentInvestorGraph = useMemo(
+    () =>
+      roboinvestorGraphs.find((g) => g.graphId === graphState.currentGraphId),
+    [roboinvestorGraphs, graphState.currentGraphId]
   )
 
   // Calculate total entities across all graphs
@@ -141,12 +154,15 @@ export function EntitySelectorDropdown() {
   const hasNoGraphs =
     roboinvestorGraphs.length === 0 && repositories.length === 0
   const hasNothingToSelect =
-    !isLoading && totalEntities === 0 && repositories.length === 0
+    !isLoading &&
+    totalEntities === 0 &&
+    repositories.length === 0 &&
+    roboinvestorGraphs.length === 0
 
   // Label shown on the trigger button
   const buttonLabel = currentRepo
     ? currentRepo.graphName
-    : currentEntity?.name || 'Select Entity'
+    : currentEntity?.name || currentInvestorGraph?.graphName || 'Select Entity'
   const ButtonIcon = currentRepo ? HiDatabase : HiOfficeBuilding
 
   // If no graphs at all, link to platform to create one
@@ -285,6 +301,55 @@ export function EntitySelectorDropdown() {
                   {/* All other entities grouped by graph */}
                   {roboinvestorGraphs.map((graph) => {
                     const entities = entitiesByGraph.get(graph.graphId) || []
+
+                    // A roboinvestor graph with no entities yet (e.g. freshly
+                    // created) still needs to be reachable — surface it as a
+                    // selectable row so the user can switch to it. Without this
+                    // the graph is invisible and the app can't be pointed at it.
+                    if (entities.length === 0) {
+                      const isCurrent =
+                        graphState.currentGraphId === graph.graphId
+                      return (
+                        <div
+                          key={graph.graphId}
+                          className="border-b border-gray-200 last:border-0 dark:border-gray-600"
+                        >
+                          <button
+                            onClick={() => handleGraphSelect(graph.graphId)}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-left transition-colors ${
+                              isCurrent
+                                ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/40'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                            }`}
+                          >
+                            <HiOfficeBuilding
+                              className={`h-4 w-4 shrink-0 ${
+                                isCurrent
+                                  ? 'text-blue-600 dark:text-blue-300'
+                                  : 'text-gray-400 dark:text-gray-500'
+                              }`}
+                            />
+                            <div className="flex flex-col">
+                              <span
+                                className={`text-sm font-medium ${
+                                  isCurrent
+                                    ? 'text-blue-700 dark:text-blue-300'
+                                    : 'text-gray-900 dark:text-gray-100'
+                                }`}
+                              >
+                                {graph.graphName}
+                              </span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {isCurrent
+                                  ? 'Selected • no entities yet'
+                                  : 'No entities yet'}
+                              </span>
+                            </div>
+                          </button>
+                        </div>
+                      )
+                    }
+
                     // Filter out the currently selected entity
                     const otherEntities = entities.filter(
                       (e) =>

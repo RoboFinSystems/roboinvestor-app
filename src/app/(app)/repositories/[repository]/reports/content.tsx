@@ -2,9 +2,8 @@
 
 import { PageHeader, PageLayout } from '@/lib/core'
 import { TickerSearch, type SecEntity } from '@/lib/sec'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { HiArrowLeft, HiDocumentSearch } from 'react-icons/hi'
+import { HiDocumentSearch } from 'react-icons/hi'
 
 export function ReportsSearchContent({ repository }: { repository: string }) {
   const router = useRouter()
@@ -15,17 +14,9 @@ export function ReportsSearchContent({ repository }: { repository: string }) {
 
   return (
     <PageLayout>
-      <Link
-        href={`/repositories/${repository}/getting-started`}
-        className="text-primary-600 dark:text-primary-400 inline-flex items-center gap-1 text-sm hover:underline"
-      >
-        <HiArrowLeft className="h-4 w-4" /> {repository.toUpperCase()}{' '}
-        repository
-      </Link>
-
       <PageHeader
         icon={HiDocumentSearch}
-        title="Financial Statements"
+        title="Reports"
         subtitle="Search a public company to browse its filings and view rendered financial statements."
       />
 

@@ -11,7 +11,7 @@ import {
 import { TbTrendingUp } from 'react-icons/tb'
 
 interface NavigationOptions {
-  /** User has a roboinvestor entity graph (for Entity, Portfolio) */
+  /** The currently selected graph is a roboinvestor entity graph (for Entity, Portfolio) */
   hasEntityGraph: boolean
   /** User has any usable graph including shared repositories like SEC (for Console) */
   hasAnyGraph: boolean

@@ -28,10 +28,13 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const currentGraph =
     state.graphs.find((g) => g.graphId === state.currentGraphId) || null
 
-  // Roboinvestor entity graphs (for Entity, Portfolio)
+  // Entity/Portfolio apply only to a roboinvestor entity graph, so gate them on
+  // the CURRENTLY selected graph rather than merely owning one somewhere.
+  // Otherwise they linger in the sidebar while a shared repository (e.g. SEC) is
+  // selected, where they don't apply.
   const hasEntityGraph = useMemo(
-    () => state.graphs.filter(GraphFilters.roboinvestor).length > 0,
-    [state.graphs]
+    () => !!currentGraph && GraphFilters.roboinvestor(currentGraph),
+    [currentGraph]
   )
 
   // Roboinvestor graphs OR shared repositories like SEC (for Console)
