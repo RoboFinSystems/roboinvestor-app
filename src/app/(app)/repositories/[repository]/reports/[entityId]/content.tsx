@@ -98,20 +98,25 @@ function EntityReportsInner({ repository, cik }: EntityReportsProps) {
 
   return (
     <PageLayout>
-      {reportId ? (
-        <button type="button" onClick={clearFiling} className={backLinkClass}>
-          <HiArrowLeft className="h-4 w-4" /> All filings
-        </button>
-      ) : (
-        <Link href={reportsBase} className={backLinkClass}>
-          <HiArrowLeft className="h-4 w-4" /> Search companies
-        </Link>
-      )}
-
       <PageHeader
         icon={HiOfficeBuilding}
         title={entity.name}
         subtitle={subtitle}
+        actions={
+          reportId ? (
+            <button
+              type="button"
+              onClick={clearFiling}
+              className={backLinkClass}
+            >
+              <HiArrowLeft className="h-4 w-4" /> All filings
+            </button>
+          ) : (
+            <Link href={reportsBase} className={backLinkClass}>
+              <HiArrowLeft className="h-4 w-4" /> Search companies
+            </Link>
+          )
+        }
       />
 
       {reportId ? (
