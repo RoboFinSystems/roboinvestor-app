@@ -179,6 +179,19 @@
 }
 
 /*
+  Externalized SEC disclosure blocks (report-components ExternalTextBlock) render
+  the raw filing HTML — black text, no background — inside a sandboxed iframe. On
+  the dark theme that left dark-on-dark, unreadable text. Give the iframe a white
+  "document" surface so the filing stays legible (it's authored black-on-white, and
+  CSS-inverting uncontrolled HTML would mangle any colored cells/links). No-op in
+  light mode, where the block already sits on a white page.
+*/
+.rs-report-scope iframe {
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+/*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
