@@ -16,6 +16,7 @@ import { useMemo } from 'react'
 import {
   HiDocumentReport,
   HiDocumentText,
+  HiGlobeAlt,
   HiHome,
   HiOfficeBuilding,
   HiPlus,
@@ -166,16 +167,24 @@ const HomePageContent: FC = function () {
     ]
   }, [isInvestorGraph, isRepository, currentGraph])
 
-  // Explore actions shown in the create-graph empty state.
+  // Explore actions shown in the create-graph empty state. Research and
+  // Repositories require no graph, so they always appear — and are the only
+  // actions when nothing is available yet. Console/Reports are added only when
+  // the user has a usable repository (e.g. SEC). This mirrors the sidebar,
+  // which likewise shows only Research + Repositories when no graph is present.
   const exploreActions: ActionCard[] = [
-    {
-      title: 'Open Console',
-      description: 'Query repositories with natural language',
-      icon: HiTerminal,
-      href: '/console',
-      iconBg: 'bg-cyan-100 dark:bg-cyan-900',
-      iconColor: 'text-cyan-600 dark:text-cyan-400',
-    },
+    ...(hasAnyGraph
+      ? [
+          {
+            title: 'Open Console',
+            description: 'Query repositories with natural language',
+            icon: HiTerminal,
+            href: '/console',
+            iconBg: 'bg-cyan-100 dark:bg-cyan-900',
+            iconColor: 'text-cyan-600 dark:text-cyan-400',
+          },
+        ]
+      : []),
     ...(reportsRepoId
       ? [
           {
@@ -190,11 +199,19 @@ const HomePageContent: FC = function () {
       : []),
     {
       title: 'Research',
-      description: 'AI-generated research & market analysis',
+      description: 'AI research & market analysis',
       icon: HiDocumentText,
       href: '/research',
       iconBg: 'bg-rose-100 dark:bg-rose-900',
       iconColor: 'text-rose-600 dark:text-rose-400',
+    },
+    {
+      title: 'Repositories',
+      description: 'Browse shared data repositories',
+      icon: HiGlobeAlt,
+      href: '/repositories',
+      iconBg: 'bg-blue-100 dark:bg-blue-900',
+      iconColor: 'text-blue-600 dark:text-blue-400',
     },
   ]
 
@@ -331,30 +348,29 @@ const HomePageContent: FC = function () {
             </div>
           </Card>
 
-          {/* Explore the shared repositories the user already has access to */}
-          {hasAnyGraph && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {exploreActions.map((action) => (
-                <Link
-                  key={action.title}
-                  href={action.href}
-                  className={actionCardClass}
-                >
-                  <div className={`rounded-lg ${action.iconBg} p-3`}>
-                    <action.icon className={`h-6 w-6 ${action.iconColor}`} />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {action.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {action.description}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          {/* What you can do without a graph (Research, Repositories), plus
+              repository tools when a shared repository is available. */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {exploreActions.map((action) => (
+              <Link
+                key={action.title}
+                href={action.href}
+                className={actionCardClass}
+              >
+                <div className={`rounded-lg ${action.iconBg} p-3`}>
+                  <action.icon className={`h-6 w-6 ${action.iconColor}`} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    {action.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {action.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </PageLayout>
