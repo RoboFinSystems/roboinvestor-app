@@ -11,68 +11,108 @@ import {
 import { useSSO } from '@/lib/core/auth-core/sso'
 import { Button, Card } from 'flowbite-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import type { FC } from 'react'
+import type { ComponentType, FC } from 'react'
 import { useMemo } from 'react'
 import {
-  HiChartPie,
-  HiCog,
   HiDocumentReport,
   HiDocumentText,
   HiHome,
-  HiLightningBolt,
+  HiOfficeBuilding,
   HiPlus,
+  HiSearch,
   HiTerminal,
   HiTrendingUp,
 } from 'react-icons/hi'
-
-const quickActions = [
-  {
-    title: 'Console',
-    description: 'AI analysis terminal',
-    icon: HiTerminal,
-    href: '/console',
-    gradient: 'from-primary-500 to-secondary-600',
-    shadowColor: 'hover:shadow-primary-500/10',
-  },
-  {
-    title: 'Portfolio',
-    description: 'View holdings',
-    icon: HiChartPie,
-    href: '/portfolio',
-    gradient: 'from-secondary-500 to-accent-600',
-    shadowColor: 'hover:shadow-secondary-500/10',
-  },
-  {
-    title: 'Settings',
-    description: 'API & account',
-    icon: HiCog,
-    href: '/settings',
-    gradient: 'from-primary-500 to-accent-600',
-    shadowColor: 'hover:shadow-primary-500/10',
-  },
-]
+import { TbTrendingUp } from 'react-icons/tb'
 
 const API_URL =
   process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'http://localhost:8000'
 
+interface ActionCard {
+  title: string
+  description: string
+  icon: ComponentType<{ className?: string }>
+  href: string
+  iconBg: string
+  iconColor: string
+}
+
+// Shared tools available against any usable graph (entity graph or repository).
+const TOOL_ACTIONS: ActionCard[] = [
+  {
+    title: 'Console',
+    description: 'Ask questions in natural language',
+    icon: HiTerminal,
+    href: '/console',
+    iconBg: 'bg-cyan-100 dark:bg-cyan-900',
+    iconColor: 'text-cyan-600 dark:text-cyan-400',
+  },
+  {
+    title: 'Search',
+    description: 'Search across the graph',
+    icon: HiSearch,
+    href: '/search',
+    iconBg: 'bg-purple-100 dark:bg-purple-900',
+    iconColor: 'text-purple-600 dark:text-purple-400',
+  },
+]
+
+// Research is surfaced for the SEC/repository context (public-market analysis),
+// not the user's own investment graph.
+const RESEARCH_ACTION: ActionCard = {
+  title: 'Research',
+  description: 'AI research & market analysis',
+  icon: HiDocumentText,
+  href: '/research',
+  iconBg: 'bg-rose-100 dark:bg-rose-900',
+  iconColor: 'text-rose-600 dark:text-rose-400',
+}
+
+const actionCardClass =
+  'flex items-center gap-4 rounded-lg border border-zinc-200 bg-white/80 p-6 text-left shadow-lg backdrop-blur-sm transition-all hover:scale-[1.02] hover:border-zinc-300 hover:shadow-xl dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-zinc-500'
+
+const gettingStarted = [
+  {
+    step: '1',
+    title: 'Pick a graph',
+    body: 'Use the selector in the top bar to choose an investment graph or a shared repository like SEC — the app tailors itself to what you select.',
+  },
+  {
+    step: '2',
+    title: 'Explore with the Console',
+    body: 'Ask questions in plain English — "What are my largest positions?" or query filings across 10,000+ public companies in the SEC repository.',
+  },
+  {
+    step: '3',
+    title: 'Connect Claude via MCP',
+    body: 'Type /mcp in the Console to connect Claude Desktop or Claude Code to your graph for deeper, agent-driven analysis.',
+  },
+]
+
 const HomePageContent: FC = function () {
   const { state: graphState } = useGraphContext()
-  const router = useRouter()
   const { navigateToApp } = useSSO(API_URL)
 
-  // Roboinvestor entity graphs (for full dashboard)
-  const hasEntityGraph = useMemo(
+  // The currently selected graph drives which actions are surfaced.
+  const currentGraph = useMemo(
+    () =>
+      graphState.graphs.find((g) => g.graphId === graphState.currentGraphId) ??
+      null,
+    [graphState.graphs, graphState.currentGraphId]
+  )
+  const isInvestorGraph =
+    !!currentGraph && GraphFilters.roboinvestor(currentGraph)
+  const isRepository = !!currentGraph && onlyRepositories(currentGraph)
+
+  // Owning a roboinvestor graph anywhere decides dashboard vs. create-graph.
+  const hasInvestorGraph = useMemo(
     () => graphState.graphs.filter(GraphFilters.roboinvestor).length > 0,
     [graphState.graphs]
   )
-
-  // Roboinvestor graphs OR shared repositories like SEC (for Console access)
   const hasAnyGraph = useMemo(
     () =>
-      graphState.graphs.filter(GraphFilters.roboinvestor).length > 0 ||
-      graphState.graphs.filter(onlyRepositories).length > 0,
-    [graphState.graphs]
+      hasInvestorGraph || graphState.graphs.filter(onlyRepositories).length > 0,
+    [graphState.graphs, hasInvestorGraph]
   )
 
   // Shared repository that exposes the filing viewer (SEC), for the Reports
@@ -82,16 +122,59 @@ const HomePageContent: FC = function () {
     return (repos.find((r) => r.graphId === 'sec') ?? repos[0])?.graphId ?? null
   }, [graphState.graphs])
 
-  // Quick actions shown in the empty state alongside "Create Graph": explore
-  // the shared repositories the user already has access to.
-  const exploreActions = [
+  // Quick actions tailored to the currently selected graph. Entity-graph
+  // features (Portfolio, Entity) only when an investor graph is active; the
+  // filing viewer (Reports) only for the SEC repository; shared tools always.
+  const quickActions = useMemo<ActionCard[]>(() => {
+    const investor: ActionCard[] = [
+      {
+        title: 'Portfolio',
+        description: 'Holdings, securities & positions',
+        icon: TbTrendingUp,
+        href: '/portfolio',
+        iconBg: 'bg-green-100 dark:bg-green-900',
+        iconColor: 'text-green-600 dark:text-green-400',
+      },
+      {
+        title: 'Entity',
+        description: 'Company profile & subsidiaries',
+        icon: HiOfficeBuilding,
+        href: '/entity',
+        iconBg: 'bg-primary-100 dark:bg-primary-900',
+        iconColor: 'text-primary-600 dark:text-primary-400',
+      },
+    ]
+    const reports: ActionCard[] =
+      isRepository && currentGraph?.graphId === 'sec'
+        ? [
+            {
+              title: 'Reports',
+              description: 'Filings & financial statements',
+              icon: HiDocumentReport,
+              href: `/repositories/${currentGraph.graphId}/reports`,
+              iconBg: 'bg-amber-100 dark:bg-amber-900',
+              iconColor: 'text-amber-600 dark:text-amber-400',
+            },
+          ]
+        : []
+    return [
+      ...(isInvestorGraph ? investor : []),
+      ...reports,
+      ...TOOL_ACTIONS,
+      // Research is public-market analysis — omit it on the user's own graph.
+      ...(isInvestorGraph ? [] : [RESEARCH_ACTION]),
+    ]
+  }, [isInvestorGraph, isRepository, currentGraph])
+
+  // Explore actions shown in the create-graph empty state.
+  const exploreActions: ActionCard[] = [
     {
       title: 'Open Console',
       description: 'Query repositories with natural language',
       icon: HiTerminal,
       href: '/console',
-      gradient: 'from-primary-500 to-secondary-600',
-      shadowColor: 'hover:shadow-primary-500/10',
+      iconBg: 'bg-cyan-100 dark:bg-cyan-900',
+      iconColor: 'text-cyan-600 dark:text-cyan-400',
     },
     ...(reportsRepoId
       ? [
@@ -100,8 +183,8 @@ const HomePageContent: FC = function () {
             description: 'Browse SEC filings & financial statements',
             icon: HiDocumentReport,
             href: `/repositories/${reportsRepoId}/reports`,
-            gradient: 'from-secondary-500 to-accent-600',
-            shadowColor: 'hover:shadow-secondary-500/10',
+            iconBg: 'bg-amber-100 dark:bg-amber-900',
+            iconColor: 'text-amber-600 dark:text-amber-400',
           },
         ]
       : []),
@@ -110,217 +193,80 @@ const HomePageContent: FC = function () {
       description: 'AI-generated research & market analysis',
       icon: HiDocumentText,
       href: '/research',
-      gradient: 'from-primary-500 to-accent-600',
-      shadowColor: 'hover:shadow-primary-500/10',
+      iconBg: 'bg-rose-100 dark:bg-rose-900',
+      iconColor: 'text-rose-600 dark:text-rose-400',
     },
   ]
 
   return (
     <PageLayout>
-      {/* Welcome Header */}
       <PageHeader
         icon={HiHome}
-        title="Welcome to RoboInvestor"
+        title={
+          currentGraph
+            ? `Welcome back to ${currentGraph.graphName}`
+            : 'Welcome to RoboInvestor'
+        }
         subtitle="AI-powered investment intelligence platform"
       />
 
-      {hasEntityGraph ? (
+      {hasInvestorGraph ? (
         <>
-          {/* Quick Actions */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Quick actions — tailored to the selected graph */}
+          <h2 className="font-heading text-lg font-semibold text-gray-900 dark:text-white">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {quickActions.map((action) => (
-              <Link key={action.title} href={action.href}>
-                <Card
-                  theme={customTheme.card}
-                  className={`group cursor-pointer transition-all duration-300 hover:shadow-lg ${action.shadowColor}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`rounded-lg bg-gradient-to-br ${action.gradient} p-3`}
-                    >
-                      <action.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {action.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {action.description}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
+              <Link
+                key={action.title}
+                href={action.href}
+                className={actionCardClass}
+              >
+                <div className={`rounded-lg ${action.iconBg} p-3`}>
+                  <action.icon className={`h-6 w-6 ${action.iconColor}`} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    {action.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {action.description}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* Getting Started Card */}
-            <Card theme={customTheme.card} className="lg:col-span-2">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="bg-primary-500/20 rounded-lg p-2">
-                  <HiTrendingUp className="text-primary-500 h-5 w-5" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Getting Started
-                </h2>
+          {/* Getting started */}
+          <Card theme={customTheme.card}>
+            <div className="mb-4 flex items-center gap-3">
+              <div className="bg-primary-500/20 rounded-lg p-2">
+                <HiTrendingUp className="text-primary-500 h-5 w-5" />
               </div>
-
-              <div className="space-y-4">
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-                  <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-                    1. Connect Your Data
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Import portfolio data or connect to external sources through
-                    our integrations. Your data is stored securely in the
-                    RoboSystems knowledge graph.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-                  <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-                    2. Use the Console
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Open the interactive Console to analyze your investments
-                    using natural language. Ask questions like &quot;Show me my
-                    top performing holdings&quot; or &quot;What&apos;s my sector
-                    allocation?&quot;
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-                  <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-                    3. Set Up MCP
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Connect Claude Desktop or Claude Code to your portfolio
-                    using MCP (Model Context Protocol). Type /mcp in the Console
-                    to generate your configuration.
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            {/* Features Card */}
-            <Card theme={customTheme.card}>
-              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-                Platform Features
+              <h2 className="font-heading text-lg font-semibold text-gray-900 dark:text-white">
+                Getting Started
               </h2>
-
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary-500 mt-0.5 h-2 w-2 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      AI-Powered Analysis
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Claude integration for intelligent insights
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="bg-secondary-500 mt-0.5 h-2 w-2 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      Knowledge Graph
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Semantic portfolio relationships
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="bg-accent-500 mt-0.5 h-2 w-2 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      Interactive Console
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Natural language queries
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary-500 mt-0.5 h-2 w-2 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      MCP Protocol
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Connect to Claude Desktop
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="bg-secondary-500 mt-0.5 h-2 w-2 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      Open Source
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Apache 2.0 licensed, fully customizable
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
-                <a
-                  href="https://github.com/RoboFinSystems/roboinvestor-app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-600 hover:text-primary-500 dark:text-primary-400 flex items-center gap-2 text-sm transition-colors"
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {gettingStarted.map((s) => (
+                <div
+                  key={s.step}
+                  className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800"
                 >
-                  <svg
-                    className="h-4 w-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                  View on GitHub
-                </a>
-              </div>
-            </Card>
-          </div>
-
-          {/* Alpha Notice */}
-          <Card
-            theme={customTheme.card}
-            className="border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30"
-          >
-            <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-amber-500/20 p-2">
-                <HiLightningBolt className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-amber-900 dark:text-amber-200">
-                  Alpha Release
-                </h3>
-                <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
-                  RoboInvestor is currently in alpha. This is the foundational
-                  framework for building AI-powered investment applications.
-                  Features are being actively developed and APIs may change.
-                  Check our{' '}
-                  <a
-                    href="https://github.com/RoboFinSystems/roboinvestor-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:no-underline"
-                  >
-                    GitHub repository
-                  </a>{' '}
-                  for the latest updates.
-                </p>
-              </div>
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="bg-primary-500/15 text-primary-600 dark:text-primary-400 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
+                      {s.step}
+                    </span>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {s.title}
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {s.body}
+                  </p>
+                </div>
+              ))}
             </div>
           </Card>
         </>
@@ -387,29 +333,24 @@ const HomePageContent: FC = function () {
 
           {/* Explore the shared repositories the user already has access to */}
           {hasAnyGraph && (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {exploreActions.map((action) => (
-                <Link key={action.title} href={action.href} className="block">
-                  <Card
-                    theme={customTheme.card}
-                    className={`group h-full cursor-pointer transition-all duration-300 hover:shadow-lg ${action.shadowColor}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`rounded-lg bg-gradient-to-br ${action.gradient} p-3`}
-                      >
-                        <action.icon className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {action.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {action.description}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
+                <Link
+                  key={action.title}
+                  href={action.href}
+                  className={actionCardClass}
+                >
+                  <div className={`rounded-lg ${action.iconBg} p-3`}>
+                    <action.icon className={`h-6 w-6 ${action.iconColor}`} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {action.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {action.description}
+                    </p>
+                  </div>
                 </Link>
               ))}
             </div>
