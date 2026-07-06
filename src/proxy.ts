@@ -21,6 +21,12 @@ export function proxy(request: NextRequest) {
   // pages fetch these client-side, so the host is needed in connect-src too.
   const RESEARCH_ASSETS = 'https://assets.robosystems.ai'
 
+  // Public bucket hosting the SEC repository's externalized fact bodies
+  // (large XBRL text blocks stored as `fact_<hash>.html`/`.txt`). The report
+  // viewer's ExternalTextBlock fetches these client-side, so the host is needed
+  // in connect-src (the fetch) and img-src (images embedded in the fetched HTML).
+  const SEC_FILING_ASSETS = 'https://public.robosystems.ai'
+
   // Comprehensive CSP configuration for modern web apps
   const cspDirectives = [
     "default-src 'self'",
@@ -51,7 +57,9 @@ export function proxy(request: NextRequest) {
       'https://raw.githubusercontent.com ' +
       'https://www.google-analytics.com https://www.googletagmanager.com ' +
       'https://ssl.gstatic.com https://www.gstatic.com ' +
-      RESEARCH_ASSETS,
+      RESEARCH_ASSETS +
+      ' ' +
+      SEC_FILING_ASSETS,
 
     // Font sources - Allow Google Fonts and common CDNs
     "font-src 'self' data: " +
@@ -66,14 +74,18 @@ export function proxy(request: NextRequest) {
         'https://www.google-analytics.com https://analytics.google.com ' +
         'https://region1.google-analytics.com https://www.googletagmanager.com ' +
         'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com ' +
-        RESEARCH_ASSETS
+        RESEARCH_ASSETS +
+        ' ' +
+        SEC_FILING_ASSETS
       : "connect-src 'self' " +
         'https://api.robosystems.ai https://staging.api.robosystems.ai ' +
         'https://cloudflareinsights.com https://static.cloudflareinsights.com ' +
         'https://www.google-analytics.com https://analytics.google.com ' +
         'https://region1.google-analytics.com https://www.googletagmanager.com ' +
         'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com ' +
-        RESEARCH_ASSETS,
+        RESEARCH_ASSETS +
+        ' ' +
+        SEC_FILING_ASSETS,
 
     // Frame sources - Allow Cloudflare CAPTCHA and common embeds
     "frame-src 'self' " +
