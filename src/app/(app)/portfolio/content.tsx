@@ -478,16 +478,6 @@ const PortfolioPageContent: FC = function () {
             title="No Portfolios Yet"
             description="Create your first portfolio to start tracking investments."
             className="py-8"
-            action={
-              <Button
-                theme={customTheme.button}
-                color="secondary"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <HiPlus className="mr-2 h-4 w-4" />
-                Create Portfolio
-              </Button>
-            }
           />
         </Card>
       ) : (

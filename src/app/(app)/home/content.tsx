@@ -17,6 +17,8 @@ import { useMemo } from 'react'
 import {
   HiChartPie,
   HiCog,
+  HiDocumentReport,
+  HiDocumentText,
   HiHome,
   HiLightningBolt,
   HiPlus,
@@ -72,6 +74,46 @@ const HomePageContent: FC = function () {
       graphState.graphs.filter(onlyRepositories).length > 0,
     [graphState.graphs]
   )
+
+  // Shared repository that exposes the filing viewer (SEC), for the Reports
+  // shortcut. Prefer the SEC repo; fall back to the first repository.
+  const reportsRepoId = useMemo(() => {
+    const repos = graphState.graphs.filter(onlyRepositories)
+    return (repos.find((r) => r.graphId === 'sec') ?? repos[0])?.graphId ?? null
+  }, [graphState.graphs])
+
+  // Quick actions shown in the empty state alongside "Create Graph": explore
+  // the shared repositories the user already has access to.
+  const exploreActions = [
+    {
+      title: 'Open Console',
+      description: 'Query repositories with natural language',
+      icon: HiTerminal,
+      href: '/console',
+      gradient: 'from-primary-500 to-secondary-600',
+      shadowColor: 'hover:shadow-primary-500/10',
+    },
+    ...(reportsRepoId
+      ? [
+          {
+            title: 'Reports',
+            description: 'Browse SEC filings & financial statements',
+            icon: HiDocumentReport,
+            href: `/repositories/${reportsRepoId}/reports`,
+            gradient: 'from-secondary-500 to-accent-600',
+            shadowColor: 'hover:shadow-secondary-500/10',
+          },
+        ]
+      : []),
+    {
+      title: 'Research',
+      description: 'AI-generated research & market analysis',
+      icon: HiDocumentText,
+      href: '/research',
+      gradient: 'from-primary-500 to-accent-600',
+      shadowColor: 'hover:shadow-primary-500/10',
+    },
+  ]
 
   return (
     <PageLayout>
@@ -284,32 +326,7 @@ const HomePageContent: FC = function () {
         </>
       ) : (
         <div className="space-y-6">
-          {/* Console shortcut when user has shared repos but no entity graph */}
-          {hasAnyGraph && (
-            <Link href="/console">
-              <Card
-                theme={customTheme.card}
-                className="group hover:shadow-primary-500/10 cursor-pointer transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="from-primary-500 to-secondary-600 rounded-lg bg-gradient-to-br p-3">
-                    <HiTerminal className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                      Open Console
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Query shared repositories using AI-powered natural
-                      language
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          )}
-
-          {/* Create graph CTA */}
+          {/* Create graph CTA — the primary action, shown first */}
           <Card
             theme={customTheme.card}
             className="transition-shadow hover:shadow-lg"
@@ -367,6 +384,36 @@ const HomePageContent: FC = function () {
               </Button>
             </div>
           </Card>
+
+          {/* Explore the shared repositories the user already has access to */}
+          {hasAnyGraph && (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {exploreActions.map((action) => (
+                <Link key={action.title} href={action.href} className="block">
+                  <Card
+                    theme={customTheme.card}
+                    className={`group h-full cursor-pointer transition-all duration-300 hover:shadow-lg ${action.shadowColor}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`rounded-lg bg-gradient-to-br ${action.gradient} p-3`}
+                      >
+                        <action.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {action.title}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {action.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </PageLayout>
