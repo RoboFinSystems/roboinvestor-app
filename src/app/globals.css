@@ -182,11 +182,20 @@
   Externalized SEC disclosure blocks (report-components ExternalTextBlock) render
   the raw filing HTML — black text, no background — inside a sandboxed iframe. On
   the dark theme that left dark-on-dark, unreadable text. Give the iframe a white
-  "document" surface so the filing stays legible (it's authored black-on-white, and
-  CSS-inverting uncontrolled HTML would mangle any colored cells/links). No-op in
-  light mode, where the block already sits on a white page.
+  "document" surface with an inner buffer so the filing stays legible (it's authored
+  black-on-white, and CSS-inverting uncontrolled HTML would mangle any colored
+  cells/links). No-op in light mode, where the block already sits on a white page.
+
+  The library auto-sizes the iframe from its content (`iframe.style.height =
+  scrollHeight`); `content-box` keeps that measured height as the *content* height,
+  so the padding sits outside it and can't clip the last lines. The `!important`
+  width beats the library's inline `width: 100%`, leaving 1rem side gutters while the
+  element still spans the full column.
 */
 .rs-report-scope iframe {
+  box-sizing: content-box;
+  width: calc(100% - 2rem) !important;
+  padding: 0.75rem 1rem;
   background: #ffffff;
   border-radius: 8px;
 }
