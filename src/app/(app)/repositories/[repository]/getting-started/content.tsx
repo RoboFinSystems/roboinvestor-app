@@ -141,36 +141,6 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
         }
       />
 
-      {/* Financial Statements Viewer — SEC filings rendered without a query */}
-      {repository === 'sec' && (
-        <Card theme={customTheme.card}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <div className="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-2">
-                <HiDocumentSearch className="text-primary-600 dark:text-primary-400 h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-heading text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                  Financial Statements Viewer
-                </h3>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  Search a public company and read its filings as rendered
-                  financial statements — no query required.
-                </p>
-              </div>
-            </div>
-            <Button
-              color="primary"
-              onClick={() => router.push(`/repositories/${repository}/reports`)}
-              className="shrink-0"
-            >
-              <HiDocumentSearch className="mr-2 h-4 w-4" />
-              Browse Filings
-            </Button>
-          </div>
-        </Card>
-      )}
-
       {/* What's Included */}
       <Card theme={customTheme.card}>
         <div className="space-y-4">
@@ -241,8 +211,31 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Choose how you want to access and explore the data
           </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div
+            className={`grid gap-3 ${
+              repository === 'sec' ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+            }`}
+          >
+            {repository === 'sec' && (
+              <Button
+                theme={customTheme.button}
+                color="primary"
+                onClick={() =>
+                  router.push(`/repositories/${repository}/reports`)
+                }
+                className="h-auto flex-col items-start gap-2 py-4"
+              >
+                <HiDocumentSearch className="h-6 w-6" />
+                <div className="text-left">
+                  <div className="font-semibold">Reports</div>
+                  <div className="text-xs font-normal opacity-90">
+                    Browse filings &amp; statements
+                  </div>
+                </div>
+              </Button>
+            )}
             <Button
+              theme={customTheme.button}
               color="secondary"
               onClick={handleOpenConsole}
               className="h-auto flex-col items-start gap-2 py-4"
@@ -256,6 +249,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
               </div>
             </Button>
             <Button
+              theme={customTheme.button}
               color="gray"
               onClick={() => {
                 const element = document.getElementById('api-access')
@@ -322,7 +316,12 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             </ul>
           </div>
 
-          <Button color="secondary" onClick={handleOpenConsole} size="lg">
+          <Button
+            theme={customTheme.button}
+            color="secondary"
+            onClick={handleOpenConsole}
+            size="lg"
+          >
             <HiTerminal className="mr-2 h-5 w-5" />
             Open Console
           </Button>
@@ -356,6 +355,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           </div>
 
           <Button
+            theme={customTheme.button}
             color="primary"
             onClick={generateApiKey}
             disabled={isCreatingKey}
