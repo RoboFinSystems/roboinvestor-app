@@ -2,7 +2,6 @@
 
 import {
   clients,
-  customTheme,
   EmptyState,
   GraphFilters,
   LoadingState,
@@ -422,7 +421,7 @@ const PortfolioPageContent: FC = function () {
   if (!graphId && !isLoading) {
     return (
       <PageLayout>
-        <Card theme={customTheme.card}>
+        <Card>
           <EmptyState
             icon={HiViewGrid}
             title="No Portfolio Graph"
@@ -448,7 +447,6 @@ const PortfolioPageContent: FC = function () {
         subtitle="Manage your investment portfolios and holdings"
         actions={
           <Button
-            theme={customTheme.button}
             color="secondary"
             onClick={() => setShowCreateModal(true)}
             disabled={isLoading}
@@ -460,11 +458,7 @@ const PortfolioPageContent: FC = function () {
       />
 
       {error && (
-        <Alert
-          theme={customTheme.alert}
-          color="failure"
-          icon={HiExclamationCircle}
-        >
+        <Alert color="failure" icon={HiExclamationCircle}>
           {error}
         </Alert>
       )}
@@ -472,7 +466,7 @@ const PortfolioPageContent: FC = function () {
       {isLoading ? (
         <LoadingState size="xl" />
       ) : portfolios.length === 0 ? (
-        <Card theme={customTheme.card}>
+        <Card>
           <EmptyState
             icon={HiViewGrid}
             title="No Portfolios Yet"
@@ -490,7 +484,6 @@ const PortfolioPageContent: FC = function () {
             {portfolios.map((p) => (
               <Card
                 key={p.id}
-                theme={customTheme.card}
                 className={`cursor-pointer transition-all ${
                   selectedPortfolio?.id === p.id
                     ? 'ring-secondary-500 ring-2'
@@ -503,11 +496,7 @@ const PortfolioPageContent: FC = function () {
                     {p.name}
                   </h3>
                   {p.strategy && (
-                    <Badge
-                      theme={customTheme.badge}
-                      color="gray"
-                      className="mt-1"
-                    >
+                    <Badge color="gray" className="mt-1">
                       {p.strategy}
                     </Badge>
                   )}
@@ -530,7 +519,6 @@ const PortfolioPageContent: FC = function () {
                     {selectedPortfolio.name}
                   </h2>
                   <Button
-                    theme={customTheme.button}
                     size="sm"
                     color="secondary"
                     onClick={() => {
@@ -545,11 +533,7 @@ const PortfolioPageContent: FC = function () {
                 </div>
 
                 {holdingsError && (
-                  <Alert
-                    theme={customTheme.alert}
-                    color="failure"
-                    icon={HiExclamationCircle}
-                  >
+                  <Alert color="failure" icon={HiExclamationCircle}>
                     {holdingsError}
                   </Alert>
                 )}
@@ -557,7 +541,7 @@ const PortfolioPageContent: FC = function () {
                 {holdingsLoading ? (
                   <LoadingState className="py-8" />
                 ) : holdings.length === 0 ? (
-                  <Card theme={customTheme.card}>
+                  <Card>
                     <EmptyState
                       icon={HiOfficeBuilding}
                       title="No holdings yet"
@@ -568,7 +552,7 @@ const PortfolioPageContent: FC = function () {
                 ) : (
                   <div className="space-y-4">
                     {holdings.map((h) => (
-                      <Card key={h.entity_id} theme={customTheme.card}>
+                      <Card key={h.entity_id}>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -594,16 +578,12 @@ const PortfolioPageContent: FC = function () {
                           </div>
 
                           {h.source_graph_id && (
-                            <Badge
-                              theme={customTheme.badge}
-                              color="info"
-                              className="text-xs"
-                            >
+                            <Badge color="info" className="text-xs">
                               Linked graph: {h.source_graph_id}
                             </Badge>
                           )}
 
-                          <Table theme={customTheme.table}>
+                          <Table>
                             <TableHead>
                               <TableHeadCell>Security</TableHeadCell>
                               <TableHeadCell>Type</TableHeadCell>
@@ -619,10 +599,7 @@ const PortfolioPageContent: FC = function () {
                                     {s.security_name}
                                   </TableCell>
                                   <TableCell>
-                                    <Badge
-                                      theme={customTheme.badge}
-                                      color="gray"
-                                    >
+                                    <Badge color="gray">
                                       {securityTypeLabel[s.security_type] ||
                                         s.security_type}
                                     </Badge>
@@ -670,7 +647,7 @@ const PortfolioPageContent: FC = function () {
                 )}
               </div>
             ) : (
-              <Card theme={customTheme.card} className="text-center">
+              <Card className="text-center">
                 <div className="py-12">
                   <p className="text-gray-500 dark:text-gray-400">
                     Select a portfolio to view holdings
@@ -684,7 +661,6 @@ const PortfolioPageContent: FC = function () {
 
       {/* Create Portfolio Modal */}
       <Modal
-        theme={customTheme.modal}
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         size="md"
@@ -693,11 +669,8 @@ const PortfolioPageContent: FC = function () {
         <ModalBody>
           <div className="space-y-4">
             <div>
-              <Label theme={customTheme.label} htmlFor="name">
-                Name
-              </Label>
+              <Label htmlFor="name">Name</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="name"
                 placeholder="My PE Portfolio"
                 value={createForm.name}
@@ -708,11 +681,8 @@ const PortfolioPageContent: FC = function () {
               />
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="strategy">
-                Strategy (optional)
-              </Label>
+              <Label htmlFor="strategy">Strategy (optional)</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="strategy"
                 placeholder="e.g., pe_fund, venture, growth"
                 value={createForm.strategy}
@@ -722,11 +692,8 @@ const PortfolioPageContent: FC = function () {
               />
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="description">
-                Description (optional)
-              </Label>
+              <Label htmlFor="description">Description (optional)</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="description"
                 placeholder="Portfolio description"
                 value={createForm.description}
@@ -739,7 +706,6 @@ const PortfolioPageContent: FC = function () {
         </ModalBody>
         <ModalFooter>
           <Button
-            theme={customTheme.button}
             color="secondary"
             onClick={handleCreate}
             disabled={creating || !createForm.name.trim()}
@@ -749,11 +715,7 @@ const PortfolioPageContent: FC = function () {
             ) : null}
             Create
           </Button>
-          <Button
-            theme={customTheme.button}
-            color="gray"
-            onClick={() => setShowCreateModal(false)}
-          >
+          <Button color="gray" onClick={() => setShowCreateModal(false)}>
             Cancel
           </Button>
         </ModalFooter>
@@ -761,7 +723,6 @@ const PortfolioPageContent: FC = function () {
 
       {/* Add Security Modal */}
       <Modal
-        theme={customTheme.modal}
         show={showSecurityModal}
         onClose={() => setShowSecurityModal(false)}
         size="md"
@@ -770,20 +731,13 @@ const PortfolioPageContent: FC = function () {
         <ModalBody>
           <div className="space-y-4">
             {securityModalError && (
-              <Alert
-                theme={customTheme.alert}
-                color="failure"
-                icon={HiExclamationCircle}
-              >
+              <Alert color="failure" icon={HiExclamationCircle}>
                 {securityModalError}
               </Alert>
             )}
             <div>
-              <Label theme={customTheme.label} htmlFor="sec-name">
-                Security Name
-              </Label>
+              <Label htmlFor="sec-name">Security Name</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="sec-name"
                 placeholder="e.g., Common Stock Class A"
                 value={securityForm.name}
@@ -794,11 +748,8 @@ const PortfolioPageContent: FC = function () {
               />
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="sec-type">
-                Security Type
-              </Label>
+              <Label htmlFor="sec-type">Security Type</Label>
               <Select
-                theme={customTheme.select}
                 id="sec-type"
                 value={securityForm.security_type}
                 onChange={(e) =>
@@ -816,11 +767,8 @@ const PortfolioPageContent: FC = function () {
               </Select>
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="sec-subtype">
-                Subtype (optional)
-              </Label>
+              <Label htmlFor="sec-subtype">Subtype (optional)</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="sec-subtype"
                 placeholder="e.g., class_a, series_a"
                 value={securityForm.security_subtype}
@@ -833,9 +781,7 @@ const PortfolioPageContent: FC = function () {
               />
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="sec-entity">
-                Company (optional)
-              </Label>
+              <Label htmlFor="sec-entity">Company (optional)</Label>
               {loadingEntities ? (
                 <div className="flex items-center gap-2 py-2">
                   <Spinner size="sm" />
@@ -845,7 +791,6 @@ const PortfolioPageContent: FC = function () {
                 </div>
               ) : linkedEntities.length > 0 ? (
                 <Select
-                  theme={customTheme.select}
                   id="sec-entity"
                   value={securityForm.entity_id}
                   onChange={(e) => {
@@ -878,11 +823,8 @@ const PortfolioPageContent: FC = function () {
               </p>
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="sec-graph">
-                Source Graph ID (optional)
-              </Label>
+              <Label htmlFor="sec-graph">Source Graph ID (optional)</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="sec-graph"
                 placeholder="e.g., kg19d46a8029980520"
                 value={securityForm.source_graph_id}
@@ -903,11 +845,8 @@ const PortfolioPageContent: FC = function () {
             </p>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label theme={customTheme.label} htmlFor="sec-qty">
-                  Quantity
-                </Label>
+                <Label htmlFor="sec-qty">Quantity</Label>
                 <TextInput
-                  theme={customTheme.textInput}
                   id="sec-qty"
                   type="number"
                   placeholder="10000"
@@ -921,11 +860,8 @@ const PortfolioPageContent: FC = function () {
                 />
               </div>
               <div>
-                <Label theme={customTheme.label} htmlFor="sec-qty-type">
-                  Unit
-                </Label>
+                <Label htmlFor="sec-qty-type">Unit</Label>
                 <Select
-                  theme={customTheme.select}
                   id="sec-qty-type"
                   value={securityForm.quantity_type}
                   onChange={(e) =>
@@ -942,11 +878,8 @@ const PortfolioPageContent: FC = function () {
               </div>
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="sec-cost">
-                Cost Basis ($)
-              </Label>
+              <Label htmlFor="sec-cost">Cost Basis ($)</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="sec-cost"
                 type="number"
                 placeholder="150000"
@@ -963,7 +896,6 @@ const PortfolioPageContent: FC = function () {
         </ModalBody>
         <ModalFooter>
           <Button
-            theme={customTheme.button}
             color="secondary"
             onClick={handleCreateSecurity}
             disabled={creatingSecurity || !securityForm.name.trim()}
@@ -973,18 +905,13 @@ const PortfolioPageContent: FC = function () {
             ) : null}
             Add
           </Button>
-          <Button
-            theme={customTheme.button}
-            color="gray"
-            onClick={() => setShowSecurityModal(false)}
-          >
+          <Button color="gray" onClick={() => setShowSecurityModal(false)}>
             Cancel
           </Button>
         </ModalFooter>
       </Modal>
       {/* Edit Security Modal */}
       <Modal
-        theme={customTheme.modal}
         show={showEditSecurityModal}
         onClose={() => setShowEditSecurityModal(false)}
         size="md"
@@ -993,18 +920,12 @@ const PortfolioPageContent: FC = function () {
         <ModalBody>
           <div className="space-y-4">
             {editError && (
-              <Alert
-                theme={customTheme.alert}
-                color="failure"
-                icon={HiExclamationCircle}
-              >
+              <Alert color="failure" icon={HiExclamationCircle}>
                 {editError}
               </Alert>
             )}
             <div>
-              <Label theme={customTheme.label} htmlFor="edit-entity">
-                Company
-              </Label>
+              <Label htmlFor="edit-entity">Company</Label>
               {loadingEntities ? (
                 <div className="flex items-center gap-2 py-2">
                   <Spinner size="sm" />
@@ -1012,7 +933,6 @@ const PortfolioPageContent: FC = function () {
                 </div>
               ) : linkedEntities.length > 0 ? (
                 <Select
-                  theme={customTheme.select}
                   id="edit-entity"
                   value={editEntityId}
                   onChange={(e) => {
@@ -1040,11 +960,8 @@ const PortfolioPageContent: FC = function () {
               )}
             </div>
             <div>
-              <Label theme={customTheme.label} htmlFor="edit-graph">
-                Source Graph ID
-              </Label>
+              <Label htmlFor="edit-graph">Source Graph ID</Label>
               <TextInput
-                theme={customTheme.textInput}
                 id="edit-graph"
                 placeholder="e.g., kg19d46a8029980520"
                 value={editSourceGraphId}
@@ -1055,7 +972,6 @@ const PortfolioPageContent: FC = function () {
         </ModalBody>
         <ModalFooter>
           <Button
-            theme={customTheme.button}
             color="secondary"
             onClick={handleEditSecurity}
             disabled={
@@ -1067,11 +983,7 @@ const PortfolioPageContent: FC = function () {
             ) : null}
             Save
           </Button>
-          <Button
-            theme={customTheme.button}
-            color="gray"
-            onClick={() => setShowEditSecurityModal(false)}
-          >
+          <Button color="gray" onClick={() => setShowEditSecurityModal(false)}>
             Cancel
           </Button>
         </ModalFooter>

@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  customTheme,
   GraphFilters,
   onlyRepositories,
   PageHeader,
@@ -268,7 +267,7 @@ const HomePageContent: FC = function () {
           </div>
 
           {/* Getting started */}
-          <Card theme={customTheme.card}>
+          <Card>
             <div className="mb-4 flex items-center gap-3">
               <div className="bg-primary-500/20 rounded-lg p-2">
                 <HiTrendingUp className="text-primary-500 h-5 w-5" />
@@ -302,10 +301,7 @@ const HomePageContent: FC = function () {
       ) : (
         <div className="space-y-6">
           {/* Create graph CTA — the primary action, shown first */}
-          <Card
-            theme={customTheme.card}
-            className="transition-shadow hover:shadow-lg"
-          >
+          <Card className="transition-shadow hover:shadow-lg">
             <div className="space-y-4 p-6">
               <div className="flex items-center gap-3">
                 <div className="bg-primary-100 dark:bg-primary-900 rounded-lg p-3">
@@ -348,7 +344,6 @@ const HomePageContent: FC = function () {
                 </li>
               </ul>
               <Button
-                theme={customTheme.button}
                 color="primary"
                 onClick={() => navigateToApp('robosystems', '/graphs/new')}
                 className="w-full"

@@ -2,7 +2,6 @@
 
 import type { Entity } from '@/lib/core'
 import {
-  customTheme,
   EmptyState,
   GraphFilters,
   LoadingState,
@@ -133,7 +132,6 @@ const EntitiesListPageContent: FC = function () {
                   <HiSearch className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                 </div>
                 <TextInput
-                  theme={customTheme.textInput}
                   id="search"
                   placeholder="Search entities..."
                   value={searchTerm}
@@ -148,7 +146,7 @@ const EntitiesListPageContent: FC = function () {
 
       {error && (
         <div className="p-4">
-          <Alert theme={customTheme.alert} color="failure">
+          <Alert color="failure">
             <HiExclamationCircle className="h-4 w-4" />
             <span className="font-medium">Error!</span> {error}
           </Alert>
@@ -163,7 +161,7 @@ const EntitiesListPageContent: FC = function () {
                 <LoadingState />
               ) : entities.length === 0 ? (
                 <div className="p-8">
-                  <Card theme={customTheme.card}>
+                  <Card>
                     <EmptyState
                       icon={HiOfficeBuilding}
                       title="No Entities Found"
@@ -172,7 +170,7 @@ const EntitiesListPageContent: FC = function () {
                   </Card>
                 </div>
               ) : (
-                <Table theme={customTheme.table}>
+                <Table>
                   <TableHead>
                     <TableHeadCell>Entity</TableHeadCell>
                     <TableHeadCell>Type</TableHeadCell>
