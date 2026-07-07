@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  customTheme,
-  EmptyState,
-  PageHeader,
-  useEntity,
-  useGraphContext,
-} from '@/lib/core'
+import { EmptyState, PageHeader, useEntity, useGraphContext } from '@/lib/core'
 import { Alert, Badge, Card } from 'flowbite-react'
 import { type FC } from 'react'
 import { HiOfficeBuilding } from 'react-icons/hi'
@@ -33,7 +27,7 @@ const EntityInfoPageContent: FC = function () {
 
       <div className="grid grid-cols-1 gap-y-4 px-4 pb-1">
         {!currentEntity ? (
-          <Card theme={customTheme.card}>
+          <Card>
             <EmptyState
               icon={HiOfficeBuilding}
               title="No Entity Selected"
@@ -41,11 +35,7 @@ const EntityInfoPageContent: FC = function () {
               className="py-8"
               action={
                 !graphState.currentGraphId && (
-                  <Alert
-                    theme={customTheme.alert}
-                    color="info"
-                    className="text-left"
-                  >
+                  <Alert color="info" className="text-left">
                     <span className="font-medium">No graph selected.</span>{' '}
                     Please select a graph first.
                   </Alert>
@@ -56,7 +46,7 @@ const EntityInfoPageContent: FC = function () {
         ) : (
           <>
             {/* Entity Overview Card */}
-            <Card theme={customTheme.card}>
+            <Card>
               <div className="mb-4 border-b border-gray-200 pb-4 dark:border-gray-600">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Entity Information
@@ -121,7 +111,7 @@ const EntityInfoPageContent: FC = function () {
 
             {/* Graph Information Card */}
             {currentGraph && (
-              <Card theme={customTheme.card}>
+              <Card>
                 <div className="mb-4 border-b border-gray-200 pb-4 dark:border-gray-600">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Graph Information
