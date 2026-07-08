@@ -15,7 +15,7 @@ const EntityInfoPageContent: FC = function () {
 
   return (
     <>
-      <div className="mb-4 px-4 pt-6">
+      <div className="mb-4 px-6 pt-6">
         <PageHeader
           icon={HiOfficeBuilding}
           title="Entity Details"
@@ -25,7 +25,7 @@ const EntityInfoPageContent: FC = function () {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-y-4 px-4 pb-1">
+      <div className="grid grid-cols-1 gap-y-4 px-6 pb-1">
         {!currentEntity ? (
           <Card>
             <EmptyState
