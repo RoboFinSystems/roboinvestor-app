@@ -118,7 +118,7 @@ const EntitiesListPageContent: FC = function () {
 
   return (
     <>
-      <div className="block items-center justify-between border-b border-gray-200 p-4 sm:flex dark:border-gray-700">
+      <div className="block items-center justify-between border-b border-gray-200 p-6 sm:flex dark:border-gray-700">
         <div className="mb-1 w-full">
           <PageHeader
             icon={HiOfficeBuilding}
