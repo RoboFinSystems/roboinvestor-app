@@ -1,78 +1,50 @@
 import { render, screen } from '@testing-library/react'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ConsolePageContent from '../content'
+
+// The graph-aware example selection is exercised by the core
+// graphAwareConfig.test.ts; here we only verify this app hands its branding to
+// the shared hook and renders the resulting config.
+const mockUseGraphAwareConsoleConfig = vi.fn()
 
 vi.mock('@/lib/core', async () => {
   const actual = await vi.importActual('@/lib/core')
   return {
     ...actual,
     ConsoleContent: vi.fn(({ config }) => (
-      <div data-testid="console-content" data-config={JSON.stringify(config)}>
+      <div data-testid="console-content">
         <h1>{config.header.title}</h1>
       </div>
     )),
-    customTheme: { card: {} },
-    useGraphContext: vi.fn(() => ({
-      state: {
-        graphs: [{ graphId: 'test-graph-id' }],
-        isLoading: false,
-        currentGraphId: 'test-graph-id',
-      },
-      loadGraphs: vi.fn(),
-      setCurrentGraph: vi.fn(),
-      refreshGraphs: vi.fn(),
-    })),
+    useGraphAwareConsoleConfig: (...args: any[]) =>
+      mockUseGraphAwareConsoleConfig(...args),
   }
 })
 
-vi.mock('@/lib/core/hooks', () => ({
-  useStreamingQuery: vi.fn(() => ({
-    executeQuery: vi.fn(),
-    cancelQuery: vi.fn(),
-    reset: vi.fn(),
-    isStreaming: false,
-    status: 'idle',
-    results: [],
-    error: null,
-    creditsUsed: null,
-  })),
-}))
-
-describe('ConsolePageContent', () => {
-  beforeAll(() => {
-    Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', {
-      writable: true,
-      value: vi.fn(),
+describe('RoboInvestor ConsolePageContent', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUseGraphAwareConsoleConfig.mockReturnValue({
+      header: { title: 'RoboInvestor Console' },
     })
   })
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('should render ConsoleContent with RoboInvestor config', () => {
+  it('passes RoboInvestor branding to the graph-aware config hook', () => {
     render(<ConsolePageContent />)
 
-    const consoleContent = screen.getByTestId('console-content')
-    const config = JSON.parse(consoleContent.getAttribute('data-config')!)
-
-    expect(config.header.title).toBe('RoboInvestor Console')
-    expect(config.welcome.consoleName).toBe('RoboInvestor Console')
-    expect(config.mcp.serverName).toBe('robosystems')
-    expect(config.mcp.packageName).toBe('@robosystems/mcp')
-    expect(config.examplesLabel).toBe('Example Cypher Queries:')
-    expect(config.noSelectionError).toBe(
-      'No graph selected. Please select a graph first.'
-    )
+    expect(mockUseGraphAwareConsoleConfig).toHaveBeenCalledTimes(1)
+    const branding = mockUseGraphAwareConsoleConfig.mock.calls[0][0]
+    expect(branding.title).toBe('RoboInvestor Console')
+    expect(branding.consoleName).toBe('RoboInvestor Console')
+    expect(branding.mcp.serverName).toBe('robosystems')
+    expect(branding.mcp.packageName).toBe('@robosystems/mcp')
+    // Dual-extension graphs should read as portfolio graphs in this app.
+    expect(branding.preferredKind).toBe('roboinvestor')
   })
 
-  it('should include sample queries', () => {
+  it('renders the console with the resolved config', () => {
     render(<ConsolePageContent />)
-
-    const consoleContent = screen.getByTestId('console-content')
-    const config = JSON.parse(consoleContent.getAttribute('data-config')!)
-
-    expect(config.sampleQueries.length).toBe(7)
-    expect(config.sampleQueries[0].name).toBe('Graph overview')
+    expect(screen.getByTestId('console-content')).toBeInTheDocument()
+    expect(screen.getByText('RoboInvestor Console')).toBeInTheDocument()
   })
 })
