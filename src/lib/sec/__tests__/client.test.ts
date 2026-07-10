@@ -1,4 +1,4 @@
-import { executeCypherQuery } from '@robosystems/client'
+import { executeCypher } from '@robosystems/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   getEntityByCik,
@@ -7,7 +7,7 @@ import {
   searchEntities,
 } from '../client'
 
-const mockCypher = vi.mocked(executeCypherQuery)
+const mockCypher = vi.mocked(executeCypher)
 
 /** Shape the SDK's `{ data: { data: rows } }` envelope around a set of rows. */
 function ok(rows: Array<Record<string, unknown>>) {
