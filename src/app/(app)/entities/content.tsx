@@ -55,7 +55,7 @@ const EntitiesListPageContent: FC = function () {
 
         for (const graph of roboinvestorGraphs) {
           try {
-            const response = await SDK.executeCypherQuery({
+            const response = await SDK.executeCypher({
               path: { graph_id: graph.graphId },
               query: { mode: 'sync' },
               body: {

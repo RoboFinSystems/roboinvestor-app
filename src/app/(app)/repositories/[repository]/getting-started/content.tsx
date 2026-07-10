@@ -503,7 +503,7 @@ for record in response.data:
                 <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
                   <code>
                     {`import { client } from '@robosystems/client/client';
-import { executeCypherQuery } from '@robosystems/client';
+import { executeCypher } from '@robosystems/client';
 
 // Configure the client with API key authentication
 client.setConfig({
@@ -522,7 +522,7 @@ client.setConfig({
 });
 
 // Execute a Cypher query
-const { data } = await executeCypherQuery({
+const { data } = await executeCypher({
   path: { graph_id: '${repository}' },
   body: { query: 'MATCH (n) RETURN n LIMIT 10' },
 });

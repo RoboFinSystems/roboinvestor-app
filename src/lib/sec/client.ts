@@ -19,7 +19,7 @@
  * `WHERE ... IS NOT NULL` predicate, and always `LIMIT` — those keep the planner on
  * the fast path.
  */
-import { executeCypherQuery } from '@robosystems/client'
+import { executeCypher } from '@robosystems/client'
 import type { SecQuery } from '@robosystems/report-components'
 
 /** A public company in the SEC repository. `cik` is its stable primary identifier. */
@@ -61,7 +61,7 @@ function describeError(error: unknown): string {
  */
 export function makeSecQuery(graphId: string): SecQuery {
   return async (cypher, params) => {
-    const res = await executeCypherQuery({
+    const res = await executeCypher({
       path: { graph_id: graphId },
       body: {
         query: cypher,
