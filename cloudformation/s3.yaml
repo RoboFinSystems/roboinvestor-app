@@ -43,6 +43,11 @@ Resources:
         - HasNamespace
         - !Sub roboinvestor-app-${Namespace}-${Environment}-static-assets
         - !Sub roboinvestor-app-${Environment}-static-assets
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+            BucketKeyEnabled: true
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
