@@ -6,8 +6,8 @@ import {
   PageHeader,
   PageLayout,
   useGraphContext,
-} from '@/lib/core'
-import { useSSO } from '@/lib/core/auth-core/sso'
+} from '@robosystems/core'
+import { useSSO } from '@robosystems/core/auth-core/sso'
 import { Button, Card } from 'flowbite-react'
 import Link from 'next/link'
 import type { ComponentType, FC } from 'react'

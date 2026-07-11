@@ -1,6 +1,10 @@
 'use client'
 
-import { ActiveSubscriptions, BrowseRepositories, PageLayout } from '@/lib/core'
+import {
+  ActiveSubscriptions,
+  BrowseRepositories,
+  PageLayout,
+} from '@robosystems/core'
 import { useRouter } from 'next/navigation'
 
 export function RepositoriesContent() {

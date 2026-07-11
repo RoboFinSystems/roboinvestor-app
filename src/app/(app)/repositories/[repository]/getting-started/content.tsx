@@ -1,13 +1,13 @@
 'use client'
 
+import { createUserApiKey } from '@robosystems/client/sdk'
 import {
   PageHeader,
   PageLayout,
   useGraphContext,
   useServiceOfferings,
   useToast,
-} from '@/lib/core'
-import { createUserApiKey } from '@robosystems/client/sdk'
+} from '@robosystems/core'
 import { Button, Card, Spinner } from 'flowbite-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'

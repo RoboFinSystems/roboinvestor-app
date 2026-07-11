@@ -1,6 +1,6 @@
 'use client'
 
-import { useSidebarContext } from '@/lib/core/contexts'
+import { useSidebarContext } from '@robosystems/core/contexts'
 import type { PropsWithChildren } from 'react'
 import { twMerge } from 'tailwind-merge'
 

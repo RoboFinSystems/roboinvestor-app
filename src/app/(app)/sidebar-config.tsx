@@ -1,4 +1,4 @@
-import type { SidebarItemData } from '@/lib/core'
+import type { SidebarItemData } from '@robosystems/core'
 import {
   HiDocumentReport,
   HiDocumentText,

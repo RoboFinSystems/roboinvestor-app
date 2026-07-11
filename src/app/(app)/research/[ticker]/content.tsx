@@ -1,11 +1,11 @@
 'use client'
-import { EmptyState, LoadingState, PageLayout } from '@/lib/core'
+import { EmptyState, LoadingState, PageLayout } from '@robosystems/core'
 import {
   ResearchArticle,
   fetchBrief,
   getCoverage,
   type CoverageItem,
-} from '@/lib/core/research'
+} from '@robosystems/core/research'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { HiArrowLeft, HiDocumentText } from 'react-icons/hi'

@@ -1,14 +1,14 @@
 'use client'
 
-import type { Entity } from '@/lib/core'
+import type { Entity } from '@robosystems/core'
 import {
   clients,
   GraphFilters,
   onlyRepositories,
   useEntity,
   useGraphContext,
-} from '@/lib/core'
-import { useSSO } from '@/lib/core/auth-core/sso'
+} from '@robosystems/core'
+import { useSSO } from '@robosystems/core/auth-core/sso'
 import { useEffect, useMemo, useState } from 'react'
 import { HiChevronDown, HiDatabase, HiOfficeBuilding } from 'react-icons/hi'
 
