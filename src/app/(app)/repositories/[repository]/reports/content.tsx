@@ -1,7 +1,7 @@
 'use client'
 
-import { PageHeader, PageLayout } from '@/lib/core'
 import { TickerSearch, type SecEntity } from '@/lib/sec'
+import { PageHeader, PageLayout } from '@robosystems/core'
 import { useRouter } from 'next/navigation'
 import { HiDocumentSearch } from 'react-icons/hi'
 

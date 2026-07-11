@@ -1,10 +1,10 @@
 'use client'
-import { LoadingState, PageHeader, PageLayout } from '@/lib/core'
+import { LoadingState, PageHeader, PageLayout } from '@robosystems/core'
 import {
   CoverageGrid,
   getAllCoverage,
   type CoverageItem,
-} from '@/lib/core/research'
+} from '@robosystems/core/research'
 import { useEffect, useState } from 'react'
 import { HiDocumentText } from 'react-icons/hi'
 

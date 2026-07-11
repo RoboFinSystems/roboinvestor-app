@@ -1,6 +1,10 @@
 'use client'
 
-import { SearchContent, useIsRepository, type SearchConfig } from '@/lib/core'
+import {
+  SearchContent,
+  useIsRepository,
+  type SearchConfig,
+} from '@robosystems/core'
 import { useMemo } from 'react'
 
 const REPO_CONFIG: SearchConfig = {

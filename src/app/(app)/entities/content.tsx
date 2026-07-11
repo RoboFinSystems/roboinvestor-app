@@ -1,6 +1,6 @@
 'use client'
 
-import type { Entity } from '@/lib/core'
+import type { Entity } from '@robosystems/core'
 import {
   EmptyState,
   GraphFilters,
@@ -8,7 +8,7 @@ import {
   PageHeader,
   SDK,
   useGraphContext,
-} from '@/lib/core'
+} from '@robosystems/core'
 import {
   Alert,
   Badge,

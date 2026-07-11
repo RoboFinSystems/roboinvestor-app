@@ -1,6 +1,11 @@
 'use client'
 
-import { EmptyState, PageHeader, useEntity, useGraphContext } from '@/lib/core'
+import {
+  EmptyState,
+  PageHeader,
+  useEntity,
+  useGraphContext,
+} from '@robosystems/core'
 import { Alert, Badge, Card } from 'flowbite-react'
 import { type FC } from 'react'
 import { HiOfficeBuilding } from 'react-icons/hi'
