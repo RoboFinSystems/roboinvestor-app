@@ -7,7 +7,8 @@
  * navigates to that entity's route).
  */
 import { Spinner } from 'flowbite-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { HiSearch } from 'react-icons/hi'
 import { searchEntities, type SecEntity } from '../client'
 
@@ -24,6 +25,16 @@ export function TickerSearch({ graphId, onSelect }: TickerSearchProps) {
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(0)
   const boxRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+  // Portal + fixed positioning let the dropdown escape the app's scroll container
+  // (`#main-content` is `overflow-y-auto`, which would otherwise clip an absolutely
+  // positioned list to a single row). We track the input's viewport rect and anchor
+  // the fixed-position list to it, recomputing on scroll/resize while open.
+  const [rect, setRect] = useState<{
+    top: number
+    left: number
+    width: number
+  } | null>(null)
 
   // Debounced search. A stale-response guard (`current`) keeps a slow earlier
   // query from overwriting a newer one.
@@ -56,15 +67,40 @@ export function TickerSearch({ graphId, onSelect }: TickerSearchProps) {
     }
   }, [term, graphId])
 
-  // Close on outside click.
+  // Close on outside click. The list is portaled out of `boxRef`, so a click inside
+  // it isn't contained by `boxRef` — check both, or picking an option would close
+  // the dropdown before the option's click fires.
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node))
+      const node = e.target as Node
+      if (
+        boxRef.current &&
+        !boxRef.current.contains(node) &&
+        !listRef.current?.contains(node)
+      )
         setOpen(false)
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
+
+  // Keep the fixed-position list anchored to the input while it's open.
+  useLayoutEffect(() => {
+    if (!open || !term.trim()) return
+    const measure = () => {
+      const el = boxRef.current
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      setRect({ top: r.bottom, left: r.left, width: r.width })
+    }
+    measure()
+    window.addEventListener('scroll', measure, true)
+    window.addEventListener('resize', measure)
+    return () => {
+      window.removeEventListener('scroll', measure, true)
+      window.removeEventListener('resize', measure)
+    }
+  }, [open, term])
 
   const choose = (entity: SecEntity) => {
     onSelect(entity)
@@ -110,46 +146,51 @@ export function TickerSearch({ graphId, onSelect }: TickerSearchProps) {
         />
       </div>
 
-      {open && term.trim() ? (
-        <ul
-          className="absolute z-20 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
-          role="listbox"
-        >
-          {loading ? (
-            <li className="flex items-center gap-2 px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400">
-              <Spinner size="sm" /> Searching…
-            </li>
-          ) : results.length === 0 ? (
-            <li className="px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400">
-              No companies found
-            </li>
-          ) : (
-            results.map((r, i) => (
-              <li key={r.cik}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={i === active}
-                  className={`flex w-full items-baseline gap-3 px-4 py-2 text-left ${
-                    i === active
-                      ? 'bg-primary-50 dark:bg-primary-900/30'
-                      : 'hover:bg-zinc-50 dark:hover:bg-zinc-700/50'
-                  }`}
-                  onMouseEnter={() => setActive(i)}
-                  onClick={() => choose(r)}
-                >
-                  <span className="text-primary-700 dark:text-primary-400 w-16 shrink-0 font-mono text-sm font-semibold">
-                    {r.ticker ?? '—'}
-                  </span>
-                  <span className="truncate text-sm text-zinc-800 dark:text-zinc-200">
-                    {r.name}
-                  </span>
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
-      ) : null}
+      {open && term.trim() && rect
+        ? createPortal(
+            <ul
+              ref={listRef}
+              className="fixed z-50 max-h-80 overflow-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
+              style={{ top: rect.top + 4, left: rect.left, width: rect.width }}
+              role="listbox"
+            >
+              {loading ? (
+                <li className="flex items-center gap-2 px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400">
+                  <Spinner size="sm" /> Searching…
+                </li>
+              ) : results.length === 0 ? (
+                <li className="px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400">
+                  No companies found
+                </li>
+              ) : (
+                results.map((r, i) => (
+                  <li key={r.cik}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={i === active}
+                      className={`flex w-full items-baseline gap-3 px-4 py-2 text-left ${
+                        i === active
+                          ? 'bg-primary-50 dark:bg-primary-900/30'
+                          : 'hover:bg-zinc-50 dark:hover:bg-zinc-700/50'
+                      }`}
+                      onMouseEnter={() => setActive(i)}
+                      onClick={() => choose(r)}
+                    >
+                      <span className="text-primary-700 dark:text-primary-400 w-16 shrink-0 font-mono text-sm font-semibold">
+                        {r.ticker ?? '—'}
+                      </span>
+                      <span className="truncate text-sm text-zinc-800 dark:text-zinc-200">
+                        {r.name}
+                      </span>
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>,
+            document.body
+          )
+        : null}
     </div>
   )
 }
