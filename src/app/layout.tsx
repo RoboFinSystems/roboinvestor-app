@@ -1,3 +1,4 @@
+import { CloudflareAnalytics } from '@/components/analytics/CloudflareAnalytics'
 import { organizationJsonLd } from '@/lib/structured-data'
 import { AuthProvider, customTheme } from '@robosystems/core'
 import { ThemeModeScript, ThemeProvider } from 'flowbite-react'
@@ -69,6 +70,7 @@ export default function RootLayout({
         <ThemeProvider theme={customTheme}>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
+        <CloudflareAnalytics />
       </body>
     </html>
   )
