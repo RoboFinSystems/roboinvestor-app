@@ -1,7 +1,7 @@
 'use client'
 import { LoadingState, PageHeader, PageLayout } from '@robosystems/core'
 import {
-  CoverageGrid,
+  CoverageBrowser,
   getAllCoverage,
   type CoverageItem,
 } from '@robosystems/core/research'
@@ -27,7 +27,7 @@ export default function ResearchContent() {
       {items === null ? (
         <LoadingState message="Loading research…" />
       ) : (
-        <CoverageGrid items={items} />
+        <CoverageBrowser items={items} />
       )}
     </PageLayout>
   )
