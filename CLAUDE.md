@@ -38,11 +38,13 @@ npm run format:check # Check code formatting
 **API Routes:**
 
 - `/api/utilities/health` - Health check endpoint for App Runner
+- `/api/contact` - Contact form submission via SNS
+- `/api/support` - Support request submission via SNS
 - `/api/session/sidebar` - Sidebar state management
 
 **Route Structure:**
 
-- `(app)` route group: Authenticated pages (home, console, graphs, entities, entity, portfolio, settings)
+- `(app)` route group: Authenticated pages (home, console, graphs, entities, entity, portfolio, repositories, research, search, settings)
 - `(landing)` route group: Public pages (login, register, legal pages, landing page)
 - API routes follow RESTful patterns with proper session validation
 

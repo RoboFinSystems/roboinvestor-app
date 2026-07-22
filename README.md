@@ -1,7 +1,5 @@
 # RoboInvestor App
 
-> **Version 0.2 (Alpha)** — Core infrastructure complete, actively developing investment-specific features
-
 RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and Claude-powered investment insights via the RoboSystems knowledge graph.
 
 - **Portfolio Intelligence**: Track and analyze investment holdings with AI-powered insights and recommendations
@@ -19,7 +17,8 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 - **Securities Management**: Track stocks, bonds, and other securities with mutual-handshake cross-graph linking to issuer entities
 - **AI Console**: Natural language and Cypher query terminal with streaming results and MCP integration
 - **Entity Browser**: Search and manage entities (native + linked from portfolio companies) across graphs
-- **Shared Repository Access**: Subscribe to and query SEC XBRL filings for public-company holdings
+- **Shared Repository Access**: Subscribe to SEC XBRL filings and browse rendered financial reports for public-company holdings
+- **Research**: SEC-filing-grounded equity research browser, every figure traceable to a filing
 - **Document Search**: Full-text and semantic search across connected sources
 - **Graph Creation**: Wizard-based portfolio graph setup with schema selection
 - **API Keys**: Secure programmatic access with key creation and rotation
@@ -115,6 +114,7 @@ See the **[Bootstrap Guide](https://github.com/RoboFinSystems/robosystems/wiki/B
 - TypeScript 5 for type safety
 - Flowbite React with Tailwind CSS for UI components
 - RoboSystems Client SDK for API communication and authentication
+- Statement and report rendering via [`@robosystems/report-components`](https://www.npmjs.com/package/@robosystems/report-components)
 
 **Core Library ([`@robosystems/core`](https://www.npmjs.com/package/@robosystems/core)):**
 
@@ -137,8 +137,8 @@ Shared modules consumed as an npm package across RoboSystems frontend apps:
 
 - **`prod.yml`**: Production deployment to roboinvestor.ai
 - **`staging.yml`**: Staging deployment to staging.roboinvestor.ai
-- **`test.yml`**: Automated testing on pull requests
-- **`build.yml`**: Docker image building for ECR
+- **`test-ci.yml`**: Automated testing on pull requests
+- **`build.yml`**: Reusable Docker image build for ECR, invoked by the deploy workflows
 
 ## Support
 
