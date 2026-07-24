@@ -106,11 +106,11 @@ export default function HeroSection() {
                   </svg>
                 </div>
                 <h3 className="mb-2 text-center text-lg font-semibold text-white">
-                  MCP Integration
+                  Agent-Managed Portfolio
                 </h3>
                 <p className="text-center text-sm text-gray-400">
-                  Connect Claude Desktop, Cursor, and other AI tools directly to
-                  your investment graph via MCP
+                  Connect Claude Desktop or Cursor over MCP — query your graph
+                  and record portfolios, securities, and positions
                 </p>
               </div>
             </div>

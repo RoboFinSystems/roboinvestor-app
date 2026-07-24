@@ -102,7 +102,7 @@ export default function InvestorSchemaSection() {
                           <div>Knowledge Graph</div>
                         </div>
                         <div className="text-xs text-gray-400">
-                          Portfolio + Market data semantics
+                          Portfolio + securities semantics
                         </div>
                       </div>
                     </div>
@@ -118,10 +118,10 @@ export default function InvestorSchemaSection() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    Portfolios, positions, trades
+                    Portfolios, positions, cost basis
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {['Portfolio', 'Position', 'Trade'].map((comp, cidx) => (
+                    {['Portfolio', 'Position'].map((comp, cidx) => (
                       <span
                         key={cidx}
                         className="bg-primary-900/50 text-primary-300 rounded px-2 py-0.5 text-xs"
@@ -139,7 +139,7 @@ export default function InvestorSchemaSection() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    Instruments with entity linking
+                    Instruments, terms, and issuer linking
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {['Security', 'Entity'].map((comp, cidx) => (
@@ -228,7 +228,8 @@ export default function InvestorSchemaSection() {
                     <div className="font-semibold text-white">MCP Tools</div>
                   </div>
                   <p className="text-xs text-gray-400">
-                    AI analytics in Claude Desktop via @robosystems/mcp
+                    Read and write your graph from Claude Desktop via
+                    @robosystems/mcp
                   </p>
                 </div>
 
@@ -252,7 +253,7 @@ export default function InvestorSchemaSection() {
                     <div className="font-semibold text-white">API Access</div>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Python, TypeScript, and REST clients
+                    GraphQL and REST, with Python and TypeScript clients
                   </p>
                 </div>
               </div>
@@ -274,15 +275,16 @@ export default function InvestorSchemaSection() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                 />
               </svg>
             </div>
             <h3 className="mb-2 text-lg font-semibold text-white">
-              Daily Sync
+              Atomic Writes
             </h3>
             <p className="text-sm text-gray-400">
-              Daily updates from brokerage accounts and market feeds
+              Portfolio and position changes apply as one envelope — validated
+              up front, rolled back on any failure
             </p>
           </div>
 
@@ -306,8 +308,8 @@ export default function InvestorSchemaSection() {
               Unified Data Model
             </h3>
             <p className="text-sm text-gray-400">
-              Single source of truth connecting portfolios, securities, and
-              market data
+              Single source of truth connecting portfolios, securities, and the
+              entities that issue them
             </p>
           </div>
 

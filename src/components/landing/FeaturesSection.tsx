@@ -41,7 +41,7 @@ export default function FeaturesSection() {
       ),
       title: 'Private Security Types',
       description:
-        'Track PE and VC instruments: LLC units, LP interests, SAFEs, KISSes, convertible notes, and warrants',
+        'LLC units, LP interests, SAFEs, notes, warrants, options, and RSUs — with liquidation preference, cap, strike, and vesting terms',
       color: 'teal',
     },
     {
@@ -81,9 +81,9 @@ export default function FeaturesSection() {
           />
         </svg>
       ),
-      title: 'Cross-Graph Intelligence',
+      title: 'Cross-Graph Linking',
       description:
-        'Query private portfolio data alongside public SEC filings in a single AI workflow',
+        "Link a holding to its issuer's own graph — portfolio companies publish reports straight into yours, alongside public SEC data",
       color: 'green',
     },
     {
@@ -102,9 +102,9 @@ export default function FeaturesSection() {
           />
         </svg>
       ),
-      title: 'MCP Protocol',
+      title: 'Agent-Native Operations',
       description:
-        'Connect Claude Desktop, Cursor, and other AI tools directly to your investment graph',
+        'Every portfolio operation is an MCP tool — Claude reads and writes your graph, validated on every call',
       color: 'orange',
     },
     {
