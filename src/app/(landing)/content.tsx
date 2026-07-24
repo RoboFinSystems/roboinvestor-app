@@ -8,6 +8,7 @@ import Header from '@/components/landing/Header'
 import HeroSection from '@/components/landing/HeroSection'
 import InvestorSchemaSection from '@/components/landing/InvestorSchemaSection'
 import ResearchSection from '@/components/landing/ResearchSection'
+import WorkspaceSection from '@/components/landing/WorkspaceSection'
 
 export default function LandingPageContent() {
   return (
@@ -19,6 +20,7 @@ export default function LandingPageContent() {
         <FeaturesSection />
         <InvestorSchemaSection />
         <ResearchSection />
+        <WorkspaceSection />
         <AIAnalysisSection />
         <FinalCTA />
       </main>

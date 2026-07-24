@@ -5,6 +5,7 @@ interface FloatingElementsVariantProps {
     | 'features'
     | 'schema'
     | 'research'
+    | 'workspace'
     | 'ai-analysis'
     | 'final'
 }
@@ -43,6 +44,14 @@ export default function FloatingElementsVariant({
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="animate-float-slow from-accent-600/12 to-primary-600/12 absolute -top-24 left-1/3 h-[480px] w-[480px] rounded-full bg-linear-to-br blur-3xl"></div>
           <div className="animate-float-slower from-secondary-600/10 to-accent-600/10 absolute right-1/4 -bottom-24 h-[420px] w-[420px] rounded-full bg-linear-to-br blur-3xl"></div>
+        </div>
+      )
+
+    case 'workspace':
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="animate-float from-primary-600/12 to-accent-600/12 absolute -top-24 right-1/3 h-[460px] w-[460px] rounded-full bg-linear-to-br blur-3xl"></div>
+          <div className="animate-float-slower from-secondary-600/10 to-primary-600/10 absolute -bottom-24 left-1/4 h-[440px] w-[440px] rounded-full bg-linear-to-br blur-3xl"></div>
         </div>
       )
 
