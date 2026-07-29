@@ -30,7 +30,7 @@ import {
   TextInput,
 } from 'flowbite-react'
 import type { FC } from 'react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   HiCurrencyDollar,
   HiExclamationCircle,
@@ -39,6 +39,7 @@ import {
   HiPlus,
   HiViewGrid,
 } from 'react-icons/hi'
+import { parseMoneyToCents, parseQuantity } from './money'
 
 interface Portfolio {
   id: string
@@ -167,6 +168,12 @@ const PortfolioPageContent: FC = function () {
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(
     null
   )
+  // The graph the selection was made in. State updates from a graph switch
+  // land a render after the effects that read them, so without this tag the
+  // holdings effect fires once with the new graph and the old portfolio id.
+  const [selectionGraphId, setSelectionGraphId] = useState<string | undefined>(
+    undefined
+  )
   const [holdings, setHoldings] = useState<Holding[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [holdingsLoading, setHoldingsLoading] = useState(false)
@@ -212,6 +219,26 @@ const PortfolioPageContent: FC = function () {
   const investorGraph = graphState.graphs.find(GraphFilters.roboinvestor)
   const graphId = investorGraph?.graphId
 
+  // Every id on this page — portfolio, security, entity — belongs to one graph.
+  // The loaders below are also re-invoked directly after a mutation, where an
+  // effect cleanup would never fire, so they carry sequence numbers and discard
+  // their result when a newer load has started. `graphIdRef` lets a write that
+  // is already in flight tell whether the graph moved under it.
+  const graphIdRef = useRef(graphId)
+  useEffect(() => {
+    graphIdRef.current = graphId
+  }, [graphId])
+  const portfoliosSeq = useRef(0)
+  const holdingsSeq = useRef(0)
+
+  // The only selection anything may act on: one that belongs to the graph
+  // currently in view. Everything downstream — the holdings read, the detail
+  // pane and the writes it hosts — goes through this rather than
+  // `selectedPortfolio`, so a selection left over from the previous graph
+  // cannot pair its id with the new graph.
+  const activeSelection =
+    selectedPortfolio && selectionGraphId === graphId ? selectedPortfolio : null
+
   const loadLinkedEntities = useCallback(async () => {
     if (!graphId) return
     try {
@@ -239,37 +266,50 @@ const PortfolioPageContent: FC = function () {
       setIsLoading(false)
       return
     }
+    const seq = ++portfoliosSeq.current
     try {
       setIsLoading(true)
       setError(null)
       const data = await clients.investor.listPortfolios(graphId)
+      if (seq !== portfoliosSeq.current) return
       const list = (data?.portfolios ?? []).map(toPortfolio)
       setPortfolios(list)
-      if (list.length > 0 && !selectedPortfolio) {
-        setSelectedPortfolio(list[0])
-      }
+      // Keep the selection if this graph still has it, otherwise fall back to
+      // the head of its list. The graph-change effect above clears the
+      // selection first, so on a switch this seeds; the lookup matters for any
+      // later plain refresh, which must not move the user's selection.
+      setSelectedPortfolio(
+        (prev) =>
+          list.find((p) => p.id === prev?.id) ??
+          (list.length > 0 ? list[0] : null)
+      )
+      setSelectionGraphId(graphId)
     } catch (err) {
+      if (seq !== portfoliosSeq.current) return
       setError(err instanceof Error ? err.message : 'Failed to load portfolios')
     } finally {
-      setIsLoading(false)
+      if (seq === portfoliosSeq.current) setIsLoading(false)
     }
-  }, [graphId, selectedPortfolio])
+  }, [graphId])
 
   const loadHoldings = useCallback(
     async (portfolioId: string) => {
       if (!graphId) return
+      const seq = ++holdingsSeq.current
       try {
         setHoldingsLoading(true)
         setHoldingsError(null)
         const data = await clients.investor.getHoldings(graphId, portfolioId)
+        if (seq !== holdingsSeq.current) return
         setHoldings(((data?.holdings as RawHolding[]) ?? []).map(toHolding))
       } catch (err) {
+        if (seq !== holdingsSeq.current) return
         setHoldings([])
         setHoldingsError(
           err instanceof Error ? err.message : 'Failed to load holdings'
         )
       } finally {
-        setHoldingsLoading(false)
+        if (seq === holdingsSeq.current) setHoldingsLoading(false)
       }
     },
     [graphId]
@@ -290,6 +330,7 @@ const PortfolioPageContent: FC = function () {
 
   const handleEditSecurity = useCallback(async () => {
     if (!graphId || !editSecurityId) return
+    const requestGraphId = graphId
     try {
       setSavingEdit(true)
       setEditError(null)
@@ -298,71 +339,113 @@ const PortfolioPageContent: FC = function () {
       if (editSourceGraphId.trim())
         updates.source_graph_id = editSourceGraphId.trim()
 
-      await clients.investor.updateSecurity(graphId, editSecurityId, updates)
+      await clients.investor.updateSecurity(
+        requestGraphId,
+        editSecurityId,
+        updates
+      )
 
+      // The write targeted the right graph, but the graph-change reset has
+      // already cleared this modal and reloaded holdings if the graph moved.
+      if (graphIdRef.current !== requestGraphId) return
       setShowEditSecurityModal(false)
-      if (selectedPortfolio) loadHoldings(selectedPortfolio.id)
+      if (activeSelection) loadHoldings(activeSelection.id)
     } catch (err) {
+      if (graphIdRef.current !== requestGraphId) return
       setEditError(
         err instanceof Error ? err.message : 'Failed to update security'
       )
     } finally {
-      setSavingEdit(false)
+      if (graphIdRef.current === requestGraphId) setSavingEdit(false)
     }
   }, [
     graphId,
     editSecurityId,
     editEntityId,
     editSourceGraphId,
-    selectedPortfolio,
+    activeSelection,
     loadHoldings,
   ])
 
   useEffect(() => {
+    // Drop everything scoped to the previous graph before loading. Leaving the
+    // selection or an open modal in place would let a write fire against the
+    // new graph carrying the old graph's portfolio, security or entity id —
+    // and both modals are gated on state cleared here.
+    setPortfolios([])
+    setSelectedPortfolio(null)
+    setSelectionGraphId(undefined)
+    setHoldings([])
+    setError(null)
+    setHoldingsError(null)
+    setLinkedEntities([])
+    setShowSecurityModal(false)
+    setShowEditSecurityModal(false)
+    setEditSecurityId(null)
+    setEditError(null)
+    setSecurityModalError(null)
+
     loadPortfolios()
   }, [loadPortfolios])
 
   useEffect(() => {
-    if (selectedPortfolio) {
-      loadHoldings(selectedPortfolio.id)
+    if (activeSelection) {
+      loadHoldings(activeSelection.id)
     } else {
       setHoldings([])
     }
-  }, [selectedPortfolio, loadHoldings])
+  }, [activeSelection, loadHoldings])
 
   const handleCreate = async () => {
     if (!graphId || !createForm.name.trim()) return
+    const requestGraphId = graphId
     try {
       setCreating(true)
-      const raw = await clients.investor.createPortfolioBlock(graphId, {
+      const raw = await clients.investor.createPortfolioBlock(requestGraphId, {
         portfolio: {
           name: createForm.name.trim(),
           description: createForm.description.trim() || null,
           strategy: createForm.strategy.trim() || null,
         },
       })
+      // Adding the new portfolio to a list that now belongs to another graph
+      // would show it under, and select it for, the wrong graph.
+      if (graphIdRef.current !== requestGraphId) return
       const portfolio = toPortfolio(raw)
       setPortfolios((prev) => [...prev, portfolio])
       setShowCreateModal(false)
       setCreateForm({ name: '', description: '', strategy: '' })
       setSelectedPortfolio(portfolio)
+      setSelectionGraphId(requestGraphId)
     } catch (err) {
+      if (graphIdRef.current !== requestGraphId) return
       setError(
         err instanceof Error ? err.message : 'Failed to create portfolio'
       )
     } finally {
-      setCreating(false)
+      if (graphIdRef.current === requestGraphId) setCreating(false)
     }
   }
 
   const handleCreateSecurity = async () => {
-    if (!graphId || !selectedPortfolio || !securityForm.name.trim()) return
+    if (!graphId || !activeSelection || !securityForm.name.trim()) return
+
+    // Reject an unusable quantity before creating anything: the security is
+    // written first, so failing after it leaves an orphan behind.
+    const quantity = parseQuantity(securityForm.quantity)
+    if (securityForm.quantity.trim() && quantity === null) {
+      setSecurityModalError('Enter a positive quantity, e.g. 1500.5')
+      return
+    }
+
+    const requestGraphId = graphId
+    const requestPortfolioId = activeSelection.id
     try {
       setCreatingSecurity(true)
       setSecurityModalError(null)
 
       // 1. Create the security
-      const security = await clients.investor.createSecurity(graphId, {
+      const security = await clients.investor.createSecurity(requestGraphId, {
         name: securityForm.name.trim(),
         security_type: securityForm.security_type,
         security_subtype: securityForm.security_subtype.trim() || null,
@@ -371,22 +454,20 @@ const PortfolioPageContent: FC = function () {
       })
 
       // 2. Add the position via portfolio block update if quantity was provided
-      if (securityForm.quantity) {
-        const costBasisCents = securityForm.cost_basis
-          ? Math.round(parseFloat(securityForm.cost_basis) * 100)
-          : 0
-
+      if (quantity !== null) {
+        // Both ids were captured together, so this cannot post one graph's
+        // portfolio id against another graph.
         await clients.investor.updatePortfolioBlock(
-          graphId,
-          selectedPortfolio.id,
+          requestGraphId,
+          requestPortfolioId,
           {
             positions: {
               add: [
                 {
                   security_id: (security as { id: string }).id,
-                  quantity: parseFloat(securityForm.quantity),
+                  quantity,
                   quantity_type: securityForm.quantity_type,
-                  cost_basis: costBasisCents,
+                  cost_basis: parseMoneyToCents(securityForm.cost_basis),
                 },
               ],
             },
@@ -394,6 +475,7 @@ const PortfolioPageContent: FC = function () {
         )
       }
 
+      if (graphIdRef.current !== requestGraphId) return
       setShowSecurityModal(false)
       setSecurityModalError(null)
       setSecurityForm({
@@ -407,13 +489,14 @@ const PortfolioPageContent: FC = function () {
         cost_basis: '',
       })
       // Reload holdings
-      loadHoldings(selectedPortfolio.id)
+      loadHoldings(requestPortfolioId)
     } catch (err) {
+      if (graphIdRef.current !== requestGraphId) return
       setSecurityModalError(
         err instanceof Error ? err.message : 'Failed to create security'
       )
     } finally {
-      setCreatingSecurity(false)
+      if (graphIdRef.current === requestGraphId) setCreatingSecurity(false)
     }
   }
 
@@ -485,11 +568,14 @@ const PortfolioPageContent: FC = function () {
               <Card
                 key={p.id}
                 className={`cursor-pointer transition-all ${
-                  selectedPortfolio?.id === p.id
+                  activeSelection?.id === p.id
                     ? 'ring-secondary-500 ring-2'
                     : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600'
                 }`}
-                onClick={() => setSelectedPortfolio(p)}
+                onClick={() => {
+                  setSelectedPortfolio(p)
+                  setSelectionGraphId(graphId)
+                }}
               >
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -512,11 +598,11 @@ const PortfolioPageContent: FC = function () {
 
           {/* Holdings detail */}
           <div className="lg:col-span-2">
-            {selectedPortfolio ? (
+            {activeSelection ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {selectedPortfolio.name}
+                    {activeSelection.name}
                   </h2>
                   <Button
                     size="sm"
