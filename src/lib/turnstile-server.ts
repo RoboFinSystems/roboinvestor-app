@@ -94,34 +94,27 @@ export async function verifyTurnstileToken(
 
 /**
  * Middleware helper to check if CAPTCHA should be required
+ *
+ * SECURITY NOTE: CAPTCHA is always required in production.
+ * The REQUIRE_CAPTCHA environment variable should only be set to 'false'
+ * in development/testing environments, never in production.
+ *
+ * @returns boolean indicating if CAPTCHA verification is required
  */
 export function isCaptchaRequired(): boolean {
+  // Always require CAPTCHA in production for security
   if (process.env.NODE_ENV === 'production') {
     return true
   }
+
+  // In non-production environments, allow override for testing
+  // Default to true if not explicitly disabled
   return process.env.REQUIRE_CAPTCHA !== 'false'
 }
 
 /**
- * Extract client IP from Next.js request headers
+ * Extract client IP from Next.js request headers. Re-exported from the shared
+ * helper so the CAPTCHA `remoteip` hint and the rate limiter agree on which
+ * proxy hop to trust.
  */
-export function getClientIp(request: Request): string | undefined {
-  const headers = request.headers
-
-  const forwardedFor = headers.get('x-forwarded-for')
-  if (forwardedFor) {
-    return forwardedFor.split(',')[0].trim()
-  }
-
-  const realIp = headers.get('x-real-ip')
-  if (realIp) {
-    return realIp
-  }
-
-  const cfConnectingIp = headers.get('cf-connecting-ip')
-  if (cfConnectingIp) {
-    return cfConnectingIp
-  }
-
-  return undefined
-}
+export { getClientIp } from './client-ip'
