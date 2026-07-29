@@ -51,7 +51,7 @@ npm run format:check # Check code formatting
 **RoboInvestor-Specific Features:**
 
 - Console configured with investment-specific sample queries and `@robosystems/mcp` integration for AI analytics
-- Portfolio page (coming soon placeholder with planned features)
+- Portfolio page: create portfolios, add securities and positions, and view holdings grouped by entity (`clients.investor.*`); cost basis is submitted in integer cents, parsed by `portfolio/money.ts`
 - Graph creation enforces `roboinvestor` schema extension
 - Entity browser with multi-graph traversal
 
