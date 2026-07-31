@@ -71,8 +71,7 @@ export function makeSecQuery(graphId: string): SecQuery {
     })
     if (res.error) throw new Error(describeError(res.error))
     const body = res.data as
-      | { data?: unknown[]; error?: string | null }
-      | undefined
+      { data?: unknown[]; error?: string | null } | undefined
     if (body?.error) throw new Error(body.error)
     return (body?.data as Array<Record<string, unknown>>) ?? []
   }
