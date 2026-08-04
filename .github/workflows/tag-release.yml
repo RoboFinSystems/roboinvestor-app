@@ -54,7 +54,7 @@ jobs:
         env:
           VERSION: ${{ steps.get-version.outputs.version }}
         run: |
-          if [ $(git tag -l "v${VERSION}") ]; then
+          if [ -n "$(git tag -l "v${VERSION}")" ]; then
             echo "tag_exists=true" >> $GITHUB_OUTPUT
             echo "Tag v${VERSION} already exists"
           else
@@ -85,10 +85,9 @@ jobs:
         if: steps.check-tag.outputs.tag_exists == 'false'
         id: analyze-changes
         run: |
-          # Get the last release tag. The pattern is anchored at both ends so
-          # only strict vMAJOR.MINOR.PATCH tags are eligible — the selected tag
-          # is fed to git and to downstream steps, so it must not carry
-          # arbitrary trailing text.
+          # Get the last release tag. The pattern is anchored at both ends so only
+          # a strict vMAJOR.MINOR.PATCH tag can be selected: LAST_TAG flows into
+          # later git commands and prompt text, so it must not carry trailing text.
           LAST_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
 
           if [ -z "$LAST_TAG" ]; then
@@ -227,11 +226,6 @@ jobs:
       - name: Call Claude API for changelog
         if: steps.check-tag.outputs.tag_exists == 'false' && steps.curated-notes.outputs.found != 'true'
         id: claude-changelog
-        # SECURITY: the API key reaches curl through a config file on stdin
-        # rather than a command-line header. Passing it as -H "x-api-key: $VAR"
-        # would not help — the shell expands the variable before exec, so the
-        # literal key would still sit in the curl process argv, which any
-        # process on the runner can read.
         env:
           CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL || 'claude-sonnet-4-6' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -254,11 +248,18 @@ jobs:
               ]
             }')
 
-          RESPONSE=$(printf 'header = "x-api-key: %s"\n' "$ANTHROPIC_API_KEY" | \
-            curl -s --config - --max-time 60 --retry 3 --retry-delay 10 -X POST "https://api.anthropic.com/v1/messages" \
-            -H "Content-Type: application/json" \
-            -H "anthropic-version: 2023-06-01" \
-            -d "$PAYLOAD")
+            # The credential is fed to curl through a config file on stdin rather
+            # than an -H flag. Writing -H "x-api-key: $ANTHROPIC_API_KEY" would not
+            # help: the shell expands the variable before exec, so the literal key
+            # still lands in the curl process argv, which any other process on the
+            # runner can read. printf is a bash builtin, so it adds no process of
+            # its own, and curl parses the config at startup so --retry resends the
+            # header correctly.
+          RESPONSE=$(printf 'header = "x-api-key: %s"\n' "$ANTHROPIC_API_KEY" \
+            | curl -s --config - --max-time 60 --retry 3 --retry-delay 10 -X POST "https://api.anthropic.com/v1/messages" \
+              -H "Content-Type: application/json" \
+              -H "anthropic-version: 2023-06-01" \
+              -d "$PAYLOAD")
 
           # Check for API errors
           if echo "$RESPONSE" | jq -e '.error' > /dev/null; then
