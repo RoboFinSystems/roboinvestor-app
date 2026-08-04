@@ -85,8 +85,11 @@ jobs:
         if: steps.check-tag.outputs.tag_exists == 'false'
         id: analyze-changes
         run: |
-          # Get the last release tag
-          LAST_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+          # Get the last release tag. The pattern is anchored at both ends so
+          # only strict vMAJOR.MINOR.PATCH tags are eligible — the selected tag
+          # is fed to git and to downstream steps, so it must not carry
+          # arbitrary trailing text.
+          LAST_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
 
           if [ -z "$LAST_TAG" ]; then
             echo "No previous release found, analyzing all commits"
@@ -224,13 +227,21 @@ jobs:
       - name: Call Claude API for changelog
         if: steps.check-tag.outputs.tag_exists == 'false' && steps.curated-notes.outputs.found != 'true'
         id: claude-changelog
+        # SECURITY: the API key reaches curl through a config file on stdin
+        # rather than a command-line header. Passing it as -H "x-api-key: $VAR"
+        # would not help — the shell expands the variable before exec, so the
+        # literal key would still sit in the curl process argv, which any
+        # process on the runner can read.
+        env:
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL || 'claude-sonnet-4-6' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           # Call Claude API with the analysis prompt
           PROMPT=$(cat /tmp/changelog_prompt.txt)
 
           # Create a proper JSON payload using jq to handle escaping
           PAYLOAD=$(jq -n \
-            --arg model "${{ vars.CLAUDE_MODEL || 'claude-sonnet-4-6' }}" \
+            --arg model "$CLAUDE_MODEL" \
             --arg content "$PROMPT" \
             '{
               "model": $model,
@@ -243,9 +254,9 @@ jobs:
               ]
             }')
 
-          RESPONSE=$(curl -s --max-time 60 --retry 3 --retry-delay 10 -X POST "https://api.anthropic.com/v1/messages" \
+          RESPONSE=$(printf 'header = "x-api-key: %s"\n' "$ANTHROPIC_API_KEY" | \
+            curl -s --config - --max-time 60 --retry 3 --retry-delay 10 -X POST "https://api.anthropic.com/v1/messages" \
             -H "Content-Type: application/json" \
-            -H "x-api-key: ${{ secrets.ANTHROPIC_API_KEY }}" \
             -H "anthropic-version: 2023-06-01" \
             -d "$PAYLOAD")
 
@@ -363,9 +374,11 @@ jobs:
         if: steps.check-tag.outputs.tag_exists == 'false'
         # SECURITY (H2): the changelog (generated or curated) is untrusted;
         # it is read from the file written by the compose step rather than
-        # interpolated with ${{ ... }} into the shell.
+        # interpolated with ${{ ... }} into the shell. last_tag is git-derived
+        # and non-numeric, so it travels through env for the same reason.
         env:
           VERSION: ${{ steps.get-version.outputs.version }}
+          LAST_TAG: ${{ steps.analyze-changes.outputs.last_tag }}
         run: |
 
           echo "## 🚀 RoboInvestor v$VERSION Released" >> $GITHUB_STEP_SUMMARY
@@ -379,7 +392,7 @@ jobs:
           echo "- **Components Updated:** ${{ steps.analyze-changes.outputs.components_changed }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Pages Updated:** ${{ steps.analyze-changes.outputs.pages_changed }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Styles Updated:** ${{ steps.analyze-changes.outputs.styles_changed }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Previous Release:** ${{ steps.analyze-changes.outputs.last_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Previous Release:** ${LAST_TAG}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📝 Changelog" >> $GITHUB_STEP_SUMMARY
           cat /tmp/release_changelog.md >> $GITHUB_STEP_SUMMARY
