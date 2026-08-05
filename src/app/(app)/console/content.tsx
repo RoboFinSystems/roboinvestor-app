@@ -19,7 +19,6 @@ const ROBOINVESTOR_BRANDING: ConsoleBranding = {
   closingMessage: 'What would you like to analyze today?',
   mcp: {
     serverName: 'robosystems',
-    packageName: '@robosystems/mcp',
     contextIdFallback: 'your_graph_id',
   },
   // A graph carrying both entity extensions reads as a portfolio graph here.
