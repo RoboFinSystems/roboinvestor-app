@@ -91,9 +91,13 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
   const generateApiKey = async () => {
     setIsCreatingKey(true)
     try {
+      // Scoped to this repository: the key works only here (least privilege),
+      // which is also what makes the pasteable Claude connector URL below
+      // acceptable — account-wide keys are rejected in URLs server-side.
       const response = await createUserApiKey({
         body: {
           name: `Repository Access - ${repository.toUpperCase()} - ${new Date().toLocaleDateString()}`,
+          graph_id: repository,
         },
       })
 
@@ -104,9 +108,9 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       setApiKey(response.data.key)
       setKeyCreated(true)
 
-      showSuccess('API key created successfully!')
+      showSuccess('Repository-scoped API key created!')
       showWarning(
-        'Keep this key secure! You can manage all your API keys in Settings.'
+        'This key works only for this repository. Manage or revoke it in Settings.'
       )
 
       // Trigger typing animation and scroll to code examples
@@ -399,12 +403,12 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
 
             <div className="space-y-2">
               <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase dark:text-zinc-500">
-                Claude — Settings → Connectors → Add custom connector
+                Claude (claude.ai / Desktop) — Settings → Connectors → Add
+                custom connector
               </p>
               <pre className="overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
                 <code>
-                  {`URL:    ${mcpUrl}
-Header: X-API-Key: `}
+                  {`${mcpUrl}?token=`}
                   <ApiKeyDisplay
                     keyCreated={keyCreated}
                     isTypingKey={isTypingKey}
@@ -414,6 +418,11 @@ Header: X-API-Key: `}
                   </ApiKeyDisplay>
                 </code>
               </pre>
+              <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                Paste the whole URL — the repository-scoped key rides inside it,
+                no header needed. Claude&apos;s connectors can&apos;t send
+                custom headers, which is why the key must be scoped.
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -451,9 +460,9 @@ Header: X-API-Key: `}
                 rel="noopener noreferrer"
                 className="text-primary-600 dark:text-primary-400 hover:underline"
               >
-                legacy stdio bridge
-              </a>
-              .
+                stdio bridge
+              </a>{' '}
+              in proxy mode.
             </p>
           </div>
 
