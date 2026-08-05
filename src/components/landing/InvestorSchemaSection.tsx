@@ -228,8 +228,7 @@ export default function InvestorSchemaSection() {
                     <div className="font-semibold text-white">MCP Tools</div>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Read and write your graph from Claude Desktop via
-                    @robosystems/mcp
+                    Read and write your graph from Claude — connect its MCP URL
                   </p>
                 </div>
 

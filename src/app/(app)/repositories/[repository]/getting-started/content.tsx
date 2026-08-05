@@ -127,6 +127,10 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
 
   const displayApiKey = apiKey || 'YOUR_API_KEY_HERE'
 
+  // The graph id lives in the URL path and never becomes a tool argument, so a
+  // connector is anchored to exactly one repository.
+  const mcpUrl = `${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}/v1/graphs/${repository}/mcp`
+
   return (
     <PageLayout>
       <ToastContainer />
@@ -370,7 +374,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             <ul className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
               <li className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-zinc-400"></span>
-                Access via MCP tools in Claude Desktop, Cursor, or other AI apps
+                Connect Claude, Claude Code, Cursor, or any MCP client
               </li>
               <li className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-zinc-400"></span>
@@ -383,40 +387,74 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             </ul>
           </div>
 
-          {/* MCP Client Configuration */}
+          {/* MCP Connection */}
           <div className="space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-700">
             <h4 className="font-heading font-medium text-zinc-900 dark:text-zinc-100">
-              MCP Configuration
+              Connect via MCP
             </h4>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Add this to your MCP settings file for Claude Desktop, Cursor, or
-              other AI tools:
+              One URL, one header — no install required. The URL picks the
+              repository, so add one connector per graph you want to reach.
             </p>
-            <pre className="overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
-              <code>
-                {`{
-  "mcpServers": {
-    "robosystems": {
-      "command": "npx",
-      "args": ["-y", "@robosystems/mcp@latest"],
-      "env": {
-        "ROBOSYSTEMS_API_KEY": "`}
-                <ApiKeyDisplay
-                  keyCreated={keyCreated}
-                  isTypingKey={isTypingKey}
-                  onTypingComplete={() => setIsTypingKey(false)}
-                >
-                  {displayApiKey}
-                </ApiKeyDisplay>
-                {`",
-        "ROBOSYSTEMS_API_URL": "${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}",
-        "ROBOSYSTEMS_GRAPH_ID": "${repository}"
-      }
-    }
-  }
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase dark:text-zinc-500">
+                Claude — Settings → Connectors → Add custom connector
+              </p>
+              <pre className="overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
+                <code>
+                  {`URL:    ${mcpUrl}
+Header: X-API-Key: `}
+                  <ApiKeyDisplay
+                    keyCreated={keyCreated}
+                    isTypingKey={isTypingKey}
+                    onTypingComplete={() => setIsTypingKey(false)}
+                  >
+                    {displayApiKey}
+                  </ApiKeyDisplay>
+                </code>
+              </pre>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase dark:text-zinc-500">
+                Claude Code
+              </p>
+              <pre className="overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
+                <code>
+                  {`claude mcp add --transport http robosystems-${repository} \\
+  ${mcpUrl} \\
+  --header "X-API-Key: ${displayApiKey}"`}
+                </code>
+              </pre>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase dark:text-zinc-500">
+                Cursor / VS Code (mcp.json)
+              </p>
+              <pre className="overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
+                <code>
+                  {`"robosystems-${repository}": {
+  "url": "${mcpUrl}",
+  "headers": { "X-API-Key": "${displayApiKey}" }
 }`}
-              </code>
-            </pre>
+                </code>
+              </pre>
+            </div>
+
+            <p className="text-xs text-zinc-500 dark:text-zinc-500">
+              Clients without HTTP transport support can use the{' '}
+              <a
+                href="https://github.com/RoboFinSystems/robosystems-mcp-client"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-600 dark:text-primary-400 hover:underline"
+              >
+                legacy stdio bridge
+              </a>
+              .
+            </p>
           </div>
 
           {/* API SDK Examples */}
