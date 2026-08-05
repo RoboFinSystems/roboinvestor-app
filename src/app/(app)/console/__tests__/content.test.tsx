@@ -37,7 +37,9 @@ describe('RoboInvestor ConsolePageContent', () => {
     expect(branding.title).toBe('RoboInvestor Console')
     expect(branding.consoleName).toBe('RoboInvestor Console')
     expect(branding.mcp.serverName).toBe('robosystems')
-    expect(branding.mcp.packageName).toBe('@robosystems/mcp')
+    // The connector name is built from serverName + graph id; core's /mcp
+    // serves the remote URL, so there is no npm package to name.
+    expect(branding.mcp.packageName).toBeUndefined()
     // Dual-extension graphs should read as portfolio graphs in this app.
     expect(branding.preferredKind).toBe('roboinvestor')
   })
