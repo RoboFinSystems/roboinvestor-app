@@ -484,7 +484,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                 </summary>
                 <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
                   <code>
-                    {`curl -X POST "${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}/v1/graphs/${repository}/query" \\
+                    {`curl -X POST "${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}/v1/graphs/${repository}/query/cypher" \\
   -H "X-API-Key: `}
                     <ApiKeyDisplay
                       keyCreated={keyCreated}
@@ -497,8 +497,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
   -H "Content-Type: application/json" \\
   -d '{
     "query": "MATCH (n) RETURN n LIMIT 10",
-    "parameters": {},
-    "timeout": 30
+    "parameters": {}
   }'`}
                   </code>
                 </pre>
@@ -511,15 +510,14 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                 </summary>
                 <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
                   <code>
-                    {`from robosystems_client.extensions import (
-    RoboSystemsExtensions,
-    RoboSystemsExtensionConfig,
-)
+                    {`from robosystems_client import AuthenticatedClient
+from robosystems_client.api.query import execute_cypher
+from robosystems_client.models import CypherStatementRequest
 
-# Initialize the client with API key authentication
-config = RoboSystemsExtensionConfig(
+# API key authentication: the key is sent as the X-API-Key header
+client = AuthenticatedClient(
     base_url="${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}",
-    headers={"X-API-Key": "`}
+    token="`}
                     <ApiKeyDisplay
                       keyCreated={keyCreated}
                       isTypingKey={isTypingKey}
@@ -527,16 +525,21 @@ config = RoboSystemsExtensionConfig(
                     >
                       {displayApiKey}
                     </ApiKeyDisplay>
-                    {`"},
+                    {`",
+    prefix="",
+    auth_header_name="X-API-Key",
 )
-client = RoboSystemsExtensions(config)
 
 # Execute a Cypher query
-response = client.query.query("${repository}", "MATCH (n) RETURN n LIMIT 10")
+result = execute_cypher.sync(
+    "${repository}",
+    client=client,
+    body=CypherStatementRequest(query="MATCH (n) RETURN n LIMIT 10"),
+)
 
 # Process results
-print(f"Rows: {response.row_count}, Time: {response.execution_time_ms}ms")
-for record in response.data:
+print(f"Rows: {result['row_count']}, Time: {result['execution_time_ms']}ms")
+for record in result["data"]:
     print(record)`}
                   </code>
                 </pre>
