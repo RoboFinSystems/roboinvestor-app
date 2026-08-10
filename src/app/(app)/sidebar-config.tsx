@@ -65,6 +65,15 @@ export const getNavigationItems = ({
           label: 'Portfolio',
           href: '/portfolio',
         },
+        // Reports the fund *received* — distinct from the SEC filing viewer
+        // below, which reads a shared repository. These live on the fund's own
+        // graph, put there by a portfolio company's share, so they belong with
+        // the other investor-graph items rather than under Repositories.
+        {
+          icon: HiDocumentReport,
+          label: 'Portfolio Reports',
+          href: '/reports',
+        },
       ]
     : []
 
