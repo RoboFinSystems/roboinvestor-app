@@ -10,12 +10,6 @@ export function proxy(request: NextRequest) {
     request.nextUrl.hostname === 'localhost' ||
     request.nextUrl.hostname === '127.0.0.1'
 
-  // Check if this is an authentication route that needs relaxed CSP
-  const isAuthRoute =
-    request.nextUrl.pathname === '/login' ||
-    request.nextUrl.pathname === '/register' ||
-    request.nextUrl.pathname.startsWith('/auth/')
-
   // CloudFront CDN serving the research portal's catalog, briefs, images,
   // video, and audio (produced by robosystems-content-machine). The research
   // pages fetch these client-side, so the host is needed in connect-src too.
