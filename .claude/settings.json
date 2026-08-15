@@ -32,7 +32,6 @@
       "Bash(npm cache:*)",
       "Bash(npx vitest:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx jest:*)",
       "Bash(NODE_ENV=production npm run build)",
       "Bash(uvx cfn-lint:*)",
       "Bash(gh pr list:*)",
