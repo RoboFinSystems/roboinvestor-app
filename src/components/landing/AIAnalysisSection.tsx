@@ -21,7 +21,10 @@ export default function AIAnalysisSection() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Query Example */}
-          <div className="border-secondary-500/30 rounded-xl border bg-zinc-900/50 p-8">
+          {/* min-w-0 lets this grid item shrink below the min-content width of
+              the non-wrapping Cypher <pre> below, so the pre scrolls on its own
+              instead of widening the page on mobile */}
+          <div className="border-secondary-500/30 min-w-0 rounded-xl border bg-zinc-900/50 p-8">
             <h3 className="mb-6 text-2xl font-bold text-white">
               From Question to Insight in Seconds
             </h3>
@@ -65,7 +68,7 @@ ORDER BY p.end_date DESC`}
           </div>
 
           {/* Analysis Steps */}
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <div className="border-secondary-500/30 rounded-lg border bg-zinc-900/50 p-6">
               <h4 className="mb-3 flex items-center text-lg font-semibold text-white">
                 <span className="bg-secondary-500 mr-3 flex h-8 w-8 items-center justify-center rounded-full text-sm">
