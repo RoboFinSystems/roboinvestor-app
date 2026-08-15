@@ -55,7 +55,10 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center space-x-6 md:flex">
+          {/* lg, not md: the full nav needs ~978px, so switching at md (768px)
+              left Login/Register clipped off the fixed header between 768 and
+              977px with the hamburger already hidden */}
+          <nav className="hidden items-center space-x-6 lg:flex">
             <Link
               href="#features"
               className="hover:text-primary-400 px-3 py-2 text-sm font-medium text-gray-300 transition-colors"
@@ -108,7 +111,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="hover:text-primary-400 flex items-center justify-center p-2 text-gray-300 transition-colors md:hidden"
+            className="hover:text-primary-400 flex items-center justify-center p-2.5 text-gray-300 transition-colors lg:hidden"
             aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? (
@@ -145,7 +148,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="border-t border-gray-800 py-4 md:hidden">
+          <nav className="border-t border-gray-800 py-4 lg:hidden">
             <div className="flex flex-col space-y-2">
               <Link
                 href="#features"

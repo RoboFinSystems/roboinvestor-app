@@ -92,7 +92,10 @@ export default function InvestorSchemaSection() {
               <h3 className="mb-6 text-center text-sm font-semibold tracking-wider text-gray-500 uppercase">
                 RoboInvestor Schema
               </h3>
-              <div className="relative mx-auto mt-8 h-72 w-72">
+              {/* aspect-square + max-w keeps the circle round while letting it
+                  shrink on viewports narrower than 337px, where a fixed 288px
+                  width overflowed the p-8 card */}
+              <div className="relative mx-auto mt-8 aspect-square w-full max-w-72">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="border-primary-500/30 from-primary-600/10 to-secondary-600/10 h-full w-full rounded-full border-2 bg-linear-to-br">
                     <div className="flex h-full items-center justify-center">
