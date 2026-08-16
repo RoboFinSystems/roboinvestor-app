@@ -1,5 +1,6 @@
 'use client'
 
+import { useCreateGraphHandoff } from '@/lib/cross-app'
 import {
   GraphFilters,
   onlyRepositories,
@@ -7,7 +8,6 @@ import {
   PageLayout,
   useGraphContext,
 } from '@robosystems/core'
-import { useSSO } from '@robosystems/core/auth-core/sso'
 import { Button, Card } from 'flowbite-react'
 import Link from 'next/link'
 import type { ComponentType, FC } from 'react'
@@ -24,9 +24,6 @@ import {
   HiTrendingUp,
 } from 'react-icons/hi'
 import { TbTrendingUp } from 'react-icons/tb'
-
-const API_URL =
-  process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'http://localhost:8000'
 
 interface ActionCard {
   title: string
@@ -91,7 +88,7 @@ const gettingStarted = [
 
 const HomePageContent: FC = function () {
   const { state: graphState } = useGraphContext()
-  const { navigateToApp } = useSSO(API_URL)
+  const { openCreateGraph } = useCreateGraphHandoff()
 
   // The currently selected graph drives which actions are surfaced.
   const currentGraph = useMemo(
@@ -345,7 +342,7 @@ const HomePageContent: FC = function () {
               </ul>
               <Button
                 color="primary"
-                onClick={() => navigateToApp('robosystems', '/graphs/new')}
+                onClick={() => void openCreateGraph()}
                 className="w-full"
                 size="lg"
               >
