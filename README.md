@@ -21,8 +21,7 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 - **Research**: SEC-filing-grounded equity research browser, every figure traceable to a filing
 - **Document Search**: Full-text and semantic search across connected sources
 - **Graph Creation**: Wizard-based portfolio graph setup with schema selection
-- **API Keys**: Secure programmatic access with key creation and rotation
-- **Settings**: Profile and password management
+- **Repository API Keys**: Generate a repository-scoped key from a repository's getting-started page for programmatic and Claude connector access
 
 ### Roadmap
 
