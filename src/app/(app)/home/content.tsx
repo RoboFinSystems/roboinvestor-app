@@ -82,7 +82,7 @@ const gettingStarted = [
   {
     step: '3',
     title: 'Connect Claude via MCP',
-    body: 'Type /mcp in the Console to connect Claude Desktop or Claude Code to your graph for deeper, agent-driven analysis.',
+    body: 'Type /mcp in the Console to connect Claude, Claude Code, or Cursor to your graph — sign in, no key to paste — for deeper, agent-driven analysis.',
   },
 ]
 
@@ -328,9 +328,7 @@ const HomePageContent: FC = function () {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500">&#10003;</span>
-                  <span>
-                    Connect Claude Desktop via MCP for deeper analysis
-                  </span>
+                  <span>Connect Claude via MCP for deeper analysis</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-green-500">&#10003;</span>
