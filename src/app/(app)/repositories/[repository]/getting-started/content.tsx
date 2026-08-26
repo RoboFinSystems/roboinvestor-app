@@ -397,8 +397,9 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
               Connect via MCP
             </h4>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              One URL, one header — no install required. The URL picks the
-              repository, so add one connector per graph you want to reach.
+              No install required. The URL picks the repository, so add one
+              connection per graph you want to reach — sign in with OAuth, or
+              put the key in a header. Credentials never travel in the URL.
             </p>
 
             <div className="space-y-2">
@@ -407,21 +408,12 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                 custom connector
               </p>
               <pre className="overflow-x-auto rounded-lg bg-zinc-100 p-4 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-300">
-                <code>
-                  {`${mcpUrl}?token=`}
-                  <ApiKeyDisplay
-                    keyCreated={keyCreated}
-                    isTypingKey={isTypingKey}
-                    onTypingComplete={() => setIsTypingKey(false)}
-                  >
-                    {displayApiKey}
-                  </ApiKeyDisplay>
-                </code>
+                <code>{mcpUrl}</code>
               </pre>
               <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                Paste the whole URL — the repository-scoped key rides inside it,
-                no header needed. Claude&apos;s connectors can&apos;t send
-                custom headers, which is why the key must be scoped.
+                Paste the URL and Claude sends you to RoboSystems to sign in —
+                this repository is already selected on the consent screen. No
+                key needed.
               </p>
             </div>
 
