@@ -62,7 +62,7 @@ export default function FeaturesSection() {
       ),
       title: 'SEC Research Console',
       description:
-        'Ask questions in plain English — AI generates Cypher queries across 10,000+ public company XBRL filings',
+        'Ask questions in plain English — the Analyst Operator answers from 10,000+ public company XBRL filings',
       color: 'cyan',
     },
     {
