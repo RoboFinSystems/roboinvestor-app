@@ -81,8 +81,8 @@ export default function HeroSection() {
                   SEC Research Console
                 </h3>
                 <p className="text-center text-sm text-gray-400">
-                  Query 10,000+ public company filings using natural language —
-                  powered by text-to-Cypher AI
+                  Query 10,000+ public company filings in plain English —
+                  powered by the Analyst Operator
                 </p>
               </div>
             </div>

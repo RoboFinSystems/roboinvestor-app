@@ -87,11 +87,12 @@ ORDER BY p.end_date DESC`}
                 <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-sm">
                   2
                 </span>
-                Text-to-Cypher Translation
+                The Analyst Operator Goes to Work
               </h4>
               <p className="text-sm text-gray-300">
-                Your question is automatically converted into a precise Cypher
-                graph query against the SEC XBRL knowledge graph
+                The Analyst Operator picks the right tool for the question — a
+                curated financial statement, a filing search, or a precise
+                Cypher query it writes against the SEC XBRL knowledge graph
               </p>
             </div>
 
