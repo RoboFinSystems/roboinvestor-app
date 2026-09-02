@@ -2,6 +2,7 @@ import Link from 'next/link'
 import FloatingElementsVariant from './FloatingElementsVariant'
 
 const REGISTER_HREF = '/register'
+const RESEARCH_HREF = '/research'
 
 // What every report bundles together.
 const formats = [
@@ -203,11 +204,11 @@ export default function ResearchSection() {
 
             <div className="bg-accent-950/40 mt-6 rounded-lg p-4">
               <div className="text-accent-400 text-sm font-semibold">
-                Free to read with an account
+                Every report is public
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Reports are available to every registered member — the SEC
-                repository powers both the research and your own queries.
+                Read any report without an account. Register to run the same
+                analysis on the SEC repository yourself.
               </p>
             </div>
           </div>
@@ -222,10 +223,10 @@ export default function ResearchSection() {
             Create free account
           </Link>
           <Link
-            href={REGISTER_HREF}
+            href={RESEARCH_HREF}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-600 px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:border-gray-500 hover:bg-white/5"
           >
-            Explore the SEC repository
+            Browse the research
             <svg
               className="h-5 w-5"
               fill="none"

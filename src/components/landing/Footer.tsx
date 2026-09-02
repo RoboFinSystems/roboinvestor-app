@@ -10,6 +10,7 @@ export default function Footer() {
       productLinks={[
         { label: 'Features', href: '#features' },
         { label: 'Platform', href: '#schema' },
+        { label: 'Research', href: '/research' },
         { label: 'Console', href: '#ai-analysis' },
       ]}
       contactModal={ContactModal}
