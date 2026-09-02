@@ -6,7 +6,8 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       // Everything below is authenticated product surface (the (app) route group) —
-      // no SEO value and login-gated, so keep crawlers off it.
+      // no SEO value and login-gated, so keep crawlers off it. /research is public
+      // (the (blog) route group) and stays crawlable; its canonical says who owns it.
       disallow: [
         '/api/',
         '/console/',
@@ -16,7 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         '/home/',
         '/portfolio/',
         '/repositories/',
-        '/research/',
         '/search/',
         '/settings/',
       ],

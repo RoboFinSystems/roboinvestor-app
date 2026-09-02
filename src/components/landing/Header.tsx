@@ -72,7 +72,7 @@ export default function Header() {
               Platform
             </Link>
             <Link
-              href="#research"
+              href="/research"
               className="hover:text-primary-400 px-3 py-2 text-sm font-medium text-gray-300 transition-colors"
             >
               Research
@@ -165,7 +165,7 @@ export default function Header() {
                 Platform
               </Link>
               <Link
-                href="#research"
+                href="/research"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="hover:text-primary-400 px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800"
               >
