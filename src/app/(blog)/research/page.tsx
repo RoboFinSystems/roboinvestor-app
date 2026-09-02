@@ -21,8 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: TITLE,
     description: DESCRIPTION,
-    // The canonical names the owner of these pages (robosystems.ai until Phase 2); og:url
-    // stays this page so a share from roboinvestor.ai lands on roboinvestor.ai.
+    // The canonical names the owner of these pages (src/lib/research-site.ts); og:url is
+    // always this page so a share from roboinvestor.ai lands on roboinvestor.ai.
     alternates: { canonical: researchCanonical() },
     openGraph: {
       type: 'website',

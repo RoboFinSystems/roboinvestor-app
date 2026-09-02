@@ -4,8 +4,8 @@
 // Video, Podcast and Breadcrumb rich results, and the index page for an ItemList carousel.
 //
 // Rendered only while these pages are canonical here (src/lib/research-site.ts): on a
-// mirror the structured data would claim a page Google is told lives elsewhere. Mirrors
-// robosystems-app's component; the shared data layer and display components live in core.
+// mirror the structured data would claim a page Google is told lives elsewhere. The shared
+// data layer and display components live in core; this consumes their types.
 
 import { SELF_ORIGIN } from '@/lib/research-site'
 import { youtubeId, type CoverageItem } from '@robosystems/core/research'

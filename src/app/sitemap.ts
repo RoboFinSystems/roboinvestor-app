@@ -11,9 +11,9 @@ function latestDate(dates: (string | undefined)[]): Date {
   return ts.length ? new Date(Math.max(...ts)) : new Date()
 }
 
-// RoboInvestor's public surface is the marketing homepage plus, once these pages are
-// canonical here, the research index and one page per covered company. While /research is
-// a mirror of robosystems.ai (src/lib/research-site.ts) it is deliberately not submitted.
+// RoboInvestor's public surface is the marketing homepage, the research index and one page
+// per covered company. The research entries are listed only while these pages are canonical
+// here (src/lib/research-site.ts); a mirror is deliberately not submitted.
 // Everything else is behind auth in the (app) route group (see robots.ts); /register is
 // de-indexed ahead of the centralized-login flip, and /pages/privacy + /pages/terms are
 // server redirects to the consolidated RoboSystems legal docs, so they are excluded.

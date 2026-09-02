@@ -1,13 +1,13 @@
-// Where the public research pages are canonical. Phase 1 of the site-content-surfaces spec
-// mirrors robosystems.ai/research here with every page's canonical pointing at the owner,
-// so Google keeps one URL per report while roboinvestor.ai gets the product surface. Phase 2
-// (after the 2026-10-02 Search Console read) flips ownership by setting
-// RESEARCH_CANONICAL_ORIGIN to SELF_ORIGIN. The canonical tags, the JSON-LD and the sitemap
-// all key off that one value, so the flip on this side is this file alone.
+// Which site owns the public research pages. roboinvestor.ai does, since 2026-09-02:
+// robosystems.ai redirects /research and /research/:ticker here (site-content-surfaces).
+// The seam stays because everything that depends on ownership keys off this one value:
+// the canonical tags, whether the JSON-LD renders, and whether the sitemap lists the
+// pages. Point RESEARCH_CANONICAL_ORIGIN at another origin and these pages become a
+// mirror of it, with no other edit.
 
 export const SELF_ORIGIN = 'https://roboinvestor.ai'
 
-export const RESEARCH_CANONICAL_ORIGIN: string = 'https://robosystems.ai'
+export const RESEARCH_CANONICAL_ORIGIN: string = SELF_ORIGIN
 
 export const RESEARCH_IS_CANONICAL_HERE =
   RESEARCH_CANONICAL_ORIGIN === SELF_ORIGIN
