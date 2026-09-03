@@ -15,7 +15,7 @@ type Organization = { name: string; url: string; logo: string }
 const DEFAULT_ORG: Organization = {
   name: 'RoboInvestor',
   url: SELF_ORIGIN,
-  logo: `${SELF_ORIGIN}/images/logos/roboinvestor.png`,
+  logo: `${SELF_ORIGIN}/images/logos/roboinvestor-icon.png`,
 }
 
 /** One JSON-LD block. `</` is escaped so report text can never break out of the script. */
