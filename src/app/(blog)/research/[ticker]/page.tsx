@@ -1,16 +1,12 @@
+import { ResearchArticle } from '@/components/research/ResearchArticle'
 import { ResearchJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
+import { fetchBrief, getCoverage, getCoverageTickers } from '@/lib/research'
 import {
   RESEARCH_IS_CANONICAL_HERE,
   SELF_ORIGIN,
   researchCanonical,
 } from '@/lib/research-site'
-import {
-  ResearchArticle,
-  fetchBrief,
-  getCoverage,
-  getCoverageTickers,
-} from '@robosystems/core/research'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'

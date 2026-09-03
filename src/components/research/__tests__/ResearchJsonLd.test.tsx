@@ -1,4 +1,4 @@
-import type { CoverageItem } from '@robosystems/core/research'
+import type { CoverageItem } from '@/lib/research'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { ResearchJsonLd, schemaDateTime } from '../ResearchJsonLd'

@@ -7,8 +7,8 @@
 // mirror the structured data would claim a page Google is told lives elsewhere. The shared
 // data layer and display components live in core; this consumes their types.
 
+import { youtubeId, type CoverageItem } from '@/lib/research'
 import { SELF_ORIGIN } from '@/lib/research-site'
-import { youtubeId, type CoverageItem } from '@robosystems/core/research'
 
 type Organization = { name: string; url: string; logo: string }
 

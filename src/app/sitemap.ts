@@ -1,5 +1,5 @@
+import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
-import { getAllCoverage } from '@robosystems/core/research'
 import type { MetadataRoute } from 'next'
 
 /** Newest valid date in a list, or `now` when none, so the hub `lastmod` stays honest. */
