@@ -8,7 +8,7 @@ export const organizationJsonLd = {
   '@type': 'Organization',
   name: 'RoboInvestor',
   url: 'https://roboinvestor.ai',
-  logo: 'https://roboinvestor.ai/images/logos/roboinvestor.png',
+  logo: 'https://roboinvestor.ai/images/logos/roboinvestor-icon.png',
   description:
     'AI-powered portfolio management agent — analyze holdings, track performance, and surface investment insights.',
   sameAs: [
