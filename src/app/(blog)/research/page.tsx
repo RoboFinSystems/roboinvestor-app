@@ -1,11 +1,12 @@
+import { CoverageBrowser } from '@/components/research/CoverageBrowser'
 import { ResearchListJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
+import { getAllCoverage } from '@/lib/research'
 import {
   RESEARCH_IS_CANONICAL_HERE,
   SELF_ORIGIN,
   researchCanonical,
 } from '@/lib/research-site'
-import { CoverageBrowser, getAllCoverage } from '@robosystems/core/research'
 import type { Metadata } from 'next'
 
 const TITLE = 'Research | RoboInvestor'
