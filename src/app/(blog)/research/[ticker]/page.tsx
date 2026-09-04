@@ -1,3 +1,4 @@
+import { CompareYourCompany } from '@/components/research/CompareYourCompany'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
 import { ResearchJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
@@ -99,6 +100,7 @@ export default async function ResearchTickerPage({
           All research
         </Link>
         <ResearchArticle item={item} briefMarkdown={briefMarkdown} />
+        <CompareYourCompany company={item.company} ticker={item.ticker} />
       </div>
     </div>
   )
