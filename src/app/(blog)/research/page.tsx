@@ -1,3 +1,4 @@
+import { CompareYourCompanyLine } from '@/components/research/CompareYourCompany'
 import { CoverageBrowser } from '@/components/research/CoverageBrowser'
 import { ResearchListJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
@@ -70,6 +71,7 @@ export default async function ResearchPage() {
             report, every figure traceable to an SEC filing. No hype, no price
             targets.
           </p>
+          <CompareYourCompanyLine />
         </div>
       </div>
 
