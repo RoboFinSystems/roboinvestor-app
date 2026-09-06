@@ -37,14 +37,15 @@ describe('CoverageCard thumbnail', () => {
     expect(img?.getAttribute('srcset')).toContain('/_next/image?url=')
     expect(img?.getAttribute('sizes')).toContain('100vw')
     expect(img?.getAttribute('loading')).toBe('lazy')
+    expect(img?.hasAttribute('fetchpriority')).toBe(false)
     expect(img?.getAttribute('alt')).toBe('Green Thumb coverage update')
   })
 
-  it('loads the first-row thumbnail eagerly when asked', () => {
+  it('loads the first-row thumbnail eagerly at high priority when asked', () => {
     const { container } = render(<CoverageCard item={makeItem()} eager />)
-    expect(container.querySelector('img')?.getAttribute('loading')).toBe(
-      'eager'
-    )
+    const img = container.querySelector('img')
+    expect(img?.getAttribute('loading')).toBe('eager')
+    expect(img?.getAttribute('fetchpriority')).toBe('high')
   })
 
   it('renders no image for an item without a thumbnail', () => {

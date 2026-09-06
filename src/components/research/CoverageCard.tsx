@@ -21,7 +21,11 @@ export function CoverageCard({
 }: {
   item: CoverageItem
   hrefBase?: string
-  /** Load the thumbnail immediately (first row, a likely LCP element) instead of lazily. */
+  /**
+   * First row: load the thumbnail immediately and at high fetch priority (a likely
+   * LCP element) instead of lazily. Not `preload`: Next 16 advises against it when
+   * several images could be the LCP depending on viewport, as in a three-column row.
+   */
   eager?: boolean
 }) {
   return (
@@ -38,6 +42,7 @@ export function CoverageCard({
             height={1080}
             sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 400px"
             loading={eager ? 'eager' : 'lazy'}
+            fetchPriority={eager ? 'high' : undefined}
             className="aspect-video w-full object-cover"
           />
         )}
