@@ -7,7 +7,7 @@
 
 export interface Representation {
   /** `holon` (dataset-form JSON-LD), `tavi` (Project Tavi compiled model), `document` (as filed). */
-  kind: 'holon' | 'tavi' | 'document' | string
+  kind: 'holon' | 'tavi' | 'document'
   name: string
   media_type: string
   bytes: number

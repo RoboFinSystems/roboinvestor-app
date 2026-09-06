@@ -14,28 +14,6 @@ import type { CoverageItem } from '@/lib/research'
 import { StatementTable } from '@robosystems/report-components'
 import { edgarFilingUrl } from './FilingsJsonLd'
 
-const FORM_ORDER = ['10-K', '20-F', '40-F', '10-Q']
-
-/** The filing the page renders: the latest annual with a holon, else the newest with one. */
-export function primaryFiling(company: CompanyCatalog): CatalogFiling | null {
-  for (const form of FORM_ORDER) {
-    const accession = company.latest[form]
-    const filing = accession
-      ? company.filings.find((f) => f.accession === accession)
-      : undefined
-    if (filing?.representations.some((r) => r.kind === 'holon')) return filing
-  }
-  return (
-    company.filings.find((f) =>
-      f.representations.some((r) => r.kind === 'holon')
-    ) ?? null
-  )
-}
-
-export function holonUrl(filing: CatalogFiling): string | null {
-  return filing.representations.find((r) => r.kind === 'holon')?.url ?? null
-}
-
 function periodOf(filing: CatalogFiling): string {
   if (filing.fiscal_period && filing.fiscal_year)
     return `${filing.fiscal_period} ${filing.fiscal_year}`

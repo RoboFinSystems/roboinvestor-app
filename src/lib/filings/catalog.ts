@@ -3,15 +3,30 @@
 // Everything here is a file on the CDN: the catalog for one filer, the corpus
 // index, and the filing's holon. No API, no database.
 
-import type { CompanyCatalog, CompanyIndex } from './types'
+import type { CatalogFiling, CompanyCatalog, CompanyIndex } from './types'
 
 /** The public data CDN (robosystems' PUBLIC_DATA_CDN_URL). Local: LocalStack. */
 export const FILINGS_CDN_URL = (
   process.env.NEXT_PUBLIC_FILINGS_CDN_URL || 'https://public.robosystems.ai'
 ).replace(/\/$/, '')
 
-export function companyCatalogUrl(ticker: string): string {
-  return `${FILINGS_CDN_URL}/companies/${ticker.trim().toLowerCase()}.json`
+/**
+ * What a ticker looks like on EDGAR: letters, digits and the `.` / `-` class
+ * separators (BRK.B, BF-B), at most ten characters. The route segment is the
+ * only input to the catalog URL, so anything else — a path escape, a stray
+ * query — is not a filer and never reaches the CDN.
+ */
+const TICKER = /^[A-Z0-9.-]{1,10}$/i
+
+/** The catalog slug for a ticker, or null when the input is not a ticker. */
+export function tickerSlug(ticker: string): string | null {
+  const slug = ticker.trim().toLowerCase()
+  return TICKER.test(slug) ? slug : null
+}
+
+export function companyCatalogUrl(ticker: string): string | null {
+  const slug = tickerSlug(ticker)
+  return slug ? `${FILINGS_CDN_URL}/companies/${slug}.json` : null
 }
 
 export const COMPANY_INDEX_URL = `${FILINGS_CDN_URL}/companies/index.json`
@@ -21,7 +36,10 @@ export async function getCompany(
   ticker: string,
   revalidate = 300
 ): Promise<CompanyCatalog | null> {
-  const res = await fetch(companyCatalogUrl(ticker), { next: { revalidate } })
+  const url = companyCatalogUrl(ticker)
+  if (!url) return null
+  const res = await fetch(url, { next: { revalidate } })
+  // The CDN answers a missing object with 403 (no list permission), not 404.
   if (res.status === 404 || res.status === 403) return null
   if (!res.ok) throw new Error(`Company catalog fetch failed: ${res.status}`)
   return (await res.json()) as CompanyCatalog
@@ -37,10 +55,33 @@ export async function getCompanyIndex(
   return (await res.json()) as CompanyIndex
 }
 
+const FORM_ORDER = ['10-K', '20-F', '40-F', '10-Q']
+
+/** The filing the page renders: the latest annual with a holon, else the newest with one. */
+export function primaryFiling(company: CompanyCatalog): CatalogFiling | null {
+  for (const form of FORM_ORDER) {
+    const accession = company.latest[form]
+    const filing = accession
+      ? company.filings.find((f) => f.accession === accession)
+      : undefined
+    if (filing?.representations.some((r) => r.kind === 'holon')) return filing
+  }
+  return (
+    company.filings.find((f) =>
+      f.representations.some((r) => r.kind === 'holon')
+    ) ?? null
+  )
+}
+
+export function holonUrl(filing: CatalogFiling): string | null {
+  return filing.representations.find((r) => r.kind === 'holon')?.url ?? null
+}
+
 /**
- * A filing's holon as text. Several megabytes, so it is not put in the
- * Next.js data cache (2 MB cap); the rendered page is cached by ISR instead,
- * so this runs once per page regeneration, not per request.
+ * A filing's holon as text. Fetched with Next's default cache option, so it
+ * is read once per page regeneration and never enters the data cache (several
+ * megabytes, past its 2 MB cap); the rendered page is what ISR caches.
+ * `no-store` would refetch on every request instead.
  */
 export async function fetchHolonText(url: string): Promise<string> {
   const res = await fetch(url)
