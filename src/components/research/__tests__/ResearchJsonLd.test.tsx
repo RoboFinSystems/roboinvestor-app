@@ -18,7 +18,7 @@ const item: CoverageItem = {
   youtube_url: 'https://youtu.be/TiGEZGb0lpU',
   assets: {
     thumbnail: 'https://assets.robosystems.ai/content/TRLV/TRLV_thumb.jpg',
-    podcast_mp3: 'https://assets.robosystems.ai/content/TRLV/TRLV_podcast.mp3',
+    narration: 'https://assets.robosystems.ai/content/TRLV/TRLV_narration.mp3',
   },
 } as CoverageItem
 
@@ -58,7 +58,20 @@ describe('ResearchJsonLd', () => {
     expect(byType.VideoObject.uploadDate).toMatch(tz)
     expect(byType.Article.datePublished).toMatch(tz)
     expect(byType.Article.dateModified).toMatch(tz)
-    expect(byType.PodcastEpisode.datePublished).toMatch(tz)
+  })
+
+  it('carries the narration as an AudioObject on the Article', () => {
+    expect(byType.Article.audio).toEqual({
+      '@type': 'AudioObject',
+      contentUrl:
+        'https://assets.robosystems.ai/content/TRLV/TRLV_narration.mp3',
+      encodingFormat: 'audio/mpeg',
+      name: 'Trilogy Ventures, from the filings: narration',
+    })
+  })
+
+  it('emits no PodcastEpisode block — the read is not a series', () => {
+    expect(byType.PodcastEpisode).toBeUndefined()
   })
 
   it('keeps the catalog date as the published day', () => {

@@ -6,12 +6,14 @@ import remarkGfm from 'remark-gfm'
 import { CoverageHistory } from './CoverageHistory'
 
 /**
- * The full coverage report: native video, the Q&A podcast (a "Listen" card right under
- * the video, rendered from the CDN MP3 only: the YouTube podcast uploads were removed,
- * and the catalog's `podcast_youtube_url` is never embedded), then the brief rendered
- * from markdown (its own
+ * The full coverage report: native video, the audio article (a "Listen" card right under
+ * the video, played from the CDN MP3), then the brief rendered from markdown (its own
  * leading H1 is stripped — we render the title above it), and the continuing-coverage
  * history. Works in a server component (SSR'd for SEO) or a client one.
+ *
+ * The "Listen" slot used to hold the two-voice Q&A podcast; that format was retired
+ * 2026-07-21 and its assets deleted 2026-09-05. `assets.narration` is its replacement:
+ * one voice reading this brief, the same affordance every blog post ships with.
  * Theme-aware: readable in both light and dark. The prose body sets an explicit
  * light + `dark:` color for every element it renders (headings, p, strong, em, links,
  * lists, code, blockquote, hr, tables) rather than relying on `prose-invert` /
@@ -64,17 +66,17 @@ export function ResearchArticle({
         )
       )}
 
-      {item.assets.podcast_mp3 && (
+      {item.assets.narration && (
         <section className="mb-8">
           <div className="rounded-xl border border-cyan-500/30 bg-cyan-50/60 p-4 dark:bg-gray-900/50">
             <p className="mb-2 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
-              🎙 Listen — Q&amp;A podcast
+              Listen to this report
             </p>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption -- the pipeline produces no transcript track for the Q&A podcast */}
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption -- the narration reads the brief below, which is the transcript */}
             <audio
               controls
               preload="none"
-              src={item.assets.podcast_mp3}
+              src={item.assets.narration}
               className="w-full"
             />
           </div>

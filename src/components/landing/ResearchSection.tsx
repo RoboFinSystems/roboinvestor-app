@@ -49,9 +49,9 @@ const formats = [
     ),
   },
   {
-    title: 'Q&A podcast',
+    title: 'Audio edition',
     description:
-      'A conversational deep-dive that pressure-tests the thesis from both sides',
+      'The written report read end to end, so you can take the filing with you',
     color: 'accent',
     icon: (
       <svg
@@ -64,7 +64,7 @@ const formats = [
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0-4a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+          d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M6 9H4a1 1 0 00-1 1v4a1 1 0 001 1h2l4 3.5v-15L6 9z"
         />
       </svg>
     ),
