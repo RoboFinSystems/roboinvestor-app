@@ -20,7 +20,7 @@ export interface HeadlineFact {
   value: number
   /** Human period, e.g. `FY ending 2024-12-31` or `as of 2024-12-31`. */
   period: string
-  /** Currency symbol for display, e.g. `$`. */
+  /** Currency symbol for display, e.g. `$`; a code with a space when there is none. */
   symbol: string
 }
 
@@ -29,10 +29,13 @@ export interface PrimaryStatements {
   tables: PivotTable[]
   units: Record<string, UnitInfo>
   headline: HeadlineFact[]
-  factCount: number
 }
 
-/** Headline figures, first matching concept wins, consolidated latest period. */
+/**
+ * Headline figures: the first concept with a consolidated fact wins, at its
+ * latest period. US GAAP first, then the IFRS concepts a 20-F or 40-F filer
+ * reports under.
+ */
 const HEADLINE: Array<{ label: string; concepts: string[] }> = [
   {
     label: 'Revenue',
@@ -40,30 +43,68 @@ const HEADLINE: Array<{ label: string; concepts: string[] }> = [
       'us-gaap:Revenues',
       'us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax',
       'us-gaap:SalesRevenueNet',
+      'ifrs-full:Revenue',
     ],
   },
   {
     label: 'Net income',
-    concepts: ['us-gaap:NetIncomeLoss', 'us-gaap:ProfitLoss'],
+    concepts: [
+      'us-gaap:NetIncomeLoss',
+      'us-gaap:ProfitLoss',
+      'ifrs-full:ProfitLossAttributableToOwnersOfParent',
+      'ifrs-full:ProfitLoss',
+    ],
   },
-  { label: 'Total assets', concepts: ['us-gaap:Assets'] },
+  { label: 'Total assets', concepts: ['us-gaap:Assets', 'ifrs-full:Assets'] },
   {
     label: 'Cash',
     concepts: [
       'us-gaap:CashAndCashEquivalentsAtCarryingValue',
       'us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents',
+      'ifrs-full:CashAndCashEquivalents',
     ],
   },
 ]
 
+/** Symbols for the headline strip; any other currency shows its code. */
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  JPY: '¥',
+  CNY: '¥',
+  CAD: 'C$',
+  AUD: 'A$',
+  HKD: 'HK$',
+  INR: '₹',
+  KRW: '₩',
+  BRL: 'R$',
+}
+
+function currencySymbol(unit: UnitInfo | null): string {
+  if (!unit) return ''
+  if (unit.symbol) return unit.symbol
+  const measure = unit.measure || unit.label || ''
+  const [scheme, local] = measure.includes(':')
+    ? measure.split(':', 2)
+    : ['iso4217', measure]
+  if (scheme !== 'iso4217') return ''
+  const code = local.toUpperCase()
+  return CURRENCY_SYMBOLS[code] ?? (code ? `${code} ` : '')
+}
+
+/**
+ * The element ids for a concept: the compacted name, or — when the holon
+ * compacts the taxonomy under another prefix — the local name within the
+ * concept's taxonomy, read off the element IRI.
+ */
 function elementIdsFor(report: NormalizedReport, concept: string): Set<string> {
-  const local = concept.split(':')[1]
+  const [taxonomy, local] = concept.split(':')
   const ids = new Set<string>()
   for (const el of Object.values(report.elements)) {
-    if (el.qname === concept) ids.add(el.id)
-    else if (
-      el.qname.endsWith(`:${local}`) &&
-      (el.id.includes('us-gaap') || el.qname.startsWith('us-gaap:'))
+    if (
+      el.qname === concept ||
+      (el.qname.endsWith(`:${local}`) && el.id.includes(taxonomy))
     )
       ids.add(el.id)
   }
@@ -119,13 +160,14 @@ export function headlineFacts(report: NormalizedReport): HeadlineFact[] {
       if (ids.size === 0) continue
       const fact = latestConsolidated(report, ids)
       if (!fact || fact.value === null) continue
-      const unit = fact.unit ? report.units[fact.unit] : null
       out.push({
         label,
         concept: report.elements[fact.element]?.qname ?? concept,
         value: fact.value,
         period: periodLabel(report, fact),
-        symbol: unit?.symbol ?? (unit?.label === 'USD' ? '$' : ''),
+        symbol: currencySymbol(
+          fact.unit ? (report.units[fact.unit] ?? null) : null
+        ),
       })
       break
     }
@@ -168,6 +210,5 @@ export async function loadPrimaryStatements(
     tables,
     units: report.units,
     headline: headlineFacts(report),
-    factCount: report.facts.length,
   }
 }

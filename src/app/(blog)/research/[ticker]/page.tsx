@@ -1,14 +1,10 @@
-import {
-  CompanyPage,
-  holonUrl,
-  primaryFiling,
-} from '@/components/filings/CompanyPage'
+import { CompanyPage } from '@/components/filings/CompanyPage'
 import { FilingsJsonLd } from '@/components/filings/FilingsJsonLd'
 import { CompareYourCompany } from '@/components/research/CompareYourCompany'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
 import { ResearchJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
-import { getCompany } from '@/lib/filings/catalog'
+import { getCompany, holonUrl, primaryFiling } from '@/lib/filings/catalog'
 import { loadPrimaryStatements } from '@/lib/filings/statements'
 import { fetchBrief, getCoverage, getCoverageTickers } from '@/lib/research'
 import {
