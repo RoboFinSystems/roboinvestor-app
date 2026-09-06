@@ -69,3 +69,20 @@ describe('ResearchArticle podcast section', () => {
     ])
   })
 })
+
+describe('ResearchArticle footer badge', () => {
+  it('serves the ElevenLabs badges from the static bucket, not the optimizer', () => {
+    const { container } = render(<ResearchArticle item={makeItem()} />)
+    const badges = Array.from(container.querySelectorAll('img')).filter((img) =>
+      img.getAttribute('alt')?.includes('ElevenLabs')
+    )
+    expect(badges.map((img) => img.getAttribute('src'))).toEqual([
+      '/images/logos/elevenlabs-grants.webp',
+      '/images/logos/elevenlabs-grants-white.webp',
+    ])
+    for (const img of badges) {
+      expect(img.getAttribute('loading')).toBe('lazy')
+      expect(img.getAttribute('height')).toBe('18')
+    }
+  })
+})
