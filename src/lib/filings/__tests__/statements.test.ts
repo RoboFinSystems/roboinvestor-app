@@ -6,7 +6,7 @@ import type {
   UnitInfo,
 } from '@robosystems/report-components'
 import { describe, expect, it } from 'vitest'
-import { compactMoney, headlineFacts } from '../statements'
+import { compactMoney, headlineFacts, statementBlocks } from '../statements'
 
 const USGAAP = 'http://fasb.org/us-gaap/2025#'
 const IFRS = 'https://xbrl.ifrs.org/taxonomy/2025-03-27/ifrs-full#'
@@ -225,6 +225,56 @@ describe('headlineFacts', () => {
 
   it('has nothing for a report without the concepts', () => {
     expect(headlineFacts(report([], [], []))).toEqual([])
+  })
+})
+
+describe('statementBlocks', () => {
+  function block(
+    id: string,
+    kind: 'Statement' | 'Disclosure',
+    name: string
+  ): NormalizedReport {
+    const r = report([], [], [])
+    r.informationBlocks = [
+      {
+        id,
+        blockType: 'Statement',
+        factSet: null,
+        label: name,
+        structureId: `s:${id}`,
+      },
+    ]
+    r.structures = [
+      {
+        id: `s:${id}`,
+        blockType: 'Statement',
+        roleUri: null,
+        structureName: name,
+        kind,
+      },
+    ]
+    return r
+  }
+
+  function merged(...rs: NormalizedReport[]): NormalizedReport {
+    const r = report([], [], [])
+    r.informationBlocks = rs.flatMap((x) => x.informationBlocks)
+    r.structures = rs.flatMap((x) => x.structures)
+    return r
+  }
+
+  it('keeps the statements and drops notes and parentheticals', () => {
+    const r = merged(
+      block('bs', 'Statement', 'Consolidated Balance Sheets'),
+      block('bsp', 'Statement', 'Consolidated Balance Sheets (Parenthetical)'),
+      block('is', 'Statement', 'Consolidated Statements of Operations'),
+      block('n1', 'Disclosure', 'Revenue Recognition')
+    )
+    expect(statementBlocks(r).map((ib) => ib.id)).toEqual(['bs', 'is'])
+  })
+
+  it('is empty for a report with no statements', () => {
+    expect(statementBlocks(block('n1', 'Disclosure', 'Leases'))).toEqual([])
   })
 })
 

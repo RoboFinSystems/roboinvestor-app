@@ -5,11 +5,12 @@
 
 import type {
   Fact,
+  InformationBlock,
   NormalizedReport,
   PivotTable,
   UnitInfo,
 } from '@robosystems/report-components'
-import { buildPivots } from '@robosystems/report-components'
+import { buildPivot, reportSections } from '@robosystems/report-components'
 import { parseJsonld } from '@robosystems/report-components/adapters'
 import { fetchHolonText } from './catalog'
 
@@ -193,18 +194,31 @@ export function compactMoney(value: number, symbol: string): string {
 }
 
 /**
+ * The blocks the page renders: the sections the filer's role definitions mark
+ * `Statement`, less the parentheticals, in the report's own order. Chosen
+ * before anything is projected — the notes and disclosures, most of a
+ * filing's sections, are never pivoted here.
+ */
+export function statementBlocks(report: NormalizedReport): InformationBlock[] {
+  const blocks = new Map(report.informationBlocks.map((ib) => [ib.id, ib]))
+  return reportSections(report)
+    .filter((s) => s.kind === 'Statement' && !/parenthetical/i.test(s.title))
+    .flatMap((s) => {
+      const ib = blocks.get(s.id)
+      return ib ? [ib] : []
+    })
+}
+
+/**
  * The statements a filing's holon carries, projected for rendering. Only the
- * primary statements (the sections the filer's role definitions mark
- * `Statement`, less the parentheticals); the viewer carries the disclosures.
+ * primary statements are projected; the viewer carries the disclosures.
  */
 export async function loadPrimaryStatements(
   holonUrl: string
 ): Promise<PrimaryStatements> {
   const text = await fetchHolonText(holonUrl)
   const report = await parseJsonld(text)
-  const tables = buildPivots(report).filter(
-    (p) => p.kind === 'Statement' && !/parenthetical/i.test(p.title)
-  )
+  const tables = statementBlocks(report).map((ib) => buildPivot(report, ib))
   return {
     entity: report.entity ? { name: report.entity.name } : null,
     tables,
