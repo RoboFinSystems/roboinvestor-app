@@ -388,6 +388,36 @@ Resources:
         SigningBehavior: always
         SigningProtocol: sigv4
 
+  # Cache policy for the next/image optimizer (`/_next/image?url=…&w=…&q=…`).
+  # The default behavior below is CachingDisabled, so without this every
+  # research thumbnail request would reach App Runner. Key the cache on the
+  # optimizer's query and on Accept (it serves webp to browsers that accept it
+  # and answers with `Vary: Accept`), and honor its `max-age` (14400s by default).
+  NextImageCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub roboinvestor-${Environment}-next-image
+        Comment: next/image optimizer responses keyed on url/w/q and Accept
+        MinTTL: 1
+        DefaultTTL: 14400
+        MaxTTL: 31536000
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Accept
+          QueryStringsConfig:
+            QueryStringBehavior: whitelist
+            QueryStrings:
+              - url
+              - w
+              - q
+
   # CloudFront Distribution
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -444,6 +474,20 @@ Resources:
           CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled managed policy
           OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader managed policy
         CacheBehaviors:
+          # next/image optimizer output (resized webp research thumbnails).
+          # Only the cache-key parts (url/w/q, Accept) are forwarded — the
+          # optimizer needs nothing else.
+          - PathPattern: /_next/image*
+            TargetOriginId: AppRunner-Dynamic-Content
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: !Ref NextImageCachePolicy
           # Cache behavior for static assets
           - PathPattern: /images/*
             TargetOriginId: S3-Static-Assets

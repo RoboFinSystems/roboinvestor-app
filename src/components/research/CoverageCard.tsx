@@ -1,4 +1,5 @@
 import type { CoverageItem } from '@/lib/research/types'
+import Image from 'next/image'
 import Link from 'next/link'
 
 /**
@@ -7,13 +8,25 @@ import Link from 'next/link'
  * sits flush at the top of every card regardless of how much text each one has — the
  * shared card theme centers its content (`justify-center`), which left the covers at
  * different heights across a row.
+ *
+ * The thumbnail is the catalog's 1920x1080 CDN PNG (~2.5 MB) served through
+ * `next/image`, which resizes it to the card and serves webp to browsers that accept it. `sizes`
+ * mirrors the grid: full width on mobile, half at `md`, and ~390px in the three
+ * `lg` columns of the `max-w-7xl` container.
  */
 export function CoverageCard({
   item,
   hrefBase = '/research',
+  eager = false,
 }: {
   item: CoverageItem
   hrefBase?: string
+  /**
+   * First row: load the thumbnail immediately and at high fetch priority (a likely
+   * LCP element) instead of lazily. Not `preload`: Next 16 advises against it when
+   * several images could be the LCP depending on viewport, as in a three-column row.
+   */
+  eager?: boolean
 }) {
   return (
     <Link
@@ -22,9 +35,14 @@ export function CoverageCard({
     >
       <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white/80 shadow-lg backdrop-blur-sm transition-shadow duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-zinc-950">
         {item.assets.thumbnail && (
-          <img
+          <Image
             src={item.assets.thumbnail}
             alt={item.title}
+            width={1920}
+            height={1080}
+            sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 400px"
+            loading={eager ? 'eager' : 'lazy'}
+            fetchPriority={eager ? 'high' : undefined}
             className="aspect-video w-full object-cover"
           />
         )}

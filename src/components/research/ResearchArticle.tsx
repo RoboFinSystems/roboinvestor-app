@@ -1,5 +1,6 @@
 import { youtubeId } from '@/lib/research/catalog'
 import type { CoverageItem } from '@/lib/research/types'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { CoverageHistory } from './CoverageHistory'
@@ -99,18 +100,23 @@ export function ResearchArticle({
           aria-label="Backed by the ElevenLabs Grants program"
           className="mt-3 inline-block"
         >
-          {}
-          <img
+          {/* ~7 KB webp badges served straight from the static bucket: `unoptimized`
+              keeps them off the App Runner image optimizer. Both are rendered and
+              Tailwind's `dark:` classes show one; lazy loading fetches only that one. */}
+          <Image
+            unoptimized
             src="/images/logos/elevenlabs-grants.webp"
             alt="Backed by the ElevenLabs Grants program"
             width={200}
+            height={18}
             className="h-auto dark:hidden"
           />
-          {}
-          <img
+          <Image
+            unoptimized
             src="/images/logos/elevenlabs-grants-white.webp"
             alt="Backed by the ElevenLabs Grants program"
             width={200}
+            height={18}
             className="hidden h-auto dark:block"
           />
         </a>

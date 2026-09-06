@@ -18,8 +18,14 @@ export function CoverageGrid({
   }
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <CoverageCard key={item.ticker} item={item} hrefBase={hrefBase} />
+      {items.map((item, index) => (
+        <CoverageCard
+          key={item.ticker}
+          item={item}
+          hrefBase={hrefBase}
+          // The first row (three columns at `lg`) is above the fold; the rest lazy-load.
+          eager={index < 3}
+        />
       ))}
     </div>
   )
