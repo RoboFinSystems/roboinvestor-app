@@ -131,26 +131,50 @@ export function CompanyPage({
   briefMarkdown?: string
 }) {
   const name = statements?.entity?.name ?? company.name
+  const filingLine = filing
+    ? `Financial statements from the ${filing.form} for ${periodOf(filing)}${
+        filing.filing_date ? `, filed ${filing.filing_date}` : ''
+      }. Every figure is traceable to the filing's XBRL facts.`
+    : null
+
+  // With coverage the hand-made research leads — it is what earned the
+  // ranking and the click — and its title is the page's H1; the filing's
+  // statements follow under their own heading. Without coverage the facts
+  // are the page and the company name is the H1.
+  const identity = (
+    <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+      <span className="rounded bg-cyan-500/10 px-2 py-0.5 font-semibold text-cyan-400">
+        {company.ticker}
+      </span>
+      {company.exchange && <span>{company.exchange}</span>}
+      {company.sic_description && <span>· {company.sic_description}</span>}
+      <span>· CIK {company.cik}</span>
+    </div>
+  )
+
   return (
     <div className="mx-auto max-w-5xl">
-      <header className="mb-8">
-        <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-400">
-          <span className="rounded bg-cyan-500/10 px-2 py-0.5 font-semibold text-cyan-400">
-            {company.ticker}
-          </span>
-          {company.exchange && <span>{company.exchange}</span>}
-          {company.sic_description && <span>· {company.sic_description}</span>}
-          <span>· CIK {company.cik}</span>
-        </div>
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">{name}</h1>
-        {filing && (
-          <p className="mt-2 text-gray-400">
-            Financial statements from the {filing.form} for {periodOf(filing)}
-            {filing.filing_date ? `, filed ${filing.filing_date}` : ''}. Every
-            figure is traceable to the filing&apos;s XBRL facts.
-          </p>
-        )}
-      </header>
+      {coverage ? (
+        <>
+          <header className="mb-6">
+            {identity}
+            <p className="text-lg font-semibold text-gray-200">{name}</p>
+          </header>
+          <ResearchArticle item={coverage} briefMarkdown={briefMarkdown} />
+          <header className="mt-14 mb-8 border-t border-gray-800 pt-10">
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">
+              Financial statements
+            </h2>
+            {filingLine && <p className="mt-2 text-gray-400">{filingLine}</p>}
+          </header>
+        </>
+      ) : (
+        <header className="mb-8">
+          {identity}
+          <h1 className="text-3xl font-bold text-white sm:text-4xl">{name}</h1>
+          {filingLine && <p className="mt-2 text-gray-400">{filingLine}</p>}
+        </header>
+      )}
 
       {statements && statements.headline.length > 0 && (
         <dl className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -186,12 +210,6 @@ export function CompanyPage({
             inspection are in the viewer. Source: SEC EDGAR, accession{' '}
             {filing?.accession}.
           </p>
-        </section>
-      )}
-
-      {coverage && (
-        <section className="mb-12 border-t border-gray-800 pt-10">
-          <ResearchArticle item={coverage} briefMarkdown={briefMarkdown} />
         </section>
       )}
 
