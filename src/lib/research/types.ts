@@ -5,9 +5,11 @@
 export interface CoverageAssets {
   video?: string
   short?: string
-  podcast_mp3?: string
-  podcast_mp4?: string
   brief?: string
+  /** The audio article: a single-voice ElevenLabs read of the brief, produced by
+   *  `just narrate` and published alongside it. Replaced the Q&A podcast (retired
+   *  2026-07-21, its assets deleted 2026-09-05) as the "listen" format. */
+  narration?: string
   thumbnail?: string
 }
 
@@ -34,9 +36,6 @@ export interface CoverageItem {
   // YouTube URLs captured by `just sync-youtube` — prefer these over the S3 MP4 (free egress).
   youtube_url?: string
   short_youtube_url?: string
-  // Retired: the podcast YouTube uploads were removed. Kept as catalog data; never
-  // rendered. The podcast plays from `assets.podcast_mp3` on the CDN or not at all.
-  podcast_youtube_url?: string
   assets: CoverageAssets
   history: CoverageVersion[]
 }

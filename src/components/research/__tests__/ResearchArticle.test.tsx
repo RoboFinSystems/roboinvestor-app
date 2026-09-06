@@ -4,9 +4,10 @@ import { describe, expect, it } from 'vitest'
 import type { CoverageItem } from '@/lib/research/types'
 import { ResearchArticle } from '../ResearchArticle'
 
-// The podcast YouTube uploads were removed (2026-09-03: a ticker page showed YouTube's
-// "Video unavailable" card under "Listen"). The podcast renders from the CDN MP3 or not
-// at all; the catalog's `podcast_youtube_url` is never embedded or linked.
+// The "Listen" slot holds the audio article: a single-voice read of the brief, played
+// from the CDN MP3. It replaced the Q&A podcast, whose YouTube uploads were removed
+// 2026-09-03 (a ticker page showed YouTube's "Video unavailable" card under "Listen")
+// and whose S3 assets were deleted 2026-09-05. Nothing in the Listen slot embeds YouTube.
 
 function makeItem(overrides: Partial<CoverageItem> = {}): CoverageItem {
   return {
@@ -24,42 +25,37 @@ function makeItem(overrides: Partial<CoverageItem> = {}): CoverageItem {
   }
 }
 
-const PODCAST_YT = 'https://youtu.be/k_udVHUhPU8'
-const PODCAST_MP3 =
-  'https://assets.robosystems.ai/content/GTBIF/GTBIF_podcast.mp3'
+const NARRATION =
+  'https://assets.robosystems.ai/content/GTBIF/GTBIF_narration.mp3'
 
 function iframeSrcs(container: HTMLElement) {
   return Array.from(container.querySelectorAll('iframe'), (f) => f.src)
 }
 
-describe('ResearchArticle podcast section', () => {
-  it('renders nothing for a podcast that only exists on YouTube', () => {
+describe('ResearchArticle listen section', () => {
+  it('renders no player for coverage with no narration', () => {
     const { container, queryByText } = render(
-      <ResearchArticle item={makeItem({ podcast_youtube_url: PODCAST_YT })} />
+      <ResearchArticle item={makeItem()} />
     )
     expect(queryByText(/Listen/)).toBeNull()
     expect(container.querySelector('audio')).toBeNull()
     expect(iframeSrcs(container)).toEqual([
       'https://www.youtube.com/embed/F6o_NypHMnU',
     ])
-    expect(container.innerHTML).not.toContain('k_udVHUhPU8')
   })
 
-  it('renders the CDN MP3 in a native player and never links YouTube', () => {
+  it('plays the narration from the CDN and adds no second iframe', () => {
     const { container, getByText } = render(
-      <ResearchArticle
-        item={makeItem({
-          podcast_youtube_url: PODCAST_YT,
-          assets: { podcast_mp3: PODCAST_MP3 },
-        })}
-      />
+      <ResearchArticle item={makeItem({ assets: { narration: NARRATION } })} />
     )
-    expect(getByText(/Listen/)).toBeInTheDocument()
+    expect(getByText('Listen to this report')).toBeInTheDocument()
     expect(container.querySelector('audio')?.getAttribute('src')).toBe(
-      PODCAST_MP3
+      NARRATION
     )
-    expect(container.innerHTML).not.toContain('k_udVHUhPU8')
-    expect(container.innerHTML).not.toContain('Watch on YouTube')
+    // The report video is the only embed on the page; audio never goes to YouTube.
+    expect(iframeSrcs(container)).toEqual([
+      'https://www.youtube.com/embed/F6o_NypHMnU',
+    ])
   })
 
   it('keeps the report video on YouTube', () => {

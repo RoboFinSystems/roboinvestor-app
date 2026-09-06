@@ -1,7 +1,7 @@
 // Schema.org JSON-LD for the public research pages. Server component: one or more
 // <script type="application/ld+json"> blocks derived entirely from the CoverageItem the
 // catalog already gives us (no extra fetches). Makes ticker pages eligible for Article,
-// Video, Podcast and Breadcrumb rich results, and the index page for an ItemList carousel.
+// Video and Breadcrumb rich results, and the index page for an ItemList carousel.
 //
 // Rendered only while these pages are canonical here (src/lib/research-site.ts): on a
 // mirror the structured data would claim a page Google is told lives elsewhere. The shared
@@ -46,9 +46,14 @@ function JsonLd({ data }: { data: Record<string, unknown> }) {
 }
 
 /**
- * Per-report structured data for `/research/{ticker}`: Article + (when media exists)
- * VideoObject and PodcastEpisode + a BreadcrumbList. `JSON.stringify` drops `undefined`
- * keys, so optional assets simply omit themselves.
+ * Per-report structured data for `/research/{ticker}`: Article (carrying the narration
+ * as an AudioObject when one exists) + VideoObject when there is video + a
+ * BreadcrumbList. `JSON.stringify` drops `undefined` keys, so optional assets simply
+ * omit themselves.
+ *
+ * The narration rides on the Article rather than being its own PodcastEpisode block: it
+ * is a read of this page, not an episode of a series, and PodcastEpisode would assert a
+ * feed and a subscribe surface that do not exist. Mirrors the blog's BlogJsonLd.
  */
 export function ResearchJsonLd({
   item,
@@ -82,6 +87,14 @@ export function ResearchJsonLd({
       dateModified: published,
       keywords,
       mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+      audio: item.assets.narration
+        ? {
+            '@type': 'AudioObject',
+            contentUrl: item.assets.narration,
+            encodingFormat: 'audio/mpeg',
+            name: `${item.title}: narration`,
+          }
+        : undefined,
       author: {
         '@type': 'Organization',
         name: organization.name,
@@ -103,25 +116,6 @@ export function ResearchJsonLd({
       embedUrl: ytId ? `https://www.youtube.com/embed/${ytId}` : undefined,
       contentUrl: item.assets.video || undefined,
       publisher,
-    })
-  }
-
-  if (item.assets.podcast_mp3) {
-    blocks.push({
-      '@context': 'https://schema.org',
-      '@type': 'PodcastEpisode',
-      name: item.title,
-      url,
-      datePublished: published,
-      associatedMedia: {
-        '@type': 'AudioObject',
-        contentUrl: item.assets.podcast_mp3,
-      },
-      partOfSeries: {
-        '@type': 'PodcastSeries',
-        name: `${organization.name} Research`,
-        url: `${baseUrl}/research`,
-      },
     })
   }
 

@@ -32,12 +32,12 @@ export function CoverageHistory({ history }: { history: CoverageVersion[] }) {
                   Video
                 </a>
               )}
-              {h.assets.podcast_mp3 && (
+              {h.assets.narration && (
                 <a
-                  href={h.assets.podcast_mp3}
+                  href={h.assets.narration}
                   className="text-cyan-600 hover:underline dark:text-cyan-400"
                 >
-                  Podcast
+                  Audio
                 </a>
               )}
               {h.assets.brief && (
