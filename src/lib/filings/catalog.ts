@@ -57,34 +57,47 @@ export async function getCompanyIndex(
 
 const FORM_ORDER = ['10-K', '20-F', '40-F', '10-Q']
 
-/** The filing the page renders: the latest annual with a holon, else the newest with one. */
+/** Whether a filing has a representation the page can render from. */
+function renderable(filing: CatalogFiling): boolean {
+  return filing.representations.some(
+    (r) => r.kind === 'tavi' || r.kind === 'holon'
+  )
+}
+
+/** The filing the page renders: the latest annual with a renderable representation, else the newest with one. */
 export function primaryFiling(company: CompanyCatalog): CatalogFiling | null {
   for (const form of FORM_ORDER) {
     const accession = company.latest[form]
     const filing = accession
       ? company.filings.find((f) => f.accession === accession)
       : undefined
-    if (filing?.representations.some((r) => r.kind === 'holon')) return filing
+    if (filing && renderable(filing)) return filing
   }
-  return (
-    company.filings.find((f) =>
-      f.representations.some((r) => r.kind === 'holon')
-    ) ?? null
-  )
-}
-
-export function holonUrl(filing: CatalogFiling): string | null {
-  return filing.representations.find((r) => r.kind === 'holon')?.url ?? null
+  return company.filings.find(renderable) ?? null
 }
 
 /**
- * A filing's holon as text. Fetched with Next's default cache option, so it
- * is read once per page regeneration and never enters the data cache (several
- * megabytes, past its 2 MB cap); the rendered page is what ISR caches.
- * `no-store` would refetch on every request instead.
+ * The file the page renders a filing from: the Tavi model when the filing has
+ * one (parsed directly, no RDF step), else the holon. Both carry the same
+ * facts and render the same statements.
  */
-export async function fetchHolonText(url: string): Promise<string> {
+export function reportUrl(filing: CatalogFiling): string | null {
+  const reps = filing.representations
+  return (
+    reps.find((r) => r.kind === 'tavi')?.url ??
+    reps.find((r) => r.kind === 'holon')?.url ??
+    null
+  )
+}
+
+/**
+ * A filing's report file (Tavi or holon) as text. Fetched with Next's default
+ * cache option, so it is read once per page regeneration and never enters the
+ * data cache (several megabytes, past its 2 MB cap); the rendered page is what
+ * ISR caches. `no-store` would refetch on every request instead.
+ */
+export async function fetchReportText(url: string): Promise<string> {
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`Holon fetch failed: ${res.status}`)
+  if (!res.ok) throw new Error(`Report fetch failed: ${res.status}`)
   return await res.text()
 }

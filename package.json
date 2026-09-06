@@ -38,7 +38,7 @@
     "@aws-sdk/client-sns": "^3.1121.0",
     "@robosystems/client": "^1.13.2",
     "@robosystems/core": "^0.8.8",
-    "@robosystems/report-components": "^0.4.1",
+    "@robosystems/report-components": "^0.5.0",
     "flowbite": "^3.1",
     "flowbite-react": "^0.12.5",
     "lru-cache": "^11.5.1",

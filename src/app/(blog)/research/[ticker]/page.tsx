@@ -4,7 +4,7 @@ import { CompareYourCompany } from '@/components/research/CompareYourCompany'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
 import { ResearchJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
-import { getCompany, holonUrl, primaryFiling } from '@/lib/filings/catalog'
+import { getCompany, primaryFiling, reportUrl } from '@/lib/filings/catalog'
 import { loadPrimaryStatements } from '@/lib/filings/statements'
 import { fetchBrief, getCoverage, getCoverageTickers } from '@/lib/research'
 import {
@@ -106,11 +106,11 @@ export default async function ResearchTickerPage({
 
   // A filer in the catalog gets the company page: the facts are the page and
   // the research, where it exists, is the layer on top. Rendering the
-  // statements needs the filing's holon; a filer whose artifacts are not
-  // written yet still gets the page, with the filings listed.
+  // statements needs the filing's Tavi model or holon; a filer whose artifacts
+  // are not written yet still gets the page, with the filings listed.
   if (company) {
     const filing = primaryFiling(company)
-    const url = filing ? holonUrl(filing) : null
+    const url = filing ? reportUrl(filing) : null
     const statements = url
       ? await loadPrimaryStatements(url).catch((e) => {
           console.error(`Statements failed for ${company.ticker}: ${e}`)

@@ -3,8 +3,8 @@ import {
   FILINGS_CDN_URL,
   companyCatalogUrl,
   getCompany,
-  holonUrl,
   primaryFiling,
+  reportUrl,
   tickerSlug,
 } from '../catalog'
 import type { CatalogFiling, CompanyCatalog, Representation } from '../types'
@@ -145,14 +145,20 @@ describe('primaryFiling', () => {
     expect(primaryFiling(c)?.accession).toBe('k-2024')
   })
 
-  it('falls back to the quarterly when the annual has no holon', () => {
-    const k = filing('k-2024', '10-K', [rep('tavi')])
+  it('falls back to the quarterly when the annual has no renderable file', () => {
+    const k = filing('k-2024', '10-K', [rep('document')])
     const q = filing('q-2025', '10-Q', [rep('holon')])
     const c = company([q, k], { '10-K': 'k-2024', '10-Q': 'q-2025' })
     expect(primaryFiling(c)?.accession).toBe('q-2025')
   })
 
-  it('takes the newest filing with a holon when latest names none', () => {
+  it('renders from a filing that has only a Tavi model', () => {
+    const k = filing('k-2024', '10-K', [rep('tavi')])
+    const c = company([k], { '10-K': 'k-2024' })
+    expect(primaryFiling(c)?.accession).toBe('k-2024')
+  })
+
+  it('takes the newest renderable filing when latest names none', () => {
     const c = company([
       filing('b', '10-Q'),
       filing('a', '10-Q', [rep('holon')]),
@@ -160,20 +166,29 @@ describe('primaryFiling', () => {
     expect(primaryFiling(c)?.accession).toBe('a')
   })
 
-  it('is null when no filing has a holon', () => {
+  it('is null when no filing has a renderable file', () => {
     expect(
       primaryFiling(company([filing('a', '10-K', [rep('document')])]))
     ).toBeNull()
   })
 })
 
-describe('holonUrl', () => {
-  it('is the holon representation URL', () => {
-    const f = filing('a', '10-K', [rep('tavi'), rep('holon', 'https://cdn/h')])
-    expect(holonUrl(f)).toBe('https://cdn/h')
+describe('reportUrl', () => {
+  it('prefers the Tavi model over the holon', () => {
+    const f = filing('a', '10-K', [
+      rep('holon', 'https://cdn/h'),
+      rep('tavi', 'https://cdn/t'),
+    ])
+    expect(reportUrl(f)).toBe('https://cdn/t')
   })
 
-  it('is null without one', () => {
-    expect(holonUrl(filing('a', '10-K'))).toBeNull()
+  it('falls back to the holon', () => {
+    expect(
+      reportUrl(filing('a', '10-K', [rep('holon', 'https://cdn/h')]))
+    ).toBe('https://cdn/h')
+  })
+
+  it('is null with neither', () => {
+    expect(reportUrl(filing('a', '10-K', [rep('document')]))).toBeNull()
   })
 })
