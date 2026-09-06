@@ -1,4 +1,4 @@
-// From a filing's holon to what the company page renders: the primary
+// From a filing's report file (its Tavi model, or its holon) to what the company page renders: the primary
 // financial statements as pivot tables (server-side, through the shared
 // report components' pure projection), and the handful of headline figures a
 // searcher wants first, each traced to the fact it came from.
@@ -11,8 +11,8 @@ import type {
   UnitInfo,
 } from '@robosystems/report-components'
 import { buildPivot, reportSections } from '@robosystems/report-components'
-import { parseJsonld } from '@robosystems/report-components/adapters'
-import { fetchHolonText } from './catalog'
+import { parseReportDocument } from '@robosystems/report-components/adapters'
+import { fetchReportText } from './catalog'
 
 export interface HeadlineFact {
   label: string
@@ -210,14 +210,16 @@ export function statementBlocks(report: NormalizedReport): InformationBlock[] {
 }
 
 /**
- * The statements a filing's holon carries, projected for rendering. Only the
- * primary statements are projected; the viewer carries the disclosures.
+ * The statements a filing carries, projected for rendering, from whichever
+ * file the catalog offers: the Tavi model (walked directly, tens of
+ * milliseconds) or the holon (through its RDF expansion). Only the primary
+ * statements are projected; the viewer carries the disclosures.
  */
 export async function loadPrimaryStatements(
-  holonUrl: string
+  reportFileUrl: string
 ): Promise<PrimaryStatements> {
-  const text = await fetchHolonText(holonUrl)
-  const report = await parseJsonld(text)
+  const text = await fetchReportText(reportFileUrl)
+  const { report } = await parseReportDocument(text)
   const tables = statementBlocks(report).map((ib) => buildPivot(report, ib))
   return {
     entity: report.entity ? { name: report.entity.name } : null,

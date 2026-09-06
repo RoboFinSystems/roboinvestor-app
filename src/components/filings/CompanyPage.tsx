@@ -1,4 +1,4 @@
-// One page per filer, rendered from the filing's own holon on the public CDN.
+// One page per filer, rendered from the filing's own Tavi model or holon on the public CDN.
 // The facts are the page; the hand-made research, where it exists, is the
 // editorial layer on top. Server component: the statements are projected and
 // rendered on the server through the shared report components' pure
@@ -102,7 +102,7 @@ export function CompanyPage({
   briefMarkdown,
 }: {
   company: CompanyCatalog
-  /** The filing the statements come from, or null when none has a holon yet. */
+  /** The filing the statements come from, or null when none has a renderable file yet. */
   filing: CatalogFiling | null
   statements: PrimaryStatements | null
   coverage: CoverageItem | null
