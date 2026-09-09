@@ -1,7 +1,7 @@
 /**
  * SEC repository data access — session-authenticated.
  *
- * Unlike the standalone holon-viewer (which is static-hosted and asks the visitor
+ * Unlike the standalone xbrlkit viewer (which is static-hosted and asks the visitor
  * for an API key), this runs inside the authenticated app: the `@robosystems/client`
  * default client is already configured with the user's session (see
  * `auth-core/client.ts`), so every read here rides that session automatically —
