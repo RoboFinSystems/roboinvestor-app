@@ -45,8 +45,10 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-// Short ISR window so catalog/publish/sync-youtube changes show up in minutes, not an hour.
-export const revalidate = 300
+// An hour, with publishes pushing through `/api/revalidate` for anything sooner. The hub
+// reads only the coverage catalog, so it is cheap to regenerate — but there is no reason
+// for it to poll on a shorter clock than a publish can announce.
+export const revalidate = 3600
 
 export default async function ResearchPage() {
   const items = await getAllCoverage().catch(() => [])

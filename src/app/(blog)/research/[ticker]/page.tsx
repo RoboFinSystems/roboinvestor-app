@@ -16,8 +16,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-// Short ISR window so catalog/publish/sync-youtube changes show up in minutes, not an hour.
-export const revalidate = 300
+// A day, not minutes. This route serves both the hand-made coverage pages and one page
+// per SEC filer, and a filer page regenerates by fetching and parsing a multi-MB Tavi or
+// holon — a short window means the whole corpus re-does that work on a timer, per App
+// Runner instance, for as long as a crawler is walking it. Publishes push instead
+// (`/api/revalidate`, called by the content machine and the SEC pipeline); this window is
+// the backstop that bounds staleness on an instance a push did not reach.
+export const revalidate = 86400
+
+// Next takes the *lowest* revalidate across a route's fetches as the route's own, so every
+// catalog read below is passed this window explicitly. A default left at minutes on any one
+// of them would re-pin the whole page to minutes and undo the line above.
 
 export async function generateStaticParams() {
   const tickers = await getCoverageTickers().catch(() => [])
@@ -31,8 +40,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { ticker } = await params
   const [item, company] = await Promise.all([
-    getCoverage(ticker).catch(() => null),
-    getCompany(ticker).catch(() => null),
+    getCoverage(ticker, revalidate).catch(() => null),
+    getCompany(ticker, revalidate).catch(() => null),
   ])
   const url = `${SELF_ORIGIN}/research/${ticker.toLowerCase()}`
   if (!item) {
@@ -95,13 +104,13 @@ export default async function ResearchTickerPage({
 }) {
   const { ticker } = await params
   const [item, company] = await Promise.all([
-    getCoverage(ticker).catch(() => null),
-    getCompany(ticker).catch(() => null),
+    getCoverage(ticker, revalidate).catch(() => null),
+    getCompany(ticker, revalidate).catch(() => null),
   ])
   if (!item && !company) notFound()
 
   const briefMarkdown = item?.assets.brief
-    ? await fetchBrief(item.assets.brief).catch(() => '')
+    ? await fetchBrief(item.assets.brief, revalidate).catch(() => '')
     : ''
 
   // A filer in the catalog gets the company page: the facts are the page and

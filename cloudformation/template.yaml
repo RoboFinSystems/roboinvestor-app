@@ -323,6 +323,14 @@ Resources:
             RuntimeEnvironmentSecrets:
               - Name: TURNSTILE_SECRET_KEY
                 Value: !Sub '${RoboSystemsSecretsArn}:TURNSTILE_SECRET_KEY::'
+              # Shared bearer token for POST /api/revalidate, the on-demand ISR
+              # invalidation the content machine and the SEC pipeline call after a
+              # publish. PREREQUISITE: the key must exist in the RoboSystems secret
+              # before this template is deployed — App Runner fails the deployment on
+              # a missing secret key. (The route itself answers 503 when the variable
+              # is absent, so it is never open; this is a deploy-time concern only.)
+              - Name: REVALIDATE_SECRET
+                Value: !Sub '${RoboSystemsSecretsArn}:REVALIDATE_SECRET::'
       InstanceConfiguration:
         Cpu: !Ref Cpu
         Memory: !Ref Memory
@@ -418,6 +426,48 @@ Resources:
               - w
               - q
 
+  # Cache policy for the public research pages (the (blog) route group). The
+  # default behavior is CachingDisabled, so every crawl of every company page
+  # reaches App Runner — and a filer page costs a multi-MB Tavi/holon fetch and
+  # parse per ISR regeneration. At corpus scale (one page per SEC filer) that is
+  # the dominant cost, so these pages cache at the edge on the origin's own
+  # `s-maxage` (Next sends `s-maxage=300, stale-while-revalidate=…`): TTLs of 0
+  # here mean CloudFront obeys that header rather than overriding it.
+  #
+  # The cache key must carry the four headers Next names in its `Vary` on an app
+  # route. A request for the RSC payload (a client-side navigation or prefetch)
+  # and a request for the HTML document differ only by these, so keying without
+  # them would serve a flight payload to a browser asking for a document, and
+  # vice versa. That rules out the managed CachingOptimized policy, which puts no
+  # headers in the key at all.
+  #
+  # No cookie in the key: the research pages render identically for everyone.
+  # ResearchTopBar is a client component that resolves the session in the
+  # browser, and nothing under (blog) reads cookies() or headers() on the server.
+  ResearchPagesCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub roboinvestor-${Environment}-research-pages
+        Comment: Public research pages keyed on the Next.js RSC headers, honoring origin s-maxage
+        MinTTL: 0
+        DefaultTTL: 0
+        MaxTTL: 31536000
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - rsc
+              - next-router-state-tree
+              - next-router-prefetch
+              - next-router-segment-prefetch
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
   # CloudFront Distribution
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -474,6 +524,46 @@ Resources:
           CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled managed policy
           OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader managed policy
         CacheBehaviors:
+          # The public research pages: the index and one page per covered
+          # company or SEC filer. Two patterns because a PathPattern without a
+          # wildcard matches that path exactly — `/research/*` alone would miss
+          # `/research` itself. All viewer methods are allowed so the behavior
+          # stays a superset of the default (a POST is forwarded, never cached);
+          # only GET/HEAD are cached.
+          - PathPattern: /research
+            TargetOriginId: AppRunner-Dynamic-Content
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - DELETE
+              - GET
+              - HEAD
+              - OPTIONS
+              - PATCH
+              - POST
+              - PUT
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: !Ref ResearchPagesCachePolicy
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader managed policy
+          - PathPattern: /research/*
+            TargetOriginId: AppRunner-Dynamic-Content
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - DELETE
+              - GET
+              - HEAD
+              - OPTIONS
+              - PATCH
+              - POST
+              - PUT
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: !Ref ResearchPagesCachePolicy
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader managed policy
           # next/image optimizer output (resized webp research thumbnails).
           # Only the cache-key parts (url/w/q, Accept) are forwarded — the
           # optimizer needs nothing else.
