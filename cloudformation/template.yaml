@@ -323,14 +323,6 @@ Resources:
             RuntimeEnvironmentSecrets:
               - Name: TURNSTILE_SECRET_KEY
                 Value: !Sub '${RoboSystemsSecretsArn}:TURNSTILE_SECRET_KEY::'
-              # Shared bearer token for POST /api/revalidate, the on-demand ISR
-              # invalidation the content machine and the SEC pipeline call after a
-              # publish. PREREQUISITE: the key must exist in the RoboSystems secret
-              # before this template is deployed — App Runner fails the deployment on
-              # a missing secret key. (The route itself answers 503 when the variable
-              # is absent, so it is never open; this is a deploy-time concern only.)
-              - Name: REVALIDATE_SECRET
-                Value: !Sub '${RoboSystemsSecretsArn}:REVALIDATE_SECRET::'
       InstanceConfiguration:
         Cpu: !Ref Cpu
         Memory: !Ref Memory

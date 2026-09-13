@@ -16,13 +16,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-// A day, not minutes. This route serves both the hand-made coverage pages and one page
-// per SEC filer, and a filer page regenerates by fetching and parsing a multi-MB Tavi or
-// holon — a short window means the whole corpus re-does that work on a timer, per App
-// Runner instance, for as long as a crawler is walking it. Publishes push instead
-// (`/api/revalidate`, called by the content machine and the SEC pipeline); this window is
-// the backstop that bounds staleness on an instance a push did not reach.
-export const revalidate = 86400
+// An hour, where this was five minutes. A filer page regenerates by fetching and parsing
+// a multi-MB Tavi or holon, and this route will serve one page per SEC filer, so a
+// five-minute window means the corpus re-does that work on a timer, per App Runner
+// instance, for as long as a crawler is walking it.
+//
+// An hour, and not the day the cost argument would justify, because the pages that carry
+// traffic today are the hand-made coverage reports and they have no other way to refresh:
+// a longer window would delay a published report by that much. The day becomes right once
+// the corpus is actually published and a publish can announce itself, rather than the page
+// waiting out a clock.
+export const revalidate = 3600
 
 // Next takes the *lowest* revalidate across a route's fetches as the route's own, so every
 // catalog read below is passed this window explicitly. A default left at minutes on any one
