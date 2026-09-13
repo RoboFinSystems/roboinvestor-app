@@ -45,9 +45,9 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-// An hour, with publishes pushing through `/api/revalidate` for anything sooner. The hub
-// reads only the coverage catalog, so it is cheap to regenerate — but there is no reason
-// for it to poll on a shorter clock than a publish can announce.
+// An hour, matching the report pages. The hub reads only the coverage catalog, so it is
+// cheap to regenerate, but it lists what those pages show and there is no sense in the
+// index and the page it links to disagreeing about how fresh they are.
 export const revalidate = 3600
 
 export default async function ResearchPage() {
