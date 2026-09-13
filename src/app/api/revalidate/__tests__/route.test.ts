@@ -69,10 +69,23 @@ describe('POST /api/revalidate', () => {
     expect(revalidatePath).not.toHaveBeenCalled()
   })
 
+  it('normalizes an uppercase ticker in either field to the prerendered path', async () => {
+    const { POST } = await import('../route')
+    const res = await POST(post({ paths: ['/research/AVAV'] }, SECRET))
+
+    // revalidatePath is case-sensitive and the page is prerendered lowercase, so
+    // passing the input through verbatim would mark a cache entry that does not exist.
+    await expect(res.json()).resolves.toEqual({
+      revalidated: ['/research/avav'],
+      rejected: [],
+    })
+    expect(revalidatePath).toHaveBeenCalledWith('/research/avav')
+  })
+
   it('deduplicates paths a caller sends twice', async () => {
     const { POST } = await import('../route')
     const res = await POST(
-      post({ tickers: ['intu'], paths: ['/research/intu'] }, SECRET)
+      post({ tickers: ['INTU'], paths: ['/research/intu'] }, SECRET)
     )
 
     await expect(res.json()).resolves.toEqual({

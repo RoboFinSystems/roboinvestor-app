@@ -28,16 +28,36 @@ import { timingSafeEqual } from 'node:crypto'
 /** Bound the work one call can queue; a corpus run batches rather than sends one list. */
 const MAX_PATHS = 500
 
-/** What this route is allowed to invalidate: the public research surface, nothing else. */
+/**
+ * What this route is allowed to invalidate: the public research surface, nothing else.
+ *
+ * Only the two `/research` entries sit behind the CloudFront behavior added with this
+ * route; `/` and `/sitemap.xml` are served on the default CachingDisabled behavior, so
+ * revalidating those clears the App Runner ISR cache and nothing at the edge.
+ */
 const ALWAYS_ALLOWED = new Set(['/', '/research', '/sitemap.xml'])
+
+const RESEARCH_PREFIX = '/research/'
 
 /** A route segment that is a plausible ticker — the same shape the catalog accepts. */
 const TICKER = /^[a-z0-9.-]{1,10}$/
 
-function allowedPath(path: string): boolean {
-  if (ALWAYS_ALLOWED.has(path)) return true
-  const ticker = path.startsWith('/research/') ? path.slice(10) : null
-  return !!ticker && TICKER.test(ticker)
+/**
+ * The path this route will revalidate for one input, or null when the input is not part
+ * of the public research surface.
+ *
+ * A ticker segment is lower-cased rather than merely accepted. `revalidatePath` is
+ * case-sensitive and the pages are prerendered under a lowercase segment, so passing
+ * `/research/AVAV` through verbatim would mark a cache entry that does not exist — a
+ * silent no-op, and a worse answer than a rejection. Normalizing here is also what makes
+ * a `paths` entry and a `tickers` entry for the same company behave identically.
+ */
+function canonicalPath(input: string): string | null {
+  const path = input.trim()
+  if (ALWAYS_ALLOWED.has(path)) return path
+  if (!path.startsWith(RESEARCH_PREFIX)) return null
+  const ticker = path.slice(RESEARCH_PREFIX.length).toLowerCase()
+  return TICKER.test(ticker) ? `${RESEARCH_PREFIX}${ticker}` : null
 }
 
 /** Constant-time secret comparison, length difference included. */
@@ -75,15 +95,13 @@ export async function POST(request: NextRequest) {
   const fromTickers = Array.isArray(body.tickers)
     ? body.tickers
         .filter((t): t is string => typeof t === 'string')
-        .map((t) => `/research/${t.trim().toLowerCase()}`)
+        .map((t) => `${RESEARCH_PREFIX}${t.trim()}`)
     : []
   const fromPaths = Array.isArray(body.paths)
-    ? body.paths
-        .filter((p): p is string => typeof p === 'string')
-        .map((p) => p.trim())
+    ? body.paths.filter((p): p is string => typeof p === 'string')
     : []
 
-  const requested = [...new Set([...fromTickers, ...fromPaths])]
+  const requested = [...fromTickers, ...fromPaths]
   if (requested.length === 0) {
     return Response.json(
       { error: 'Provide `tickers` or `paths` to revalidate' },
@@ -97,13 +115,19 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Deduplicate on the canonical path, not the input, so a ticker and a path naming the
+  // same page queue one revalidation. A rejected input is reported as it was sent.
   const revalidated: string[] = []
   const rejected: string[] = []
-  for (const path of requested) {
-    if (!allowedPath(path)) {
-      rejected.push(path)
+  const seen = new Set<string>()
+  for (const input of requested) {
+    const path = canonicalPath(input)
+    if (!path) {
+      rejected.push(input)
       continue
     }
+    if (seen.has(path)) continue
+    seen.add(path)
     revalidatePath(path)
     revalidated.push(path)
   }
