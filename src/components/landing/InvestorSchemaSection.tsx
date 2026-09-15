@@ -61,8 +61,8 @@ export default function InvestorSchemaSection() {
                   </div>
                   <ul className="space-y-1 text-xs text-gray-400">
                     <li>• XBRL financial facts</li>
-                    <li>• 10,000+ public companies</li>
-                    <li>• 10-K, 10-Q, and 8-K filings</li>
+                    <li>• 8,000+ public companies</li>
+                    <li>• 10-K, 10-Q, 20-F, and 40-F filings</li>
                   </ul>
                 </div>
 

@@ -164,9 +164,9 @@ export default function ResearchSection() {
                     Built on the SEC XBRL knowledge graph
                   </div>
                   <p className="text-sm text-gray-400">
-                    Drawn from the same shared repository of 10,000+ public
-                    companies — 10-K, 10-Q, and 8-K filings, structured as facts
-                    you can query.
+                    Drawn from the same shared repository of 8,000+ public
+                    companies — 10-K, 10-Q, 20-F, and 40-F filings, structured
+                    as facts you can query.
                   </p>
                 </div>
               </div>
