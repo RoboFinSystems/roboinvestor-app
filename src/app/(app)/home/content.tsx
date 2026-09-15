@@ -77,7 +77,7 @@ const gettingStarted = [
   {
     step: '2',
     title: 'Explore with the Console',
-    body: 'Ask questions in plain English — "What are my largest positions?" or query filings across 10,000+ public companies in the SEC repository.',
+    body: 'Ask questions in plain English — "What are my largest positions?" or query filings across 8,000+ public companies in the SEC repository.',
   },
   {
     step: '3',
