@@ -49,6 +49,15 @@ export interface CompanyCatalog {
   latest: Record<string, string>
 }
 
+export interface IndexFiling {
+  accession: string
+  form: string
+  filing_date: string | null
+  report_date: string | null
+  fiscal_year: number | null
+  fiscal_period: string | null
+}
+
 export interface IndexRow {
   ticker: string
   cik: string
@@ -56,14 +65,16 @@ export interface IndexRow {
   exchange: string | null
   sic_description: string | null
   filings: number
-  latest: {
-    accession: string
-    form: string
-    filing_date: string | null
-    report_date: string | null
-    fiscal_year: number | null
-    fiscal_period: string | null
-  }
+  /** The newest filing of any kind — it may have no artifacts yet. */
+  latest: IndexFiling
+  /**
+   * Whether any of the filer's filings has a file a page can render from, and
+   * the newest that does — what the page actually shows, so its date is the
+   * honest last-modified. Written by the catalog since robosystems #1387;
+   * optional so an older index still parses.
+   */
+  renderable?: boolean
+  latest_renderable?: IndexFiling | null
 }
 
 export interface CompanyIndex {

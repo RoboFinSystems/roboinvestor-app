@@ -1,3 +1,4 @@
+import { releasedCohortSitemaps } from '@/lib/research-site'
 import type { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
@@ -21,6 +22,11 @@ export default function robots(): MetadataRoute.Robots {
         '/settings/',
       ],
     },
-    sitemap: 'https://roboinvestor.ai/sitemap.xml',
+    // The hand-made coverage, then one sitemap per released cohort of generated filer
+    // pages (src/lib/research-site.ts); at zero cohorts this is the one file it always was.
+    sitemap: [
+      'https://roboinvestor.ai/sitemap.xml',
+      ...releasedCohortSitemaps(),
+    ],
   }
 }
