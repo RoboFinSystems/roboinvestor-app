@@ -1,9 +1,9 @@
 'use client'
 
 /**
- * The report's sections in filing order (`Structure.number`) — for SEC this leads
- * with the Cover Page. A flat list matching how the report reads; no re-grouping.
- * A dot marks sections already fetched; a spinner marks the one loading.
+ * The filing's sections in filing order — a 10-K leads with the Cover Page. A flat
+ * list matching how the report reads; no re-grouping. A dot marks sections
+ * already rendered once; a spinner marks the one loading.
  */
 import { Spinner } from 'flowbite-react'
 

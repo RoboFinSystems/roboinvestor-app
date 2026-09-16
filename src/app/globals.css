@@ -138,7 +138,7 @@
   styles keyed off `--rs-*` custom properties (each has a built-in fallback). Scope
   those variables to `.rs-report-scope` so a rendered SEC report picks up the app
   palette and font in both light and dark. The SEC report viewer wraps
-  `<ReportView>` in this class (see src/lib/sec). Only the `--rs-*` vars the library
+  `<ReportView>` in this class (see src/components/companies). Only the `--rs-*` vars the library
   actually reads are mapped here.
 */
 .rs-report-scope {
