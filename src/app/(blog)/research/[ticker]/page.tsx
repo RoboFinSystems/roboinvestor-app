@@ -32,6 +32,17 @@ export const revalidate = 3600
 // catalog read below is passed this window explicitly. A default left at minutes on any one
 // of them would re-pin the whole page to minutes and undo the line above.
 
+/** A meta description within the length a result snippet shows, cut at a word, never mid-word. */
+export function descriptionOf(text: string, max = 160): string {
+  if (text.length <= max) return text
+  const cut = text.slice(0, max + 1)
+  const at = cut.lastIndexOf(' ')
+  return (at > 0 ? cut.slice(0, at) : cut.slice(0, max)).replace(
+    /[\s,;:]+$/,
+    ''
+  )
+}
+
 export async function generateStaticParams() {
   const tickers = await getCoverageTickers().catch(() => [])
   return tickers.map((t) => ({ ticker: t.toLowerCase() }))
@@ -57,13 +68,12 @@ export async function generateMetadata({
         ? ` ${latest.fiscal_period} ${latest.fiscal_year}`
         : ''
     const title = `${company.name} (${company.ticker}) financial statements${period}`
+    const source = latest ? ` from its ${latest.form} for${period}` : ''
     return {
       title: `${title} | RoboInvestor`,
-      description:
-        `${company.name} balance sheet, income statement and cash flows from its SEC ${latest?.form ?? ''} filing, every figure traceable to the XBRL facts, with the filing as JSON-LD and Tavi.`.slice(
-          0,
-          160
-        ),
+      description: descriptionOf(
+        `${company.name} (${company.ticker}) financial statements${source}: balance sheet, income statement and cash flows, every figure traced to the SEC XBRL filing.`
+      ),
       alternates: { canonical: researchCanonical(ticker) },
       openGraph: { type: 'article', url, title },
     }
@@ -78,7 +88,7 @@ export async function generateMetadata({
   }
   return {
     title: `${seo.seo_title || item.title} | RoboInvestor Research`,
-    description: (seo.seo_description || item.summary).slice(0, 160),
+    description: descriptionOf(seo.seo_description || item.summary),
     // The canonical names the owner of these pages (src/lib/research-site.ts); og:url is
     // always this page so a share from roboinvestor.ai lands on roboinvestor.ai.
     alternates: { canonical: researchCanonical(ticker) },
@@ -125,7 +135,7 @@ export default async function ResearchTickerPage({
     const filing = primaryFiling(company)
     const url = filing ? reportUrl(filing) : null
     const statements = url
-      ? await loadPrimaryStatements(url).catch((e) => {
+      ? await loadPrimaryStatements(url, filing?.form).catch((e) => {
           console.error(`Statements failed for ${company.ticker}: ${e}`)
           return null
         })

@@ -55,7 +55,8 @@ export async function getCompanyIndex(
   return (await res.json()) as CompanyIndex
 }
 
-const FORM_ORDER = ['10-K', '20-F', '40-F', '10-Q']
+/** The forms whose filing carries a full set of financial statements. */
+const STATEMENT_FORMS = new Set(['10-K', '10-Q', '20-F', '40-F'])
 
 /** Whether a filing has a representation the page can render from. */
 function renderable(filing: CatalogFiling): boolean {
@@ -64,16 +65,24 @@ function renderable(filing: CatalogFiling): boolean {
   )
 }
 
-/** The filing the page renders: the latest annual with a renderable representation, else the newest with one. */
+function newestFirst(a: CatalogFiling, b: CatalogFiling): number {
+  return (b.filing_date ?? '').localeCompare(a.filing_date ?? '')
+}
+
+/**
+ * The filing the page renders: the newest statement-bearing filing with a
+ * renderable representation. The latest quarter is what a searcher wants and
+ * what keeps the page current from one filing to the next; the annual is a
+ * click away in the filings list. A filer whose statement forms have no
+ * renderable file yet falls back to its newest renderable filing of any form.
+ */
 export function primaryFiling(company: CompanyCatalog): CatalogFiling | null {
-  for (const form of FORM_ORDER) {
-    const accession = company.latest[form]
-    const filing = accession
-      ? company.filings.find((f) => f.accession === accession)
-      : undefined
-    if (filing && renderable(filing)) return filing
-  }
-  return company.filings.find(renderable) ?? null
+  const filings = [...company.filings].sort(newestFirst)
+  return (
+    filings.find((f) => STATEMENT_FORMS.has(f.form) && renderable(f)) ??
+    filings.find(renderable) ??
+    null
+  )
 }
 
 /**

@@ -109,8 +109,11 @@ export function CompanyPage({
   briefMarkdown?: string
 }) {
   const name = statements?.entity?.name ?? company.name
+  // A quarterly filing's statements are condensed and unaudited; say so where
+  // the period is named, since the page now leads with the latest quarter.
+  const unaudited = filing?.form.startsWith('10-Q') ? ' (unaudited)' : ''
   const filingLine = filing
-    ? `Financial statements from the ${filing.form} for ${periodOf(filing)}${
+    ? `Financial statements from the ${filing.form} for ${periodOf(filing)}${unaudited}${
         filing.filing_date ? `, filed ${filing.filing_date}` : ''
       }. Every figure is traceable to the filing's XBRL facts.`
     : null
