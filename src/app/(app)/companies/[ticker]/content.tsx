@@ -2,8 +2,10 @@
 
 import { FilingReader } from '@/components/companies/FilingReader'
 import { FilingsBar } from '@/components/companies/FilingsBar'
+import { ResearchArticle } from '@/components/research/ResearchArticle'
 import { getCompany, primaryFiling, tickerSlug } from '@/lib/filings/catalog'
 import type { CompanyCatalog } from '@/lib/filings/types'
+import { type CoverageItem, fetchBrief, getCoverage } from '@/lib/research'
 import { researchCanonical } from '@/lib/research-site'
 import {
   EmptyState,
@@ -61,6 +63,31 @@ function CompanyInner({ ticker }: CompanyContentProps) {
     getCompany(ticker)
       .then((c) => active && setCompany(c))
       .catch(() => active && setCompany(null))
+    return () => {
+      active = false
+    }
+  }, [ticker])
+
+  // The published research, where it exists: the brief leads the page, as it
+  // does on the public company page, and the filings follow.
+  const [coverage, setCoverage] = useState<CoverageItem | null>(null)
+  const [brief, setBrief] = useState('')
+
+  useEffect(() => {
+    let active = true
+    setCoverage(null)
+    setBrief('')
+    getCoverage(ticker)
+      .then((item) => {
+        if (!active) return
+        setCoverage(item)
+        if (item?.assets.brief) {
+          fetchBrief(item.assets.brief)
+            .then((md) => active && setBrief(md))
+            .catch(() => active && setBrief(''))
+        }
+      })
+      .catch(() => active && setCoverage(null))
     return () => {
       active = false
     }
@@ -129,6 +156,16 @@ function CompanyInner({ ticker }: CompanyContentProps) {
           </div>
         }
       />
+
+      {coverage ? (
+        <section className="mb-12">
+          <ResearchArticle item={coverage} briefMarkdown={brief} />
+        </section>
+      ) : null}
+
+      <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
+        Filings
+      </h2>
 
       {filing ? (
         <>
