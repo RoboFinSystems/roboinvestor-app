@@ -76,6 +76,9 @@ export async function generateMetadata({
       ),
       alternates: { canonical: researchCanonical(ticker) },
       openGraph: { type: 'article', url, title },
+      // The quality floor: a page with nothing to render is a filings list, not
+      // a page worth indexing. Crawlable, so its links still count; not indexed.
+      robots: latest ? undefined : { index: false, follow: true },
     }
   }
   const image = item.assets.thumbnail // 1920x1080 CDN PNG, the report thumbnail
