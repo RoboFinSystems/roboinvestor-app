@@ -44,7 +44,7 @@ npm run format:check # Check code formatting
 
 **Route Structure:**
 
-- `(app)` route group: Authenticated pages (home, console, graphs, entities, entity, portfolio, repositories, research, search, settings)
+- `(app)` route group: Authenticated pages (home, companies, console, graphs, entities, entity, portfolio, repositories, search, settings)
 - `(landing)` route group: Public pages (login, register, legal pages, landing page)
 - API routes follow RESTful patterns with proper session validation
 

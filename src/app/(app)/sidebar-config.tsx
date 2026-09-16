@@ -15,12 +15,6 @@ interface NavigationOptions {
   hasEntityGraph: boolean
   /** User has any usable graph including shared repositories like SEC (for Console) */
   hasAnyGraph: boolean
-  /**
-   * Repository id of the selected shared repository when it exposes the filing
-   * viewer (i.e. the SEC repository), else null. Drives the "Reports" item, which
-   * is contextual to that repository being the active graph.
-   */
-  reportsRepositoryId?: string | null
 }
 
 /**
@@ -32,7 +26,6 @@ interface NavigationOptions {
 export const getNavigationItems = ({
   hasEntityGraph,
   hasAnyGraph,
-  reportsRepositoryId,
 }: NavigationOptions): SidebarItemData[] => {
   const baseItems: SidebarItemData[] = [
     {
@@ -42,11 +35,14 @@ export const getNavigationItems = ({
     },
   ]
 
+  // Company research: every listed filer's filings, rendered from the public
+  // filing catalog on the CDN. No graph is read, so it is never gated. The
+  // public research pages on roboinvestor.ai stay external and link out from it.
   const researchItems: SidebarItemData[] = [
     {
       icon: HiDocumentText,
       label: 'Research',
-      href: '/research',
+      href: '/companies',
     },
   ]
 
@@ -65,10 +61,10 @@ export const getNavigationItems = ({
           label: 'Portfolio',
           href: '/portfolio',
         },
-        // Reports the fund *received* — distinct from the SEC filing viewer
-        // below, which reads a shared repository. These live on the fund's own
-        // graph, put there by a portfolio company's share, so they belong with
-        // the other investor-graph items rather than under Repositories.
+        // Reports the fund *received* — distinct from Company Research, which
+        // reads the public filing catalog. These live on the fund's own graph,
+        // put there by a portfolio company's share, so they belong with the
+        // other investor-graph items rather than under Repositories.
         {
           icon: HiDocumentReport,
           label: 'Portfolio Reports',
@@ -92,17 +88,6 @@ export const getNavigationItems = ({
       ]
     : []
 
-  // The filing viewer, shown only while its repository (SEC) is the active graph.
-  const reportItems: SidebarItemData[] = reportsRepositoryId
-    ? [
-        {
-          icon: HiDocumentReport,
-          label: 'Reports',
-          href: `/repositories/${reportsRepositoryId}/reports`,
-        },
-      ]
-    : []
-
   const alwaysVisibleItems: SidebarItemData[] = [
     {
       icon: HiGlobeAlt,
@@ -115,7 +100,6 @@ export const getNavigationItems = ({
     ...baseItems,
     ...entityItems,
     ...graphToolItems,
-    ...reportItems,
     ...researchItems,
     ...alwaysVisibleItems,
   ]

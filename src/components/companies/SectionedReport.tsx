@@ -2,13 +2,14 @@
 
 /**
  * The report surface: a left table-of-contents and one section rendered at a time.
- * Selecting a section resolves its report via `loadSection` (cached, so revisiting
- * is instant) and renders it with the library `ReportView` (fact inspector intact).
+ * Selecting a section resolves its report via `loadSection` — a slice of the parsed
+ * filing, so it is instant — and renders it with the library `ReportView` (fact
+ * inspector intact).
  *
  * The rendered report is wrapped in `.rs-report-scope`, which maps the library's
  * `--rs-*` theme variables onto the app palette (light + dark) — see globals.css.
  *
- * Mount this with a `key` per report (`reportId`) so each report gets fresh state;
+ * Mount this with a `key` per filing (its accession) so each report gets fresh state;
  * the initial selection then falls out of `sections[0]`.
  */
 import type { NormalizedReport } from '@robosystems/report-components'
@@ -20,7 +21,7 @@ import { TocSidebar, type SectionRef } from './TocSidebar'
 interface SectionedReportProps {
   /** The navigable sections, in display order (first is selected initially). */
   sections: SectionRef[]
-  /** Resolve one section's renderable report (a live SEC fetch). */
+  /** Resolve one section's renderable report (a slice of the parsed filing). */
   loadSection: (id: string) => Promise<NormalizedReport>
 }
 

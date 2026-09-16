@@ -1,10 +1,7 @@
-import { ReportsSearchContent } from './content'
+import { redirect } from 'next/navigation'
 
-export default async function SecReportsSearchPage({
-  params,
-}: {
-  params: Promise<{ repository: string }>
-}) {
-  const { repository } = await params
-  return <ReportsSearchContent repository={repository} />
+// The SEC filing viewer moved off the graph and onto the public filing catalog:
+// it is Company Research now, for every user, whatever graph is selected.
+export default function SecReportsSearchPage() {
+  redirect('/companies')
 }
