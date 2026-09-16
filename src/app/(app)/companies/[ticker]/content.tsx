@@ -1,5 +1,6 @@
 'use client'
 
+import { FilingChat } from '@/components/companies/FilingChat'
 import { FilingReader } from '@/components/companies/FilingReader'
 import { FilingsBar } from '@/components/companies/FilingsBar'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
@@ -169,6 +170,11 @@ function CompanyInner({ ticker }: CompanyContentProps) {
 
       {filing ? (
         <>
+          <FilingChat
+            key={filing.accession}
+            company={company}
+            filing={filing}
+          />
           <FilingsBar
             company={company}
             selected={filing}
