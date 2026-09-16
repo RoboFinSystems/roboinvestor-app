@@ -25,12 +25,13 @@ function rep(
 function filing(
   accession: string,
   form: string,
-  representations: Representation[] = []
+  representations: Representation[] = [],
+  filing_date: string | null = null
 ): CatalogFiling {
   return {
     accession,
     form,
-    filing_date: null,
+    filing_date,
     report_date: null,
     fiscal_year: null,
     fiscal_period: null,
@@ -138,18 +139,39 @@ describe('getCompany', () => {
 })
 
 describe('primaryFiling', () => {
-  it('prefers the latest annual with a holon over a newer quarterly', () => {
-    const k = filing('k-2024', '10-K', [rep('holon')])
-    const q = filing('q-2025', '10-Q', [rep('holon')])
-    const c = company([q, k], { '10-K': 'k-2024', '10-Q': 'q-2025' })
-    expect(primaryFiling(c)?.accession).toBe('k-2024')
-  })
-
-  it('falls back to the quarterly when the annual has no renderable file', () => {
-    const k = filing('k-2024', '10-K', [rep('document')])
-    const q = filing('q-2025', '10-Q', [rep('holon')])
+  it('takes the newest statement filing with a renderable file, a quarterly over an older annual', () => {
+    const k = filing('k-2024', '10-K', [rep('holon')], '2025-02-20')
+    const q = filing('q-2025', '10-Q', [rep('holon')], '2025-08-04')
     const c = company([q, k], { '10-K': 'k-2024', '10-Q': 'q-2025' })
     expect(primaryFiling(c)?.accession).toBe('q-2025')
+  })
+
+  it('orders by filing date, not by the list', () => {
+    const k = filing('k-2024', '10-K', [rep('holon')], '2025-02-20')
+    const q = filing('q-2025', '10-Q', [rep('holon')], '2025-08-04')
+    const c = company([k, q], { '10-K': 'k-2024', '10-Q': 'q-2025' })
+    expect(primaryFiling(c)?.accession).toBe('q-2025')
+  })
+
+  it('skips a newer filing that carries no statements', () => {
+    const proxy = filing('def-2025', 'DEF 14A', [rep('holon')], '2025-09-01')
+    const q = filing('q-2025', '10-Q', [rep('holon')], '2025-08-04')
+    const c = company([proxy, q])
+    expect(primaryFiling(c)?.accession).toBe('q-2025')
+  })
+
+  it('falls back to any renderable filing when no statement form renders', () => {
+    const proxy = filing('def-2025', 'DEF 14A', [rep('holon')], '2025-09-01')
+    const q = filing('q-2025', '10-Q', [rep('document')], '2025-08-04')
+    const c = company([proxy, q])
+    expect(primaryFiling(c)?.accession).toBe('def-2025')
+  })
+
+  it('falls back to the older annual when the quarterly has no renderable file', () => {
+    const k = filing('k-2024', '10-K', [rep('holon')], '2025-02-20')
+    const q = filing('q-2025', '10-Q', [rep('document')], '2025-08-04')
+    const c = company([q, k], { '10-K': 'k-2024', '10-Q': 'q-2025' })
+    expect(primaryFiling(c)?.accession).toBe('k-2024')
   })
 
   it('renders from a filing that has only a Tavi model', () => {

@@ -119,6 +119,9 @@ function report(
 const FY24 = duration('2024-01-01', '2024-12-31')
 const FY23 = duration('2023-01-01', '2023-12-31')
 const Q4_24 = duration('2024-10-01', '2024-12-31')
+const Q2_24 = duration('2024-04-01', '2024-06-30')
+const Q2_25 = duration('2025-04-01', '2025-06-30')
+const H1_25 = duration('2025-01-01', '2025-06-30')
 const AT24 = instant('2024-12-31')
 const AT23 = instant('2023-12-31')
 
@@ -182,6 +185,41 @@ describe('headlineFacts', () => {
     expect(headlineFacts(r)[0]?.period).toBe('Quarter ending 2024-12-31')
   })
 
+  it('on an annual filing the year still wins over a fourth-quarter stub', () => {
+    const r = report(
+      [fact(Revenues, Q4_24, 30), fact(Revenues, FY24, 100)],
+      [Revenues],
+      [FY24, Q4_24]
+    )
+    expect(headlineFacts(r, '10-K')[0]).toMatchObject({
+      value: 100,
+      period: 'FY ending 2024-12-31',
+    })
+  })
+
+  it('on a quarterly filing takes the quarter over the year to date at the same end', () => {
+    const r = report(
+      [
+        fact(Revenues, H1_25, 500),
+        fact(Revenues, Q2_25, 255),
+        fact(Revenues, Q2_24, 215),
+      ],
+      [Revenues],
+      [H1_25, Q2_25, Q2_24]
+    )
+    expect(headlineFacts(r, '10-Q')[0]).toMatchObject({
+      value: 255,
+      period: 'Quarter ending 2025-06-30',
+    })
+  })
+
+  it('labels a year-to-date span by its months', () => {
+    const r = report([fact(Revenues, H1_25, 500)], [Revenues], [H1_25])
+    expect(headlineFacts(r, '10-Q')[0]?.period).toBe(
+      '6 months ending 2025-06-30'
+    )
+  })
+
   it('reads an IFRS filer in its own currency', () => {
     const EUR = unit('EUR') // the adapter gave no symbol
     const SEK = unit('SEK', null) // the adapter said it has none
@@ -214,6 +252,17 @@ describe('headlineFacts', () => {
     const r = report([fact(aliased, FY24, 3)], [aliased], [FY24])
     expect(headlineFacts(r)).toMatchObject([
       { concept: 'gaap:Revenues', value: 3 },
+    ])
+  })
+
+  it('matches a concept the holon names with the taxonomy year in the qname', () => {
+    const dated = {
+      ...element(USGAAP, 'us-gaap', 'Revenues'),
+      qname: 'us-gaap:2025#Revenues',
+    }
+    const r = report([fact(dated, FY24, 6)], [dated], [FY24])
+    expect(headlineFacts(r)).toMatchObject([
+      { concept: 'us-gaap:2025#Revenues', value: 6 },
     ])
   })
 

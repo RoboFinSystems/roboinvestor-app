@@ -7,6 +7,7 @@ import type {
   Fact,
   InformationBlock,
   NormalizedReport,
+  PeriodInfo,
   PivotTable,
   UnitInfo,
 } from '@robosystems/report-components'
@@ -96,26 +97,56 @@ function currencySymbol(unit: UnitInfo | null): string {
 
 /**
  * The element ids for a concept: the compacted name, or — when the holon
- * compacts the taxonomy under another prefix — the local name within the
- * concept's taxonomy, read off the element IRI.
+ * compacts the taxonomy under another prefix, or keeps the taxonomy year in
+ * the qname (`us-gaap:2026#Assets`) — the local name within the concept's
+ * taxonomy, read off the element IRI.
  */
 function elementIdsFor(report: NormalizedReport, concept: string): Set<string> {
   const [taxonomy, local] = concept.split(':')
   const ids = new Set<string>()
   for (const el of Object.values(report.elements)) {
-    if (
-      el.qname === concept ||
-      (el.qname.endsWith(`:${local}`) && el.id.includes(taxonomy))
-    )
+    const sameLocal =
+      el.qname.endsWith(`:${local}`) ||
+      el.id.endsWith(`#${local}`) ||
+      el.id.endsWith(`/${local}`)
+    if (el.qname === concept || (sameLocal && el.id.includes(taxonomy)))
       ids.add(el.id)
   }
   return ids
 }
 
-/** The consolidated fact for a concept with the latest period, longest span first. */
+/** Days a duration covers; 0 for an instant or a period without both dates. */
+function spanDays(period: PeriodInfo): number {
+  if (period.type !== 'duration' || !period.startDate || !period.endDate)
+    return 0
+  const start = Date.parse(period.startDate)
+  const end = Date.parse(period.endDate)
+  if (Number.isNaN(start) || Number.isNaN(end)) return 0
+  return (end - start) / 86400000
+}
+
+/** Whole months a duration covers, so a 52- and a 53-week year both read as a year. */
+function spanMonths(period: PeriodInfo): number {
+  const days = spanDays(period)
+  return days === 0 ? 0 : Math.max(1, Math.round(days / 30.44))
+}
+
+/**
+ * Which span to headline when a filing reports several to the same date. An
+ * annual filing headlines the year over a fourth-quarter stub; a quarterly
+ * filing headlines the quarter over the year to date it reports beside it.
+ */
+type SpanPreference = 'longest' | 'shortest'
+
+function spanPreferenceFor(form: string | undefined): SpanPreference {
+  return form?.startsWith('10-Q') ? 'shortest' : 'longest'
+}
+
+/** The consolidated fact for a concept at its latest period, the preferred span first. */
 function latestConsolidated(
   report: NormalizedReport,
-  ids: Set<string>
+  ids: Set<string>,
+  prefer: SpanPreference
 ): Fact | null {
   let best: Fact | null = null
   let bestKey: [string, number] | null = null
@@ -124,11 +155,11 @@ function latestConsolidated(
     if (fact.dimensions && fact.dimensions.length > 0) continue
     const period = report.periods[fact.period]
     if (!period) continue
-    const span =
-      period.type === 'duration' && period.startDate && period.endDate
-        ? Date.parse(period.endDate) - Date.parse(period.startDate)
-        : 0
-    const key: [string, number] = [period.end, span]
+    const span = spanDays(period)
+    // Higher wins at the same end. A span that could not be measured never
+    // beats one that could, whichever way the preference runs.
+    const rank = prefer === 'shortest' ? (span > 0 ? -span : -Infinity) : span
+    const key: [string, number] = [period.end, rank]
     if (
       !bestKey ||
       key[0] > bestKey[0] ||
@@ -145,21 +176,33 @@ function periodLabel(report: NormalizedReport, fact: Fact): string {
   const period = report.periods[fact.period]
   if (!period) return ''
   if (period.type === 'instant') return `as of ${period.end}`
-  const start = period.startDate ? Date.parse(period.startDate) : NaN
-  const end = period.endDate ? Date.parse(period.endDate) : NaN
-  const days =
-    Number.isNaN(start) || Number.isNaN(end) ? 0 : (end - start) / 86400000
-  const kind = days > 300 ? 'FY' : days > 80 ? 'Quarter' : 'Period'
+  const months = spanMonths(period)
+  const kind =
+    months === 0
+      ? 'Period'
+      : months === 12
+        ? 'FY'
+        : months === 3
+          ? 'Quarter'
+          : `${months} month${months === 1 ? '' : 's'}`
   return `${kind} ending ${period.end}`
 }
 
-export function headlineFacts(report: NormalizedReport): HeadlineFact[] {
+/**
+ * The headline strip for a filing. `form` decides which span leads when the
+ * filing reports several to one date: a 10-Q's quarter over its year to date.
+ */
+export function headlineFacts(
+  report: NormalizedReport,
+  form?: string
+): HeadlineFact[] {
+  const prefer = spanPreferenceFor(form)
   const out: HeadlineFact[] = []
   for (const { label, concepts } of HEADLINE) {
     for (const concept of concepts) {
       const ids = elementIdsFor(report, concept)
       if (ids.size === 0) continue
-      const fact = latestConsolidated(report, ids)
+      const fact = latestConsolidated(report, ids, prefer)
       if (!fact || fact.value === null) continue
       out.push({
         label,
@@ -216,7 +259,8 @@ export function statementBlocks(report: NormalizedReport): InformationBlock[] {
  * statements are projected; the viewer carries the disclosures.
  */
 export async function loadPrimaryStatements(
-  reportFileUrl: string
+  reportFileUrl: string,
+  form?: string
 ): Promise<PrimaryStatements> {
   const text = await fetchReportText(reportFileUrl)
   const { report } = await parseReportDocument(text)
@@ -225,6 +269,6 @@ export async function loadPrimaryStatements(
     entity: report.entity ? { name: report.entity.name } : null,
     tables,
     units: report.units,
-    headline: headlineFacts(report),
+    headline: headlineFacts(report, form),
   }
 }
