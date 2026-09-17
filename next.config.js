@@ -4,11 +4,12 @@ import withFlowbiteReact from 'flowbite-react/plugin/nextjs'
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // Research coverage thumbnails are 1920x1080 PNGs (~2.5 MB each) on the
-    // content CDN; next/image resizes them per card and serves webp.
-    // Only that path is allowed — the optimizer rejects every other remote
-    // host. CloudFront caches `/_next/image*` on the optimizer's own max-age
-    // (see cloudformation/template.yaml), so App Runner isn't hit per view.
+    // Research cards load card-sized webps straight from the content CDN
+    // (CoverageCard). The optimizer is only the fallback for an item published
+    // before those existed: it shrinks the 1920x1080 PNG (~2.5 MB) on the app
+    // instance, which is CPU the 0.25 vCPU service cannot spare under a grid of
+    // cards (measured 2026-09-16). Only that path is allowed; the optimizer
+    // rejects every other remote host.
     remotePatterns: [
       {
         protocol: 'https',

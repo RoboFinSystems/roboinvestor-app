@@ -59,7 +59,9 @@ export function ResearchArticle({
           // eslint-disable-next-line jsx-a11y/media-has-caption -- the pipeline produces no caption track; the brief below is the written report
           <video
             controls
-            poster={item.assets.thumbnail}
+            // The 1200-wide card webp when published: the player is at most ~900px
+            // wide, and the PNG poster is ~2.5 MB.
+            poster={item.assets.thumbnail_card_1200 ?? item.assets.thumbnail}
             src={item.assets.video}
             className="mb-8 aspect-video w-full rounded-xl bg-black"
           />

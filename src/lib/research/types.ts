@@ -10,7 +10,13 @@ export interface CoverageAssets {
    *  `just narrate` and published alongside it. Replaced the Q&A podcast (retired
    *  2026-07-21, its assets deleted 2026-09-05) as the "listen" format. */
   narration?: string
+  /** 1920x1080 PNG (~2.5 MB): the social and search image, and the card fallback. */
   thumbnail?: string
+  /** Card-sized webps of the thumbnail, 800 and 1200 wide, published beside the PNG by
+   *  robosystems-content-machine (`card_thumbnails.py`) so cards load them straight from
+   *  the CDN. Absent on items published before 2026-09-17 until the backfill runs. */
+  thumbnail_card_800?: string
+  thumbnail_card_1200?: string
 }
 
 export interface CoverageVersion {
