@@ -3,14 +3,15 @@
 // on the homepage. `sameAs` mirrors the shared RoboFinSystems social profiles linked from
 // the footer.
 
+import { SITE_DESCRIPTION, SITE_NAME } from './site'
+
 export const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'RoboInvestor',
+  name: SITE_NAME,
   url: 'https://roboinvestor.ai',
   logo: 'https://roboinvestor.ai/images/logos/roboinvestor-icon.png',
-  description:
-    'AI-powered portfolio management agent — analyze holdings, track performance, and surface investment insights.',
+  description: SITE_DESCRIPTION,
   sameAs: [
     'https://github.com/RoboFinSystems',
     'https://x.com/robofinsystems',
@@ -26,15 +27,12 @@ export const organizationJsonLd = {
 export const softwareJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'RoboInvestor',
+  name: SITE_NAME,
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
-  },
-  description:
-    'AI-powered portfolio management agent. Analyze holdings, track performance, and surface investment insights across your portfolio.',
+  // No `offers` block: pricing and provisioning live on the RoboSystems side, and a
+  // `price: '0'` Offer told search engines the app was free. It is not. roboledger-app
+  // dropped the same block for the same reason.
+  description: SITE_DESCRIPTION,
   url: 'https://roboinvestor.ai',
 }

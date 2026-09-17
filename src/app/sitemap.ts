@@ -2,13 +2,17 @@ import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
 import type { MetadataRoute } from 'next'
 
-/** Newest valid date in a list, or `now` when none, so the hub `lastmod` stays honest. */
-function latestDate(dates: (string | undefined)[]): Date {
+/**
+ * Newest valid date in a list, or none. A `lastmod` is a real date or absent: a date
+ * stamped at request time teaches Bing and Google to ignore the field on every entry,
+ * including the research pages whose dates are true.
+ */
+function latestDate(dates: (string | undefined)[]): Date | undefined {
   const ts = dates
     .filter((d): d is string => !!d)
     .map((d) => new Date(d).getTime())
     .filter((n) => !Number.isNaN(n))
-  return ts.length ? new Date(Math.max(...ts)) : new Date()
+  return ts.length ? new Date(Math.max(...ts)) : undefined
 }
 
 // RoboInvestor's public surface is the marketing homepage, the research index and one page
@@ -20,9 +24,9 @@ function latestDate(dates: (string | undefined)[]): Date {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SELF_ORIGIN
 
+  // No lastModified: the homepage changes on deploys, and nothing here knows when.
   const home: MetadataRoute.Sitemap[number] = {
     url: baseUrl,
-    lastModified: new Date(),
     changeFrequency: 'weekly',
     priority: 1,
   }
@@ -32,13 +36,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const coverage = await getAllCoverage().catch(() => [])
   const researchPages = coverage.map((item) => ({
     url: `${baseUrl}/research/${item.ticker.toLowerCase()}`,
-    lastModified: item.date ? new Date(item.date) : new Date(),
+    lastModified: item.date ? new Date(item.date) : undefined,
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }))
 
   return [
-    { ...home, lastModified: latestDate(coverage.map((c) => c.date)) },
+    home,
     {
       url: `${baseUrl}/research`,
       lastModified: latestDate(coverage.map((c) => c.date)),
