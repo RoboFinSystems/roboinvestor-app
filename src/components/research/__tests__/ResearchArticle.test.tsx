@@ -82,3 +82,40 @@ describe('ResearchArticle footer badge', () => {
     }
   })
 })
+
+describe('ResearchArticle video poster', () => {
+  const VIDEO = 'https://assets.robosystems.ai/content/GTBIF/GTBIF_final.mp4'
+  const PNG = 'https://assets.robosystems.ai/content/GTBIF/GTBIF_thumbnail.png'
+  const CARD_1200 =
+    'https://assets.robosystems.ai/content/GTBIF/GTBIF_thumbnail_card_1200.webp'
+
+  it('uses the 1200-wide card webp as the poster when it is published', () => {
+    const { container } = render(
+      <ResearchArticle
+        item={makeItem({
+          youtube_url: undefined,
+          assets: {
+            video: VIDEO,
+            thumbnail: PNG,
+            thumbnail_card_1200: CARD_1200,
+          },
+        })}
+      />
+    )
+    expect(container.querySelector('video')?.getAttribute('poster')).toBe(
+      CARD_1200
+    )
+  })
+
+  it('falls back to the PNG poster without it', () => {
+    const { container } = render(
+      <ResearchArticle
+        item={makeItem({
+          youtube_url: undefined,
+          assets: { video: VIDEO, thumbnail: PNG },
+        })}
+      />
+    )
+    expect(container.querySelector('video')?.getAttribute('poster')).toBe(PNG)
+  })
+})

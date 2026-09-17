@@ -9,11 +9,16 @@ import Link from 'next/link'
  * shared card theme centers its content (`justify-center`), which left the covers at
  * different heights across a row.
  *
- * The thumbnail is the catalog's 1920x1080 CDN PNG (~2.5 MB) served through
- * `next/image`, which resizes it to the card and serves webp to browsers that accept it. `sizes`
- * mirrors the grid: full width on mobile, half at `md`, and ~390px in the three
- * `lg` columns of the `max-w-7xl` container.
+ * The thumbnail loads straight from the content CDN as a card-sized webp, 800 or 1200
+ * wide by `srcSet`, published beside the 1920x1080 PNG. Until 2026-09-17 the card sent
+ * the ~2.5 MB PNG through `next/image`, which shrank it on the 0.25 vCPU App Runner
+ * instance: a screen of cards held the server for ~20s and every click waited behind it.
+ * An item published before the webps existed still takes that path, so no card renders
+ * blank while the backfill catches up. `sizes` mirrors the grid: full width on mobile,
+ * half at `md`, and ~390px in the three `lg` columns of the `max-w-7xl` container.
  */
+const SIZES = '(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 400px'
+
 export function CoverageCard({
   item,
   hrefBase = '/research',
@@ -28,23 +33,42 @@ export function CoverageCard({
    */
   eager?: boolean
 }) {
+  const card800 = item.assets.thumbnail_card_800
+  const card1200 = item.assets.thumbnail_card_1200
+
   return (
     <Link
       href={`${hrefBase}/${item.ticker.toLowerCase()}`}
       className="group block h-full"
     >
       <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white/80 shadow-lg backdrop-blur-sm transition-shadow duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-zinc-950">
-        {item.assets.thumbnail && (
-          <Image
-            src={item.assets.thumbnail}
+        {card800 && card1200 ? (
+          // eslint-disable-next-line @next/next/no-img-element -- the CDN already serves the sized webp; next/image would put the server back in the path
+          <img
+            src={card800}
+            srcSet={`${card800} 800w, ${card1200} 1200w`}
+            sizes={SIZES}
             alt={item.title}
-            width={1920}
-            height={1080}
-            sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 400px"
+            width={800}
+            height={450}
             loading={eager ? 'eager' : 'lazy'}
             fetchPriority={eager ? 'high' : undefined}
+            decoding="async"
             className="aspect-video w-full object-cover"
           />
+        ) : (
+          item.assets.thumbnail && (
+            <Image
+              src={item.assets.thumbnail}
+              alt={item.title}
+              width={1920}
+              height={1080}
+              sizes={SIZES}
+              loading={eager ? 'eager' : 'lazy'}
+              fetchPriority={eager ? 'high' : undefined}
+              className="aspect-video w-full object-cover"
+            />
+          )
         )}
         <div className="flex flex-1 flex-col gap-2 p-5">
           <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
