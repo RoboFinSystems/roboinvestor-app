@@ -145,6 +145,9 @@ export default function ReceivedReportContent({
   }, [load])
 
   const received = formatDate(meta?.sharedAt)
+  const provenance = meta?.entityName
+    ? `${meta.entityName} shared`
+    : 'you received'
 
   return (
     <PageLayout>
@@ -214,9 +217,7 @@ export default function ReceivedReportContent({
             periodStart: meta.periodStart,
             periodEnd: meta.periodEnd,
           })}
-          intro={`Ask anything about ${meta.name}. The operator reads this graph — the report ${
-            meta.entityName ? `${meta.entityName} shared` : 'you received'
-          } and its periods — and answers from the numbers.`}
+          intro={`Ask anything about ${meta.name}. The operator reads this graph — the report ${provenance} and its periods — and answers from the numbers.`}
           examples={reportExampleQuestions({ reportId, name: meta.name })}
           placeholder="Ask about this report…"
         />
