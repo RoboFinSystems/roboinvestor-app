@@ -1,6 +1,5 @@
 import type { SidebarItemData } from '@robosystems/core'
 import {
-  HiBookOpen,
   HiDocumentReport,
   HiDocumentText,
   HiGlobeAlt,
@@ -97,17 +96,10 @@ export const getNavigationItems = ({
     },
   ]
 
-  // This app has no docs of its own: the platform guides live on robosystems.ai,
-  // so the link leaves in a new tab and the app keeps its place. There is no
-  // blog here either; the public research pages are reached through Research.
-  const tailItems: SidebarItemData[] = [
-    {
-      icon: HiBookOpen,
-      label: 'Docs',
-      href: 'https://robosystems.ai/docs/guides',
-      target: '_blank',
-    },
-  ]
+  // The docs are reached from the user menu, which carries the platform guides on
+  // robosystems.ai because this app has none of its own (see layout-wrapper's
+  // docsHref). The sidebar stays the portfolio's workspace.
+  const tailItems: SidebarItemData[] = []
 
   return [
     ...baseItems,
