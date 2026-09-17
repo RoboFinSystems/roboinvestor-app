@@ -17,11 +17,17 @@
  * browser fetch is blocked.
  */
 
+import {
+  reportAnchorNote,
+  reportExampleQuestions,
+  reportFocus,
+} from '@/lib/reports/chat'
 import type { ReportListItem } from '@robosystems/client/clients'
 import {
   clients,
   PageHeader,
   PageLayout,
+  ReportChat,
   useGraphContext,
 } from '@robosystems/core'
 import type { NormalizedReport } from '@robosystems/report-components'
@@ -139,6 +145,9 @@ export default function ReceivedReportContent({
   }, [load])
 
   const received = formatDate(meta?.sharedAt)
+  const provenance = meta?.entityName
+    ? `${meta.entityName} shared`
+    : 'you received'
 
   return (
     <PageLayout>
@@ -180,6 +189,38 @@ export default function ReceivedReportContent({
             </span>
           </div>
         </Card>
+      )}
+
+      {/* Ask about this report: the operator on this fund's graph, anchored on
+          the received report by its identifier and period. The share copies
+          the issuer's facts into this graph, so the operator answers from the
+          same numbers the page renders. It spends this graph's credits; the
+          report itself stays free to read. Keyed per report so a different
+          report starts a fresh thread. */}
+      {graphId && meta && (
+        <ReportChat
+          key={reportId}
+          graphId={graphId}
+          title="Ask about this report"
+          hint="Answers from this graph. Uses credits."
+          anchorNote={reportAnchorNote({
+            reportId,
+            name: meta.name,
+            entityName: meta.entityName,
+            periodStart: meta.periodStart,
+            periodEnd: meta.periodEnd,
+          })}
+          focus={reportFocus({
+            reportId,
+            name: meta.name,
+            entityName: meta.entityName,
+            periodStart: meta.periodStart,
+            periodEnd: meta.periodEnd,
+          })}
+          intro={`Ask anything about ${meta.name}. The operator reads this graph — the report ${provenance} and its periods — and answers from the numbers.`}
+          examples={reportExampleQuestions({ reportId, name: meta.name })}
+          placeholder="Ask about this report…"
+        />
       )}
 
       {report && (
