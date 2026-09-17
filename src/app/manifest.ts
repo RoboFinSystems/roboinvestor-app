@@ -1,11 +1,11 @@
+import { SITE_DESCRIPTION, SITE_TITLE } from '@/lib/site'
 import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'RoboInvestor | Portfolio Management Agent',
+    name: SITE_TITLE,
     short_name: 'RoboInvestor',
-    description:
-      'AI-powered portfolio management agent — analyze holdings, track performance, and surface investment insights.',
+    description: SITE_DESCRIPTION,
     start_url: '/',
     display: 'standalone',
     background_color: '#000000',

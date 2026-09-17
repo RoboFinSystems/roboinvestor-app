@@ -1,12 +1,9 @@
+import { SITE_DESCRIPTION, SITE_TITLE } from '@/lib/site'
 import type { Metadata } from 'next'
 
-const TITLE = 'RoboInvestor | AI Portfolio Management Agent'
-const DESCRIPTION =
-  'AI-powered portfolio management agent. Analyze holdings, track performance, and surface investment insights across your portfolio — powered by knowledge graphs and AI agents.'
-
 export const landingMetadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   keywords: [
     'AI portfolio management',
     'portfolio management agent',

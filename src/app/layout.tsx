@@ -1,4 +1,5 @@
 import { CloudflareAnalytics } from '@/components/analytics/CloudflareAnalytics'
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from '@/lib/site'
 import { organizationJsonLd } from '@/lib/structured-data'
 import { AuthProvider, customTheme } from '@robosystems/core'
 import { ThemeModeScript, ThemeProvider } from 'flowbite-react'
@@ -12,27 +13,23 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-const TITLE = 'RoboInvestor | Portfolio Management Agent'
-const DESCRIPTION =
-  'AI-powered portfolio management agent. Analyze holdings, track performance, and surface investment insights across your portfolio.'
-
 export const metadata: Metadata = {
   metadataBase: new URL('https://roboinvestor.ai'),
-  title: TITLE,
-  description: DESCRIPTION,
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://roboinvestor.ai',
-    siteName: 'RoboInvestor',
-    title: TITLE,
-    description: DESCRIPTION,
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     // og:image comes from the generated app/opengraph-image.tsx (site-wide).
   },
   twitter: {
     card: 'summary_large_image',
-    title: TITLE,
-    description: DESCRIPTION,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     // twitter:image comes from the generated app/twitter-image.tsx (site-wide).
     site: '@robofinsystems',
     creator: '@robofinsystems',
