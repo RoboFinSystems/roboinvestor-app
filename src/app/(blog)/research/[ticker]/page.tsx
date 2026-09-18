@@ -146,7 +146,9 @@ export default async function ResearchTickerPage({
     return (
       <div className="dark min-h-screen bg-black text-gray-100">
         {RESEARCH_IS_CANONICAL_HERE && <FilingsJsonLd company={company} />}
-        {RESEARCH_IS_CANONICAL_HERE && item && <ResearchJsonLd item={item} />}
+        {RESEARCH_IS_CANONICAL_HERE && item && (
+          <ResearchJsonLd item={item} breadcrumb={false} />
+        )}
         <div className="mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 lg:px-8">
           <ResearchTopBar />
           <Link

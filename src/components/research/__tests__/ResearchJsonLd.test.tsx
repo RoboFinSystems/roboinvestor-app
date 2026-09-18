@@ -79,6 +79,18 @@ describe('ResearchJsonLd', () => {
     expect(byType.Article.datePublished).toBe('2026-06-22T00:00:00Z')
   })
 
+  it('carries its own breadcrumb trail by default', () => {
+    expect(byType.BreadcrumbList).toBeDefined()
+  })
+
+  it('leaves the trail to FilingsJsonLd on a company page', () => {
+    const types = jsonLdBlocks(
+      renderToStaticMarkup(<ResearchJsonLd item={item} breadcrumb={false} />)
+    ).map((b) => b['@type'])
+    expect(types).not.toContain('BreadcrumbList')
+    expect(types).toContain('Article')
+  })
+
   it('never emits a bare date anywhere in the markup', () => {
     for (const block of blocks) {
       for (const [key, value] of Object.entries(block)) {
