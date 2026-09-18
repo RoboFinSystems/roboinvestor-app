@@ -51,6 +51,9 @@ function JsonLd({ data }: { data: Record<string, unknown> }) {
  * BreadcrumbList. `JSON.stringify` drops `undefined` keys, so optional assets simply
  * omit themselves.
  *
+ * `breadcrumb={false}` on a filer's company page, where FilingsJsonLd already carries
+ * the trail: two BreadcrumbLists on one page contradict each other.
+ *
  * The narration rides on the Article rather than being its own PodcastEpisode block: it
  * is a read of this page, not an episode of a series, and PodcastEpisode would assert a
  * feed and a subscribe surface that do not exist. Mirrors the blog's BlogJsonLd.
@@ -59,10 +62,12 @@ export function ResearchJsonLd({
   item,
   baseUrl = DEFAULT_ORG.url,
   organization = DEFAULT_ORG,
+  breadcrumb = true,
 }: {
   item: CoverageItem
   baseUrl?: string
   organization?: Organization
+  breadcrumb?: boolean
 }) {
   const url = `${baseUrl}/research/${item.ticker.toLowerCase()}`
   const images = item.assets.thumbnail ? [item.assets.thumbnail] : undefined
@@ -119,20 +124,22 @@ export function ResearchJsonLd({
     })
   }
 
-  blocks.push({
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Research',
-        item: `${baseUrl}/research`,
-      },
-      { '@type': 'ListItem', position: 3, name: item.company, item: url },
-    ],
-  })
+  if (breadcrumb) {
+    blocks.push({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Research',
+          item: `${baseUrl}/research`,
+        },
+        { '@type': 'ListItem', position: 3, name: item.company, item: url },
+      ],
+    })
+  }
 
   return (
     <>
