@@ -11,15 +11,14 @@
  */
 
 import DocsLink from '@/components/DocsLink'
+import { useInvestorGraph } from '@/hooks/useInvestorGraph'
 import type { ReportListItem } from '@robosystems/client/clients'
 import {
   clients,
   EmptyState,
-  GraphFilters,
   LoadingState,
   PageHeader,
   PageLayout,
-  useGraphContext,
 } from '@robosystems/core'
 import {
   Alert,
@@ -34,7 +33,7 @@ import {
 } from 'flowbite-react'
 import Link from 'next/link'
 import type { FC } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   HiDocumentReport,
   HiExclamationCircle,
@@ -62,18 +61,10 @@ const formatPeriod = (report: ReportListItem): string => {
 }
 
 const ReceivedReportsContent: FC = function () {
-  const { state: graphState } = useGraphContext()
+  const currentGraph = useInvestorGraph()
   const [reports, setReports] = useState<ReportListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  const currentGraph = useMemo(() => {
-    const investorGraphs = graphState.graphs.filter(GraphFilters.roboinvestor)
-    return (
-      investorGraphs.find((g) => g.graphId === graphState.currentGraphId) ??
-      investorGraphs[0]
-    )
-  }, [graphState.graphs, graphState.currentGraphId])
 
   useEffect(() => {
     if (!currentGraph) {

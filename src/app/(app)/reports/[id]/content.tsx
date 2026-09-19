@@ -17,6 +17,7 @@
  * browser fetch is blocked.
  */
 
+import { useInvestorGraph } from '@/hooks/useInvestorGraph'
 import {
   reportAnchorNote,
   reportExampleQuestions,
@@ -58,8 +59,10 @@ export default function ReceivedReportContent({
 }: {
   reportId: string
 }) {
-  const { state: graphState } = useGraphContext()
-  const graphId = graphState.currentGraphId
+  // The graph the Reports list read from. The raw selection can be a shared
+  // repository, where this fund's reports do not exist.
+  const graphId = useInvestorGraph()?.graphId
+  const graphsLoading = useGraphContext().state.isLoading
 
   const [meta, setMeta] = useState<ReportListItem | null>(null)
   const [report, setReport] = useState<NormalizedReport | null>(null)
@@ -85,7 +88,15 @@ export default function ReceivedReportContent({
   }, [report])
 
   const load = useCallback(async () => {
-    if (!graphId) return
+    if (!graphId) {
+      // Once the graphs have loaded, no RoboInvestor graph means there is
+      // nowhere this report could be; say so rather than spin.
+      if (!graphsLoading) {
+        setError('This report is no longer available.')
+        setIsLoading(false)
+      }
+      return
+    }
     setIsLoading(true)
     setError(null)
     try {
@@ -138,7 +149,7 @@ export default function ReceivedReportContent({
     } finally {
       setIsLoading(false)
     }
-  }, [graphId, reportId])
+  }, [graphId, graphsLoading, reportId])
 
   useEffect(() => {
     void load()

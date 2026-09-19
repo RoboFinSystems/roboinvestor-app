@@ -1,14 +1,13 @@
 'use client'
 
 import DocsLink from '@/components/DocsLink'
+import { useInvestorGraph } from '@/hooks/useInvestorGraph'
 import {
   clients,
   EmptyState,
-  GraphFilters,
   LoadingState,
   PageHeader,
   PageLayout,
-  useGraphContext,
 } from '@robosystems/core'
 import {
   Alert,
@@ -31,7 +30,7 @@ import {
   TextInput,
 } from 'flowbite-react'
 import type { FC } from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   HiCurrencyDollar,
   HiExclamationCircle,
@@ -164,7 +163,6 @@ const securityTypeLabel: Record<string, string> = {
 }
 
 const PortfolioPageContent: FC = function () {
-  const { state: graphState } = useGraphContext()
   const [portfolios, setPortfolios] = useState<Portfolio[]>([])
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(
     null
@@ -216,17 +214,9 @@ const PortfolioPageContent: FC = function () {
   const [savingEdit, setSavingEdit] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
-  // The selected graph when it is a RoboInvestor graph, otherwise the first
-  // one: the same rule as Portfolio Reports, so the two pages agree on which
-  // graph a user with more than one is looking at.
-  const investorGraph = useMemo(() => {
-    const investorGraphs = graphState.graphs.filter(GraphFilters.roboinvestor)
-    return (
-      investorGraphs.find((g) => g.graphId === graphState.currentGraphId) ??
-      investorGraphs[0]
-    )
-  }, [graphState.graphs, graphState.currentGraphId])
-  const graphId = investorGraph?.graphId
+  // The same rule as Reports and the report viewer, so every page agrees on
+  // which graph a user with more than one is looking at.
+  const graphId = useInvestorGraph()?.graphId
 
   // Every id on this page — portfolio, security, entity — belongs to one graph.
   // The loaders below are also re-invoked directly after a mutation, where an
