@@ -25,6 +25,5 @@ line of prose.
 The filename is version-specific on purpose: a leftover file can never be picked
 up by a later release.
 
-No release has used this mechanism yet; every version through `v0.3.11` shipped
-the generated changelog. The first curated file will most likely be the 1.0.0
-graduation.
+`v0.5.0` is the first release to use this mechanism; every version before it
+shipped the generated changelog.
