@@ -22,13 +22,13 @@ const REPO_CONFIG: SearchConfig = {
 
 const USER_GRAPH_CONFIG: SearchConfig = {
   title: 'Document Search',
-  description: 'Search uploaded documents and AI memories',
+  description: 'Search the documents on this graph',
   placeholder: 'Search your documents...',
   filters: { sourceType: true, semantic: true },
 }
 
 export function SearchPageContent() {
-  const isRepository = useIsRepository()
+  const { isRepository } = useIsRepository()
   const config = useMemo(
     () => (isRepository ? REPO_CONFIG : USER_GRAPH_CONFIG),
     [isRepository]
