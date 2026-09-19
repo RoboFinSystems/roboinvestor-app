@@ -7,6 +7,7 @@ import PortfolioPageContent from '../content'
 // rather than the shared extension filter.
 const graphs = vi.hoisted(() => ({
   current: [] as Array<{ graphId: string; graphName: string }>,
+  selectedId: null as string | null,
 }))
 
 const listPortfolios = vi.hoisted(() => vi.fn())
@@ -19,7 +20,9 @@ vi.mock('@robosystems/core', async () => {
   return {
     ...actual,
     GraphFilters: { roboinvestor: () => true },
-    useGraphContext: () => ({ state: { graphs: graphs.current } }),
+    useGraphContext: () => ({
+      state: { graphs: graphs.current, currentGraphId: graphs.selectedId },
+    }),
     clients: {
       investor: {
         listPortfolios,
@@ -55,6 +58,25 @@ describe('PortfolioPageContent', () => {
     createSecurity.mockResolvedValue({ id: 'sec-1' })
     updatePortfolioBlock.mockResolvedValue({})
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
+    graphs.selectedId = null
+  })
+
+  it('reads the selected graph, not the first one', async () => {
+    graphs.current = [
+      { graphId: 'graph-a', graphName: 'Graph A' },
+      { graphId: 'graph-b', graphName: 'Graph B' },
+    ]
+    graphs.selectedId = 'graph-b'
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-b1', 'Seed Fund')],
+    })
+
+    render(<PortfolioPageContent />)
+
+    await waitFor(() =>
+      expect(getHoldings).toHaveBeenCalledWith('graph-b', 'p-b1')
+    )
+    expect(listPortfolios).not.toHaveBeenCalledWith('graph-a')
   })
 
   it('selects the first portfolio and loads its holdings', async () => {
@@ -152,6 +174,7 @@ describe('adding a security with a position', () => {
     createSecurity.mockResolvedValue({ id: 'sec-1' })
     updatePortfolioBlock.mockResolvedValue({})
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
+    graphs.selectedId = null
     listPortfolios.mockResolvedValue({
       portfolios: [portfolio('p-a1', 'Growth Fund')],
     })

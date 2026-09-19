@@ -31,7 +31,7 @@ import {
   TextInput,
 } from 'flowbite-react'
 import type { FC } from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   HiCurrencyDollar,
   HiExclamationCircle,
@@ -216,8 +216,16 @@ const PortfolioPageContent: FC = function () {
   const [savingEdit, setSavingEdit] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
-  // Get the first roboinvestor graph
-  const investorGraph = graphState.graphs.find(GraphFilters.roboinvestor)
+  // The selected graph when it is a RoboInvestor graph, otherwise the first
+  // one: the same rule as Portfolio Reports, so the two pages agree on which
+  // graph a user with more than one is looking at.
+  const investorGraph = useMemo(() => {
+    const investorGraphs = graphState.graphs.filter(GraphFilters.roboinvestor)
+    return (
+      investorGraphs.find((g) => g.graphId === graphState.currentGraphId) ??
+      investorGraphs[0]
+    )
+  }, [graphState.graphs, graphState.currentGraphId])
   const graphId = investorGraph?.graphId
 
   // Every id on this page — portfolio, security, entity — belongs to one graph.
