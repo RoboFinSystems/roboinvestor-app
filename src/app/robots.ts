@@ -11,12 +11,14 @@ export default function robots(): MetadataRoute.Robots {
       // (the (blog) route group) and stays crawlable; its canonical says who owns it.
       disallow: [
         '/api/',
+        '/companies/',
         '/console/',
         '/entities/',
         '/entity/',
         '/graphs/',
         '/home/',
         '/portfolio/',
+        '/reports/',
         '/repositories/',
         '/search/',
         '/settings/',
