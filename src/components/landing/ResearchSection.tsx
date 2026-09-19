@@ -196,7 +196,7 @@ export default function ResearchSection() {
                   </div>
                   <p className="text-sm text-gray-400">
                     Subscribe to the shared SEC repository and query it directly
-                    in the console — or from Claude Desktop and Cursor over MCP.
+                    in the console — or from Claude, ChatGPT, or any MCP client.
                   </p>
                 </div>
               </div>

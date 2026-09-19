@@ -1,12 +1,12 @@
 # RoboInvestor App
 
-RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and Claude-powered investment insights via the RoboSystems knowledge graph.
+RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and AI-powered investment insights via the RoboSystems knowledge graph.
 
 - **Portfolio Intelligence**: Track and analyze investment holdings with AI-powered insights and recommendations
 - **Natural Language Queries**: Ask questions about your portfolio in plain English and get instant answers
-- **AI-Powered Guidance**: Leverage Claude AI for investment analysis via the knowledge graph
+- **AI-Powered Guidance**: Investment analysis from the AI assistant you already use, via the knowledge graph
 - **Knowledge Graph Foundation**: Investment data modeled as a semantic graph preserving relationships
-- **MCP Integration**: Model Context Protocol support for Claude Desktop and Claude Code
+- **MCP Integration**: Model Context Protocol support for Claude, ChatGPT, Cursor, and any MCP client
 
 ## Core Features
 
@@ -21,7 +21,7 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 - **Research**: SEC-filing-grounded equity research browser, every figure traceable to a filing
 - **Document Search**: Full-text and semantic search across connected sources
 - **Graph Creation**: Wizard-based portfolio graph setup with schema selection
-- **Repository API Keys**: Generate a repository-scoped key from a repository's getting-started page for programmatic and Claude connector access
+- **Repository API Keys**: Generate a repository-scoped key from a repository's getting-started page for programmatic and MCP connector access
 
 ### Roadmap
 

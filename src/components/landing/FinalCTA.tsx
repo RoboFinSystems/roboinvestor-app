@@ -11,8 +11,8 @@ export default function FinalCTA() {
           Ready to Analyze Your Investments?
         </h2>
         <p className="mb-12 text-xl text-gray-300">
-          Experience AI-powered investment analysis and SEC research — powered
-          by Claude AI and RoboSystems.
+          Experience AI-powered investment analysis and SEC research — from the
+          AI assistant you already use, built on RoboSystems.
         </p>
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
           <Link

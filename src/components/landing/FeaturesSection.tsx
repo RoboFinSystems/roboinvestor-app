@@ -104,7 +104,7 @@ export default function FeaturesSection() {
       ),
       title: 'Agent-Native Operations',
       description:
-        'Every portfolio operation is an MCP tool — Claude reads and writes your graph, validated on every call',
+        'Every portfolio operation is an MCP tool — your AI assistant reads and writes your graph, validated on every call',
       color: 'orange',
     },
     {
@@ -125,7 +125,7 @@ export default function FeaturesSection() {
       ),
       title: 'AI Research Console',
       description:
-        'Claude-powered natural language queries with deep research mode for investment analysis',
+        'AI-powered natural language queries with deep research mode for investment analysis',
       color: 'purple',
     },
   ]
@@ -277,7 +277,7 @@ export default function FeaturesSection() {
                     AI-Native Architecture
                   </div>
                   <p className="text-sm text-gray-400">
-                    Built for Claude integration from the ground up
+                    Built for MCP clients from the ground up
                   </p>
                 </div>
               </div>

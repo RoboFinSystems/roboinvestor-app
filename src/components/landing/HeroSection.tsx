@@ -1,5 +1,5 @@
+import { McpLogo } from '@/components/mcp/McpLogo'
 import { AnimatedLogo } from '@robosystems/core/ui-components'
-import Image from 'next/image'
 import Link from 'next/link'
 import FloatingElementsVariant from './FloatingElementsVariant'
 
@@ -24,10 +24,13 @@ export default function HeroSection() {
 
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:text-lg md:mt-8 md:text-2xl">
             Track investment portfolios, research public company filings, and
-            get AI-powered insights. RoboInvestor combines{' '}
-            <strong className="text-primary-400">Claude AI</strong> with
-            RoboSystems' knowledge graph to organize your holdings and connect
-            them to SEC data for intelligent investment analysis.
+            get AI-powered insights. RoboInvestor pairs RoboSystems' knowledge
+            graph with{' '}
+            <strong className="text-primary-400">
+              Claude, ChatGPT, or any MCP client
+            </strong>{' '}
+            to organize your holdings and connect them to SEC data for
+            intelligent investment analysis.
           </p>
 
           <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-4 sm:gap-6 md:mt-16 md:grid-cols-3">
@@ -109,7 +112,7 @@ export default function HeroSection() {
                   Agent-Managed Portfolio
                 </h3>
                 <p className="text-center text-sm text-gray-400">
-                  Connect Claude Desktop or Cursor over MCP — query your graph
+                  Connect Claude, ChatGPT, or any MCP client — query your graph
                   and record portfolios, securities, and positions
                 </p>
               </div>
@@ -140,14 +143,8 @@ export default function HeroSection() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 sm:gap-6 sm:text-sm md:mt-12">
             <div className="flex items-center gap-2">
-              <Image
-                src="/images/claude.svg"
-                alt="Claude AI"
-                width={20}
-                height={20}
-                className="h-5 w-5"
-              />
-              <span>Claude AI</span>
+              <McpLogo className="h-5 w-5 text-gray-300" />
+              <span>Works with any MCP client</span>
             </div>
             <div className="flex items-center gap-2">
               <AnimatedLogo
