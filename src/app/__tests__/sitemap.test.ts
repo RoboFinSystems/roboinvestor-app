@@ -2,14 +2,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockGetAllCoverage = vi.fn()
 const mockGetDocsCatalog = vi.fn()
+// Mutable so one test can point the research pages at another origin (a mirror).
+const researchSite = vi.hoisted(() => ({ canonicalHere: true }))
 
 vi.mock('@/lib/research', () => ({
   getAllCoverage: () => mockGetAllCoverage(),
 }))
 vi.mock('@/lib/research-site', () => ({
-  RESEARCH_IS_CANONICAL_HERE: true,
+  get RESEARCH_IS_CANONICAL_HERE() {
+    return researchSite.canonicalHere
+  },
   SELF_ORIGIN: 'https://roboinvestor.ai',
 }))
+// Only the fetch is replaced; the nav grouping is the real one.
 vi.mock('@/lib/docs', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   getDocsCatalog: () => mockGetDocsCatalog(),
@@ -34,6 +39,9 @@ function docsPage(slug: string, updated: string | null): DocsPage {
   }
 }
 
+// The catalog is shared across sites: this app lists its own product pages and
+// nothing else, so the fixture carries another site's product pages and the
+// technical docs too.
 const docsCatalog: DocsCatalog = {
   schema_version: 1,
   digest: 'abc',
@@ -42,14 +50,70 @@ const docsCatalog: DocsCatalog = {
       site: 'roboinvestor',
       layer: 'product',
       base_path: '/docs',
-      sections: [{ title: null, slugs: ['index', 'your-portfolio'] }],
+      sections: [
+        {
+          title: null,
+          slugs: ['index', 'your-portfolio', 'research-and-sec-filings'],
+        },
+      ],
+    },
+    {
+      site: 'roboledger',
+      layer: 'product',
+      base_path: '/docs',
+      sections: [{ title: null, slugs: ['index', 'month-end-close'] }],
+    },
+    {
+      site: 'robosystems',
+      layer: 'technical',
+      base_path: '/docs/technical',
+      sections: [{ title: 'Getting Started', slugs: ['quick-start'] }],
     },
   ],
   pages: [
     docsPage('index', '2026-09-19T01:00:00-05:00'),
-    docsPage('your-portfolio', '2026-09-19T01:00:00-05:00'),
+    docsPage('your-portfolio', '2026-09-18T12:00:00-05:00'),
+    docsPage('research-and-sec-filings', null),
+    {
+      ...docsPage('index', '2026-09-17T01:00:00-05:00'),
+      site: 'roboledger',
+      body: 'product/roboledger/index.md',
+    },
+    {
+      ...docsPage('month-end-close', '2026-09-17T01:00:00-05:00'),
+      site: 'roboledger',
+      body: 'product/roboledger/month-end-close.md',
+    },
+    {
+      ...docsPage('quick-start', '2026-08-09T22:40:55-05:00'),
+      site: 'robosystems',
+      layer: 'technical',
+      path: '/docs/technical/quick-start',
+      body: 'technical/quick-start.md',
+    },
   ],
 }
+
+const expectedDocs = [
+  {
+    url: 'https://roboinvestor.ai/docs',
+    lastModified: new Date('2026-09-19T01:00:00-05:00'),
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  },
+  {
+    url: 'https://roboinvestor.ai/docs/your-portfolio',
+    lastModified: new Date('2026-09-18T12:00:00-05:00'),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  },
+  {
+    url: 'https://roboinvestor.ai/docs/research-and-sec-filings',
+    lastModified: undefined,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  },
+]
 
 const coverage = [
   { ticker: 'MSFT', date: '2026-07-30' },
@@ -62,6 +126,7 @@ const coverage = [
 // are true.
 describe('sitemap', () => {
   beforeEach(() => {
+    researchSite.canonicalHere = true
     mockGetDocsCatalog.mockResolvedValue(null)
   })
 
@@ -114,19 +179,30 @@ describe('sitemap', () => {
     mockGetDocsCatalog.mockResolvedValue(docsCatalog)
     const docs = (await sitemap()).filter((e) => e.url.includes('/docs'))
 
-    expect(docs).toEqual([
-      {
-        url: 'https://roboinvestor.ai/docs',
-        lastModified: new Date('2026-09-19T01:00:00-05:00'),
-        changeFrequency: 'monthly',
-        priority: 0.9,
-      },
-      {
-        url: 'https://roboinvestor.ai/docs/your-portfolio',
-        lastModified: new Date('2026-09-19T01:00:00-05:00'),
-        changeFrequency: 'monthly',
-        priority: 0.8,
-      },
+    expect(docs).toEqual(expectedDocs)
+  })
+
+  it('leaves the docs out, and keeps everything else, when the docs catalog is unreachable', async () => {
+    mockGetAllCoverage.mockResolvedValue(coverage)
+    mockGetDocsCatalog.mockResolvedValue(null)
+    const urls = (await sitemap()).map((e) => e.url)
+
+    expect(urls.some((u) => u.includes('/docs'))).toBe(false)
+    expect(urls).toContain('https://roboinvestor.ai')
+    expect(urls).toContain('https://roboinvestor.ai/research/msft')
+  })
+
+  it('lists the homepage and the docs, and no research, while the research pages are a mirror', async () => {
+    researchSite.canonicalHere = false
+    mockGetAllCoverage.mockResolvedValue(coverage)
+    mockGetDocsCatalog.mockResolvedValue(docsCatalog)
+    const entries = await sitemap()
+
+    expect(entries.map((e) => e.url)).toEqual([
+      'https://roboinvestor.ai',
+      ...expectedDocs.map((d) => d.url),
     ])
+    expect(entries.filter((e) => e.url.includes('/docs'))).toEqual(expectedDocs)
+    expect(mockGetAllCoverage).not.toHaveBeenCalled()
   })
 })

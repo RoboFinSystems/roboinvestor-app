@@ -3,7 +3,7 @@
 import type { FC } from 'react'
 
 interface DocsLinkProps {
-  /** Path of the product-docs page, e.g. `/docs/month-end-close`. */
+  /** Path of the product-docs page, e.g. `/docs/your-portfolio`. */
   href: string
 }
 

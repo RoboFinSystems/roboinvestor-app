@@ -5,20 +5,20 @@ import DocsLink from '../DocsLink'
 
 describe('DocsLink', () => {
   it('points at the given docs page in a new tab', () => {
-    render(<DocsLink href="/docs/month-end-close" />)
+    render(<DocsLink href="/docs/your-portfolio" />)
 
     const link = screen.getByRole('link', { name: /Read the guide/ })
-    expect(link).toHaveAttribute('href', '/docs/month-end-close')
+    expect(link).toHaveAttribute('href', '/docs/your-portfolio')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
     expect(link.textContent).toContain('(opens in a new tab)')
   })
 
   it('reads the same wherever it lands', () => {
-    const { rerender } = render(<DocsLink href="/docs/connect-your-books" />)
+    const { rerender } = render(<DocsLink href="/docs/reports-you-receive" />)
     expect(screen.getByRole('link')).toHaveTextContent('Read the guide →')
 
-    rerender(<DocsLink href="/docs/reports-and-sharing" />)
+    rerender(<DocsLink href="/docs/research-and-sec-filings" />)
     expect(screen.getByRole('link')).toHaveTextContent('Read the guide →')
   })
 })

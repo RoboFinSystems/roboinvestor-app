@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DOCS_SITE,
   descriptionRepeatsBody,
   docsNeighbors,
   findDocsPage,
@@ -42,10 +43,10 @@ const catalog: DocsCatalog = {
       ],
     },
     {
-      site: 'roboledger',
+      site: 'roboinvestor',
       layer: 'product',
       base_path: '/docs',
-      sections: [{ title: null, slugs: ['index', 'connect'] }],
+      sections: [{ title: 'Get started', slugs: ['index', 'your-portfolio'] }],
     },
   ],
   pages: [
@@ -63,16 +64,16 @@ const catalog: DocsCatalog = {
     page({ slug: 'core-concepts', title: 'Core Concepts' }),
     page({ slug: 'graph-operations', title: 'Graph Operations' }),
     page({
-      site: 'roboledger',
+      site: 'roboinvestor',
       layer: 'product',
       slug: 'index',
       path: '/docs',
     }),
     page({
-      site: 'roboledger',
+      site: 'roboinvestor',
       layer: 'product',
-      slug: 'connect',
-      path: '/docs/connect',
+      slug: 'your-portfolio',
+      path: '/docs/your-portfolio',
     }),
   ],
 }
@@ -95,14 +96,18 @@ describe('getDocsNav', () => {
     ])
   })
 
+  it("renders roboinvestor.ai's product pages", () => {
+    expect(DOCS_SITE).toBe('roboinvestor')
+  })
+
   it('keeps each site and layer apart', () => {
-    const nav = getDocsNav(catalog, 'roboledger', 'product')!
+    const nav = getDocsNav(catalog, DOCS_SITE, 'product')!
     expect(nav.index?.path).toBe('/docs')
-    expect(nav.ordered.map((p) => p.slug)).toEqual(['index', 'connect'])
+    expect(nav.ordered.map((p) => p.slug)).toEqual(['index', 'your-portfolio'])
   })
 
   it('returns null for a collection the catalog does not have', () => {
-    expect(getDocsNav(catalog, 'roboinvestor', 'product')).toBeNull()
+    expect(getDocsNav(catalog, 'roboledger', 'product')).toBeNull()
   })
 })
 
@@ -192,8 +197,8 @@ describe('descriptionRepeatsBody', () => {
   it('is false for a written description', () => {
     expect(
       descriptionRepeatsBody(
-        'How Claude closes a month on RoboLedger.',
-        'Closing a month in RoboLedger locks the period.'
+        'Create portfolios, add securities and positions, and link an issuer.',
+        'A RoboInvestor graph holds what you own.'
       )
     ).toBe(false)
     expect(descriptionRepeatsBody('', 'Body')).toBe(false)
