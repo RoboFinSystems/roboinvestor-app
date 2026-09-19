@@ -78,6 +78,12 @@ export default function Header() {
               Research
             </Link>
             <Link
+              href="/docs"
+              className="hover:text-primary-400 px-3 py-2 text-sm font-medium text-gray-300 transition-colors"
+            >
+              Docs
+            </Link>
+            <Link
               href="#ai-analysis"
               className="hover:text-primary-400 px-3 py-2 text-sm font-medium text-gray-300 transition-colors"
             >
@@ -170,6 +176,13 @@ export default function Header() {
                 className="hover:text-primary-400 px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800"
               >
                 Research
+              </Link>
+              <Link
+                href="/docs"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="hover:text-primary-400 px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800"
+              >
+                Docs
               </Link>
               <Link
                 href="#ai-analysis"

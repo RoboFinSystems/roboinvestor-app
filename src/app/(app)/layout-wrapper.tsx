@@ -55,9 +55,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <CoreNavbar
         appName="RoboInvestor"
         currentApp={CURRENT_APP}
-        // This app has no docs of its own; the user menu points at the platform
-        // guides on robosystems.ai.
-        docsHref="https://robosystems.ai/docs/guides"
+        docsHref="/docs"
         borderColorClass="dark:border-gray-800"
         additionalComponents={<EntitySelectorDropdown />}
       />

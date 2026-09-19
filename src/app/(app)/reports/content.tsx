@@ -10,6 +10,7 @@
  * drives both the filter and the provenance line.
  */
 
+import DocsLink from '@/components/DocsLink'
 import type { ReportListItem } from '@robosystems/client/clients'
 import {
   clients,
@@ -122,7 +123,12 @@ const ReceivedReportsContent: FC = function () {
         <PageHeader
           icon={HiDocumentReport}
           title="Reports"
-          subtitle="Financial reports shared with this fund by its portfolio companies."
+          subtitle={
+            <>
+              Financial reports shared with this fund by its portfolio
+              companies. <DocsLink href="/docs/reports-you-receive" />
+            </>
+          }
         />
         <LoadingState />
       </PageLayout>
@@ -134,7 +140,12 @@ const ReceivedReportsContent: FC = function () {
       <PageHeader
         icon={HiDocumentReport}
         title="Reports"
-        subtitle="Financial reports shared with this fund by its portfolio companies."
+        subtitle={
+          <>
+            Financial reports shared with this fund by its portfolio companies.{' '}
+            <DocsLink href="/docs/reports-you-receive" />
+          </>
+        }
       />
 
       {error && (

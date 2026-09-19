@@ -12,6 +12,7 @@ export default function Footer() {
         { label: 'Platform', href: '#schema' },
         { label: 'Research', href: '/research' },
         { label: 'Console', href: '#ai-analysis' },
+        { label: 'Docs', href: '/docs' },
       ]}
       contactModal={ContactModal}
     />

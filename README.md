@@ -136,7 +136,8 @@ Shared modules consumed as an npm package across RoboSystems frontend apps:
 ## Support
 
 - [Issues](https://github.com/RoboFinSystems/roboinvestor-app/issues)
-- [Documentation](https://robosystems.ai/docs/technical)
+- [Documentation](https://roboinvestor.ai/docs)
+- [Technical docs](https://robosystems.ai/docs/technical)
 - [Projects](https://github.com/orgs/RoboFinSystems/projects)
 - [Discussions](https://github.com/orgs/RoboFinSystems/discussions)
 

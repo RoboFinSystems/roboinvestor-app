@@ -1,5 +1,6 @@
 'use client'
 
+import DocsLink from '@/components/DocsLink'
 import {
   clients,
   EmptyState,
@@ -527,7 +528,12 @@ const PortfolioPageContent: FC = function () {
       <PageHeader
         icon={HiViewGrid}
         title="Portfolio"
-        subtitle="Manage your investment portfolios and holdings"
+        subtitle={
+          <>
+            Manage your investment portfolios and holdings.{' '}
+            <DocsLink href="/docs/your-portfolio" />
+          </>
+        }
         actions={
           <Button
             color="secondary"
