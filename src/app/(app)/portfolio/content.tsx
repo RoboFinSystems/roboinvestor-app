@@ -1,13 +1,13 @@
 'use client'
 
+import DocsLink from '@/components/DocsLink'
+import { useInvestorGraph } from '@/hooks/useInvestorGraph'
 import {
   clients,
   EmptyState,
-  GraphFilters,
   LoadingState,
   PageHeader,
   PageLayout,
-  useGraphContext,
 } from '@robosystems/core'
 import {
   Alert,
@@ -163,7 +163,6 @@ const securityTypeLabel: Record<string, string> = {
 }
 
 const PortfolioPageContent: FC = function () {
-  const { state: graphState } = useGraphContext()
   const [portfolios, setPortfolios] = useState<Portfolio[]>([])
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(
     null
@@ -215,9 +214,9 @@ const PortfolioPageContent: FC = function () {
   const [savingEdit, setSavingEdit] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
-  // Get the first roboinvestor graph
-  const investorGraph = graphState.graphs.find(GraphFilters.roboinvestor)
-  const graphId = investorGraph?.graphId
+  // The same rule as Reports and the report viewer, so every page agrees on
+  // which graph a user with more than one is looking at.
+  const graphId = useInvestorGraph()?.graphId
 
   // Every id on this page — portfolio, security, entity — belongs to one graph.
   // The loaders below are also re-invoked directly after a mutation, where an
@@ -527,7 +526,12 @@ const PortfolioPageContent: FC = function () {
       <PageHeader
         icon={HiViewGrid}
         title="Portfolio"
-        subtitle="Manage your investment portfolios and holdings"
+        subtitle={
+          <>
+            Manage your investment portfolios and holdings.{' '}
+            <DocsLink href="/docs/your-portfolio" />
+          </>
+        }
         actions={
           <Button
             color="secondary"

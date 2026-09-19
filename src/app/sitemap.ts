@@ -1,3 +1,4 @@
+import { DOCS_SITE, getDocsCatalog, getDocsNav } from '@/lib/docs'
 import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
 import type { MetadataRoute } from 'next'
@@ -15,12 +16,13 @@ function latestDate(dates: (string | undefined)[]): Date | undefined {
   return ts.length ? new Date(Math.max(...ts)) : undefined
 }
 
-// RoboInvestor's public surface is the marketing homepage, the research index and one page
-// per covered company. The research entries are listed only while these pages are canonical
-// here (src/lib/research-site.ts); a mirror is deliberately not submitted.
-// Everything else is behind auth in the (app) route group (see robots.ts); /register is
-// de-indexed ahead of the centralized-login flip, and /pages/privacy + /pages/terms are
-// server redirects to the consolidated RoboSystems legal docs, so they are excluded.
+// RoboInvestor's public surface is the marketing homepage, the product docs, the
+// research index and one page per covered company. The research entries are listed
+// only while these pages are canonical here (src/lib/research-site.ts); a mirror is
+// deliberately not submitted. Everything else is behind auth in the (app) route
+// group (see robots.ts); /register is de-indexed ahead of the centralized-login
+// flip, and /pages/privacy + /pages/terms are server redirects to the consolidated
+// RoboSystems legal docs, so they are excluded.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SELF_ORIGIN
 
@@ -31,7 +33,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1,
   }
 
-  if (!RESEARCH_IS_CANONICAL_HERE) return [home]
+  const catalog = await getDocsCatalog()
+  const docs = catalog && getDocsNav(catalog, DOCS_SITE, 'product')
+  const docsPages: MetadataRoute.Sitemap = (docs?.ordered ?? []).map(
+    (page) => ({
+      url: `${baseUrl}${page.path}`,
+      lastModified: page.updated ? new Date(page.updated) : undefined,
+      changeFrequency: 'monthly' as const,
+      priority: page.slug === 'index' ? 0.9 : 0.8,
+    })
+  )
+
+  if (!RESEARCH_IS_CANONICAL_HERE) return [home, ...docsPages]
 
   const coverage = await getAllCoverage().catch(() => [])
   const researchPages = coverage.map((item) => ({
@@ -43,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     home,
+    ...docsPages,
     {
       url: `${baseUrl}/research`,
       lastModified: latestDate(coverage.map((c) => c.date)),

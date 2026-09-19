@@ -1,6 +1,7 @@
 'use client'
 
 import { CompanySearch } from '@/components/companies/CompanySearch'
+import DocsLink from '@/components/DocsLink'
 import { CoverageGrid } from '@/components/research/CoverageGrid'
 import { type CoverageItem, getAllCoverage } from '@/lib/research'
 import { researchCanonical } from '@/lib/research-site'
@@ -40,7 +41,13 @@ export function CompaniesSearchContent() {
       <PageHeader
         icon={HiDocumentText}
         title="Research"
-        subtitle="Search any listed filer's 10-K, 10-Q, 20-F or 40-F since 2024, rendered from the filing itself, or read the latest published research."
+        subtitle={
+          <>
+            Search any listed filer&apos;s 10-K, 10-Q, 20-F or 40-F since 2024,
+            rendered from the filing itself, or read the latest published
+            research. <DocsLink href="/docs/research-and-sec-filings" />
+          </>
+        }
       />
 
       <div className="mx-auto w-full max-w-2xl">

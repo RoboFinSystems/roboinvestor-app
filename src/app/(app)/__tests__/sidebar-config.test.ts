@@ -14,8 +14,8 @@ describe('getNavigationItems', () => {
     expect(labels[labels.length - 1]).toBe('Repositories')
   })
 
-  // The docs are reached from the user menu, which this app points at the platform
-  // guides on robosystems.ai; the sidebar carries none.
+  // The docs are reached from the user menu (core's CoreNavbar) and from the page
+  // each guide explains; the sidebar carries none.
   it.each(states)('links no docs page with %s', (_, options) => {
     const hrefs = getNavigationItems(options).flatMap((item) => [
       item.href,

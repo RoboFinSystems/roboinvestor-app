@@ -342,7 +342,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                 Generate an API key and use the code examples below to access
                 the repository.{' '}
                 <a
-                  href={`${process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL || 'https://api.robosystems.ai'}/docs`}
+                  href={`${process.env.NEXT_PUBLIC_ROBOSYSTEMS_APP_URL || 'https://robosystems.ai'}/docs/api`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"

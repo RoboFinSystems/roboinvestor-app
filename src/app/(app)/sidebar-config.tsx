@@ -96,9 +96,8 @@ export const getNavigationItems = ({
     },
   ]
 
-  // The docs are reached from the user menu, which carries the platform guides on
-  // robosystems.ai because this app has none of its own (see layout-wrapper's
-  // docsHref). The sidebar stays the portfolio's workspace.
+  // The docs are reached from the user menu (core's CoreNavbar) and from the page
+  // each guide explains, not from here: the sidebar is the portfolio's workspace.
   const tailItems: SidebarItemData[] = []
 
   return [
