@@ -40,7 +40,7 @@ export function CompareYourCompany({
       </h2>
       <p className="mt-3 text-gray-600 dark:text-gray-300">
         Connect your QuickBooks, add the SEC graph beside your books, and ask
-        Claude how your margins and growth compare to {ticker} — every figure
+        your AI how your margins and growth compare to {ticker} — every figure
         traced to a filing, the same as this report.
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-4">

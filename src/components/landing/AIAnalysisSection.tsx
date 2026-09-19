@@ -77,8 +77,8 @@ ORDER BY p.end_date DESC`}
                 Natural Language Understanding
               </h4>
               <p className="text-sm text-gray-300">
-                Claude AI parses your question, identifies the companies,
-                metrics, and time periods you care about
+                The AI parses your question, identifies the companies, metrics,
+                and time periods you care about
               </p>
             </div>
 
@@ -118,7 +118,7 @@ ORDER BY p.end_date DESC`}
                 Summarized Results
               </h4>
               <p className="text-sm text-gray-300">
-                Claude interprets the query results and delivers a clear
+                The AI interprets the query results and delivers a clear
                 narrative with the raw data available for further analysis
               </p>
             </div>
@@ -156,8 +156,10 @@ ORDER BY p.end_date DESC`}
 
         <div className="mt-12 text-center">
           <p className="mb-4 text-gray-300">
-            Powered by{' '}
-            <span className="text-primary-400 font-semibold">Claude AI</span>{' '}
+            Powered by the{' '}
+            <span className="text-primary-400 font-semibold">
+              Analyst Operator
+            </span>{' '}
             and{' '}
             <a
               href="https://robosystems.ai/"
@@ -183,8 +185,8 @@ ORDER BY p.end_date DESC`}
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Connect Claude Desktop or Cursor via MCP to analyze and update your
-            portfolio
+            Connect Claude, ChatGPT, or any MCP client to analyze and update
+            your portfolio
           </div>
         </div>
       </div>
