@@ -14,6 +14,12 @@ describe('DocsLink', () => {
     expect(link.textContent).toContain('(opens in a new tab)')
   })
 
+  it('never wraps, so the arrow cannot land alone on a line', () => {
+    render(<DocsLink href="/docs/your-portfolio" />)
+
+    expect(screen.getByRole('link')).toHaveClass('whitespace-nowrap')
+  })
+
   it('reads the same wherever it lands', () => {
     const { rerender } = render(<DocsLink href="/docs/reports-you-receive" />)
     expect(screen.getByRole('link')).toHaveTextContent('Read the guide →')
