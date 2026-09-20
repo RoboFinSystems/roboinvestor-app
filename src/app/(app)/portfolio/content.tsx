@@ -564,7 +564,7 @@ const PortfolioPageContent: FC = function () {
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Portfolio list sidebar */}
-          <div className="space-y-3">
+          <div className="min-w-0 space-y-3">
             <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
               Portfolios
             </h2>
@@ -601,7 +601,7 @@ const PortfolioPageContent: FC = function () {
           </div>
 
           {/* Holdings detail */}
-          <div className="lg:col-span-2">
+          <div className="min-w-0 lg:col-span-2">
             {activeSelection ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -644,14 +644,14 @@ const PortfolioPageContent: FC = function () {
                     {holdings.map((h) => (
                       <Card key={h.entity_id}>
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <HiOfficeBuilding className="text-secondary-500 h-5 w-5" />
-                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <HiOfficeBuilding className="text-secondary-500 h-5 w-5 shrink-0" />
+                              <h3 className="min-w-0 text-lg font-semibold break-words text-gray-900 dark:text-white">
                                 {h.entity_name}
                               </h3>
                             </div>
-                            <div className="flex items-center gap-4 text-sm">
+                            <div className="flex flex-wrap items-center gap-4 text-sm">
                               <span className="text-gray-500 dark:text-gray-400">
                                 Cost:{' '}
                                 {formatCurrency(h.total_cost_basis_dollars)}
@@ -669,67 +669,74 @@ const PortfolioPageContent: FC = function () {
 
                           {h.source_graph_id && (
                             <Badge color="info" className="text-xs">
-                              Linked graph: {h.source_graph_id}
+                              Linked graph:{' '}
+                              <span className="break-all">
+                                {h.source_graph_id}
+                              </span>
                             </Badge>
                           )}
 
-                          <Table>
-                            <TableHead>
-                              <TableHeadCell>Security</TableHeadCell>
-                              <TableHeadCell>Type</TableHeadCell>
-                              <TableHeadCell>Quantity</TableHeadCell>
-                              <TableHeadCell>Cost Basis</TableHeadCell>
-                              <TableHeadCell>Current Value</TableHeadCell>
-                              <TableHeadCell className="w-12"></TableHeadCell>
-                            </TableHead>
-                            <TableBody className="divide-y">
-                              {h.securities.map((s) => (
-                                <TableRow key={s.security_id}>
-                                  <TableCell className="font-medium text-gray-900 dark:text-white">
-                                    {s.security_name}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge color="gray">
-                                      {securityTypeLabel[s.security_type] ||
-                                        s.security_type}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    {s.quantity.toLocaleString()}{' '}
-                                    {s.quantity_type}
-                                  </TableCell>
-                                  <TableCell>
-                                    {formatCurrency(s.cost_basis_dollars)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {s.current_value_dollars != null ? (
-                                      <span className="flex items-center gap-1">
-                                        <HiCurrencyDollar className="h-4 w-4 text-green-500" />
-                                        {formatCurrency(
-                                          s.current_value_dollars
-                                        )}
-                                      </span>
-                                    ) : (
-                                      <span className="text-gray-400">--</span>
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <button
-                                      onClick={() =>
-                                        openEditSecurity(
-                                          s.security_id,
-                                          s.security_name
-                                        )
-                                      }
-                                      className="hover:text-secondary-500 rounded p-1 text-gray-400"
-                                    >
-                                      <HiPencil className="h-4 w-4" />
-                                    </button>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableHead>
+                                <TableHeadCell>Security</TableHeadCell>
+                                <TableHeadCell>Type</TableHeadCell>
+                                <TableHeadCell>Quantity</TableHeadCell>
+                                <TableHeadCell>Cost Basis</TableHeadCell>
+                                <TableHeadCell>Current Value</TableHeadCell>
+                                <TableHeadCell className="w-12"></TableHeadCell>
+                              </TableHead>
+                              <TableBody className="divide-y">
+                                {h.securities.map((s) => (
+                                  <TableRow key={s.security_id}>
+                                    <TableCell className="font-medium text-gray-900 dark:text-white">
+                                      {s.security_name}
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge color="gray">
+                                        {securityTypeLabel[s.security_type] ||
+                                          s.security_type}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                      {s.quantity.toLocaleString()}{' '}
+                                      {s.quantity_type}
+                                    </TableCell>
+                                    <TableCell>
+                                      {formatCurrency(s.cost_basis_dollars)}
+                                    </TableCell>
+                                    <TableCell>
+                                      {s.current_value_dollars != null ? (
+                                        <span className="flex items-center gap-1">
+                                          <HiCurrencyDollar className="h-4 w-4 text-green-500" />
+                                          {formatCurrency(
+                                            s.current_value_dollars
+                                          )}
+                                        </span>
+                                      ) : (
+                                        <span className="text-gray-400">
+                                          --
+                                        </span>
+                                      )}
+                                    </TableCell>
+                                    <TableCell>
+                                      <button
+                                        onClick={() =>
+                                          openEditSecurity(
+                                            s.security_id,
+                                            s.security_name
+                                          )
+                                        }
+                                        className="hover:text-secondary-500 rounded p-1 text-gray-400"
+                                      >
+                                        <HiPencil className="h-4 w-4" />
+                                      </button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
                         </div>
                       </Card>
                     ))}
