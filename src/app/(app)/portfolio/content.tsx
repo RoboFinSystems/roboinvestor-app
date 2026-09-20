@@ -668,8 +668,11 @@ const PortfolioPageContent: FC = function () {
                           </div>
 
                           {h.source_graph_id && (
-                            <Badge color="info" className="text-xs break-all">
-                              Linked graph: {h.source_graph_id}
+                            <Badge color="info" className="text-xs">
+                              Linked graph:{' '}
+                              <span className="break-all">
+                                {h.source_graph_id}
+                              </span>
                             </Badge>
                           )}
 
