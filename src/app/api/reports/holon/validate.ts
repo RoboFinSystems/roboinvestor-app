@@ -27,15 +27,15 @@ function bundleBucket(): string | null {
 }
 
 /**
- * The S3 endpoint override (LocalStack in local development), if any. Read per
- * call rather than at module load so a runtime env change (and tests) take
- * effect without a rebuild.
+ * The S3 endpoint override (LocalStack in local development), if any; matched
+ * on protocol, host and port. Read per call rather than at module load so a
+ * runtime env change (and tests) take effect without a rebuild.
  */
-function overrideHost(): string | null {
+function overrideOrigin(): URL | null {
   const endpoint = process.env.NEXT_PUBLIC_S3_ENDPOINT_URL
   if (!endpoint) return null
   try {
-    return new URL(endpoint).hostname.toLowerCase()
+    return new URL(endpoint)
   } catch {
     return null
   }
@@ -100,16 +100,21 @@ export function allowedHolonUrl(raw: string): URL | null {
 
   const host = u.hostname.toLowerCase()
   const bucket = bundleBucket()
-  const override = overrideHost()
+  const override = overrideOrigin()
   const isProduction = process.env.NODE_ENV === 'production'
 
   let key: string | null = null
-  if (override && host === override) {
+  if (
+    override &&
+    u.protocol === override.protocol &&
+    u.host.toLowerCase() === override.host.toLowerCase()
+  ) {
     if (isProduction && !bucket) return null
     key = overrideKey(u.pathname, bucket)
   } else {
-    // Plaintext is tolerated only for the explicitly configured endpoint.
-    if (u.protocol !== 'https:' || !bucket) return null
+    // Plaintext and explicit ports are tolerated only for the configured
+    // endpoint override.
+    if (u.protocol !== 'https:' || u.port !== '' || !bucket) return null
     key = bucketKey(host, u.pathname, bucket)
   }
   if (key === null) return null

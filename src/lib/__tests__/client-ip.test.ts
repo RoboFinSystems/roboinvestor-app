@@ -51,6 +51,15 @@ describe('getClientIp', () => {
           })
         )
       ).toBe('198.51.100.4')
+      expect(
+        getClientIp(
+          requestWith({
+            'cloudfront-viewer-address': '10.0.0.1:1',
+            'x-forwarded-for': '10.0.0.1, 198.51.100.4',
+            'x-origin-verify': 's3cret-longer',
+          })
+        )
+      ).toBe('198.51.100.4')
     })
 
     it('keeps trusting the viewer address while no secret is configured', () => {

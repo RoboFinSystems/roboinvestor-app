@@ -97,6 +97,18 @@ describe('POST /api/reports/holon', () => {
     expect(fetchMock).toHaveBeenCalledWith(URL_OK, { redirect: 'manual' })
   })
 
+  it('does not follow an upstream redirect', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, {
+        status: 302,
+        headers: { location: 'https://evil.test/' },
+      })
+    )
+    const res = await POST(post(JSON.stringify({ url: URL_OK })))
+    expect(res.status).toBe(502)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
   it('carries the safe headers on an upstream failure', async () => {
     fetchMock.mockResolvedValue(new Response('no', { status: 403 }))
     const res = await POST(post(JSON.stringify({ url: URL_OK })))

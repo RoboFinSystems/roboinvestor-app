@@ -84,6 +84,26 @@ describe('allowedHolonUrl', () => {
       ).toBeNull()
     })
 
+    it('rejects an explicit port on the bucket host', () => {
+      expect(
+        allowedHolonUrl(`https://${BUCKET}.s3.amazonaws.com:8443/${KEY}?${SIG}`)
+      ).toBeNull()
+    })
+
+    it('rejects a trailing-dot host', () => {
+      expect(
+        allowedHolonUrl(`https://${BUCKET}.s3.amazonaws.com./${KEY}?${SIG}`)
+      ).toBeNull()
+    })
+
+    it('rejects a dot-segment walk out of the prefix', () => {
+      expect(
+        allowedHolonUrl(
+          `https://${BUCKET}.s3.amazonaws.com/report-bundles/%2e%2e/user-staging/g1.holon.jsonld?${SIG}`
+        )
+      ).toBeNull()
+    })
+
     it('rejects credentials embedded in the URL', () => {
       expect(
         allowedHolonUrl(`https://u:p@${BUCKET}.s3.amazonaws.com/${KEY}?${SIG}`)
@@ -164,6 +184,13 @@ describe('allowedHolonUrl', () => {
           `http://localhost:4566/other/report-bundles/g/r/g1.holon.jsonld?${SIG}`
         )
       ).toBeNull()
+    })
+
+    it('pins the override to its port and protocol', () => {
+      vi.stubEnv('NODE_ENV', 'development')
+      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
+      expect(allowedHolonUrl(VALID.replace(':4566', ':3001'))).toBeNull()
+      expect(allowedHolonUrl(VALID.replace('http:', 'https:'))).toBeNull()
     })
 
     it('rejects loopback when no endpoint override is configured', () => {
