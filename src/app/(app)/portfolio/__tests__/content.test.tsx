@@ -24,6 +24,7 @@ const createPortfolioBlock = vi.hoisted(() => vi.fn())
 const listEntities = vi.hoisted(() => vi.fn())
 const getSecurity = vi.hoisted(() => vi.fn())
 const updateSecurity = vi.hoisted(() => vi.fn())
+const deleteSecurity = vi.hoisted(() => vi.fn())
 
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
@@ -42,6 +43,7 @@ vi.mock('@robosystems/core', async () => {
         createPortfolioBlock,
         getSecurity,
         updateSecurity,
+        deleteSecurity,
       },
       ledger: { listEntities },
     },
@@ -252,11 +254,8 @@ describe('adding a security with a position', () => {
     ).toMatchObject({ security_id: 'sec-1' })
   })
 
-  it('creates a new security when the name changes before a retry', async () => {
+  it('corrects the created security when the name changes before a retry', async () => {
     updatePortfolioBlock.mockRejectedValueOnce(new Error('boom'))
-    createSecurity
-      .mockResolvedValueOnce({ id: 'sec-1' })
-      .mockResolvedValueOnce({ id: 'sec-2' })
     fill('sec-name', 'Series A')
     fill('sec-qty', '10')
     submit()
@@ -264,7 +263,25 @@ describe('adding a security with a position', () => {
 
     fill('sec-name', 'Series B')
     submit()
-    await waitFor(() => expect(createSecurity).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(createSecurity).toHaveBeenCalledTimes(1)
+    expect(updateSecurity).toHaveBeenCalledWith('graph-a', 'sec-1', {
+      name: 'Series B',
+    })
+  })
+
+  it('finishes the same security after the modal is closed and reopened', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('boom'))
+    fill('sec-name', 'Series A')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('boom')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+    submit()
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(createSecurity).toHaveBeenCalledTimes(1)
   })
 
   it('refuses a cost basis it cannot read before writing anything', async () => {
@@ -274,7 +291,7 @@ describe('adding a security with a position', () => {
     submit()
 
     expect(
-      await screen.findByText(/Enter a dollar amount/i)
+      await screen.findByText(/Enter the cost basis as an amount/i)
     ).toBeInTheDocument()
     expect(createSecurity).not.toHaveBeenCalled()
   })
@@ -298,7 +315,7 @@ describe('adding a security with a position', () => {
     submit()
 
     expect(
-      await screen.findByText(/Enter a dollar amount/i)
+      await screen.findByText(/Enter the cost basis as an amount/i)
     ).toBeInTheDocument()
     expect(createSecurity).not.toHaveBeenCalled()
   })

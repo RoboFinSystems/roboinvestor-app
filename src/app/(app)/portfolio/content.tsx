@@ -197,14 +197,14 @@ const emptySecurityForm = {
 }
 
 /** The fields that define the security itself, as opposed to its position. */
-const securityIdentity = (f: typeof emptySecurityForm) =>
-  JSON.stringify([
-    f.name.trim(),
-    f.security_type,
-    f.security_subtype.trim(),
-    f.entity_id,
-    f.source_graph_id.trim(),
-  ])
+const securityFields = (f: typeof emptySecurityForm) => ({
+  name: f.name.trim(),
+  security_type: f.security_type,
+  security_subtype: f.security_subtype.trim(),
+  entity_id: f.entity_id,
+  source_graph_id: f.source_graph_id.trim(),
+})
+type SecurityFields = ReturnType<typeof securityFields>
 
 const PortfolioPageContent: FC = function () {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([])
@@ -235,9 +235,11 @@ const PortfolioPageContent: FC = function () {
   // The security this modal session already created, and the fields it was
   // created from. "Add Security" is two writes; when the position write fails
   // the retry must reuse this security rather than mint a second one.
+  // It survives closing the modal (the form keeps its values too), and is
+  // cleared on success and on a graph switch.
   const [pendingSecurity, setPendingSecurity] = useState<{
     id: string
-    identity: string
+    fields: SecurityFields
   } | null>(null)
   const [creatingSecurity, setCreatingSecurity] = useState(false)
   const [securityModalError, setSecurityModalError] = useState<string | null>(
@@ -374,6 +376,8 @@ const PortfolioPageContent: FC = function () {
     sourceGraphId: '',
   })
   const editSeq = useRef(0)
+  // Set once the user edits a field, so a late prefill cannot overwrite it.
+  const editTouched = useRef(false)
 
   const openEditSecurity = useCallback(
     (securityId: string, securityName: string) => {
@@ -382,6 +386,7 @@ const PortfolioPageContent: FC = function () {
       setEditEntityId('')
       setEditSourceGraphId('')
       setEditLoaded({ entityId: '', sourceGraphId: '' })
+      editTouched.current = false
       setEditError(null)
       loadLinkedEntities()
       setShowEditSecurityModal(true)
@@ -398,6 +403,7 @@ const PortfolioPageContent: FC = function () {
             sourceGraphId: security?.sourceGraphId ?? '',
           }
           setEditLoaded(loaded)
+          if (editTouched.current) return
           setEditEntityId(loaded.entityId)
           setEditSourceGraphId(loaded.sourceGraphId)
         })
@@ -551,7 +557,7 @@ const PortfolioPageContent: FC = function () {
     const costBasis = parseMoneyToCents(securityForm.cost_basis)
     if (costBasis === null) {
       setSecurityModalError(
-        'Enter a dollar amount for the cost basis, e.g. 1525.50 or 1,525.50'
+        'Enter the cost basis as an amount, e.g. 1525.50 or 1,525.50'
       )
       return
     }
@@ -564,22 +570,49 @@ const PortfolioPageContent: FC = function () {
 
       // 1. Create the security — unless this modal session already created
       // it and only the position write failed.
-      const identity = securityIdentity(securityForm)
-      let securityId: string
-      if (pendingSecurity && pendingSecurity.identity === identity) {
-        securityId = pendingSecurity.id
-      } else {
+      const fields = securityFields(securityForm)
+      const created = async () => {
         const security = await clients.investor.createSecurity(requestGraphId, {
-          name: securityForm.name.trim(),
-          security_type: securityForm.security_type,
-          security_subtype: securityForm.security_subtype.trim() || null,
-          entity_id: securityForm.entity_id || null,
-          source_graph_id: securityForm.source_graph_id.trim() || null,
+          name: fields.name,
+          security_type: fields.security_type,
+          security_subtype: fields.security_subtype || null,
+          entity_id: fields.entity_id || null,
+          source_graph_id: fields.source_graph_id || null,
         })
-        securityId = (security as { id: string }).id
-        if (graphIdRef.current !== requestGraphId) return
-        setPendingSecurity({ id: securityId, identity })
+        return (security as { id: string }).id
       }
+      let securityId: string
+      if (!pendingSecurity) {
+        securityId = await created()
+      } else {
+        const previous = pendingSecurity.fields
+        const keys = Object.keys(fields) as Array<keyof SecurityFields>
+        const changed = keys.filter((k) => fields[k] !== previous[k])
+        if (changed.length === 0) {
+          securityId = pendingSecurity.id
+        } else if (changed.some((k) => !fields[k])) {
+          // A cleared field can't be patched away; retire the unpositioned
+          // security rather than leave it behind, then create the new one.
+          await clients.investor.deleteSecurity(
+            requestGraphId,
+            pendingSecurity.id
+          )
+          if (graphIdRef.current !== requestGraphId) return
+          setPendingSecurity(null)
+          securityId = await created()
+        } else {
+          // Edited before the retry (a typo fixed): correct the security this
+          // session already created instead of minting a second one.
+          await clients.investor.updateSecurity(
+            requestGraphId,
+            pendingSecurity.id,
+            Object.fromEntries(changed.map((k) => [k, fields[k]]))
+          )
+          securityId = pendingSecurity.id
+        }
+      }
+      if (graphIdRef.current !== requestGraphId) return
+      setPendingSecurity({ id: securityId, fields })
 
       // 2. Add the position. Both ids were captured together, so this cannot
       // post one graph's portfolio id against another graph.
@@ -623,10 +656,9 @@ const PortfolioPageContent: FC = function () {
   }
 
   const closeSecurityModal = () => {
+    // The form and any security already created for it stay, so reopening and
+    // adding again finishes that security rather than creating another.
     setShowSecurityModal(false)
-    // A security created in this session with no position stays created; a
-    // fresh session starts a fresh add.
-    setPendingSecurity(null)
   }
 
   // No graph with roboinvestor extension
@@ -1184,6 +1216,7 @@ const PortfolioPageContent: FC = function () {
                     const entity = linkedEntities.find(
                       (ent) => ent.id === entityId
                     )
+                    editTouched.current = true
                     setEditEntityId(entityId)
                     if (entity?.source_graph_id) {
                       setEditSourceGraphId(entity.source_graph_id)
@@ -1191,6 +1224,14 @@ const PortfolioPageContent: FC = function () {
                   }}
                 >
                   <option value="">No company linked</option>
+                  {editLoaded.entityId &&
+                    !linkedEntities.some(
+                      (ent) => ent.id === editLoaded.entityId
+                    ) && (
+                      <option value={editLoaded.entityId}>
+                        Current link ({editLoaded.entityId})
+                      </option>
+                    )}
                   {linkedEntities.map((e) => (
                     <option key={e.id} value={e.id}>
                       {e.name}
@@ -1213,7 +1254,10 @@ const PortfolioPageContent: FC = function () {
                 id="edit-graph"
                 placeholder="e.g., kg19d46a8029980520"
                 value={editSourceGraphId}
-                onChange={(e) => setEditSourceGraphId(e.target.value)}
+                onChange={(e) => {
+                  editTouched.current = true
+                  setEditSourceGraphId(e.target.value)
+                }}
               />
             </div>
           </div>

@@ -40,6 +40,11 @@ describe('parseMoneyToCents', () => {
     expect(parseMoneyToCents('1e17')).toBeNull()
   })
 
+  it('accepts a single dollar sign only', () => {
+    expect(parseMoneyToCents('$$5')).toBeNull()
+    expect(parseMoneyToCents(' $ 5')).toBe(500)
+  })
+
   it('refuses a negative cost basis', () => {
     expect(parseMoneyToCents('-1500')).toBeNull()
   })
@@ -70,6 +75,8 @@ describe('parseQuantity', () => {
     expect(parseQuantity('10,5')).toBeNull()
     expect(parseQuantity('1.000,5')).toBeNull()
     expect(parseQuantity('$10')).toBeNull()
+    // Reads as 1.5 or as 1,500 depending on the locale.
+    expect(parseQuantity('1.500')).toBeNull()
     expect(parseQuantity('')).toBeNull()
     expect(parseQuantity('   ')).toBeNull()
   })

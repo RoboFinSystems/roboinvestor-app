@@ -36,9 +36,8 @@ function readNumber(raw: string): number | null {
  */
 export function parseMoneyToCents(raw: string): number | null {
   if (!raw.trim()) return 0
-  const text = raw.trim().replace(/^\$\s*/, '')
-  if (/\.\d{3,}$/.test(text)) return null
-  const n = readNumber(text)
+  if (/\.\d{3,}$/.test(raw.trim())) return null
+  const n = readNumber(raw)
   if (n === null) return null
   const cents = Math.round(n * 100)
   return Number.isSafeInteger(cents) ? cents : null
@@ -51,7 +50,10 @@ export function parseMoneyToCents(raw: string): number | null {
  * request body and create a position with no quantity.
  */
 export function parseQuantity(raw: string): number | null {
-  if (!raw.trim() || raw.trim().startsWith('$')) return null
-  const n = readNumber(raw)
+  const text = raw.trim()
+  if (!text || text.startsWith('$')) return null
+  // `1.500` reads as 1.5 here and as 1,500 in much of Europe; refuse it.
+  if (/^\d{1,3}\.\d{3}$/.test(text)) return null
+  const n = readNumber(text)
   return n !== null && n > 0 ? n : null
 }

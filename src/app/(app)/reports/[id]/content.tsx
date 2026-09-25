@@ -102,7 +102,10 @@ export default function ReceivedReportContent({
     if (!graphId) {
       // Once the graphs have loaded, no RoboInvestor graph means there is
       // nowhere this report could be; say so rather than spin.
-      if (!graphsLoading) {
+      if (graphsLoading) {
+        setError(null)
+        setIsLoading(true)
+      } else {
         setError('This report is no longer available.')
         setIsLoading(false)
       }
