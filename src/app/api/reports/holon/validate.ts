@@ -85,8 +85,10 @@ function overrideKey(pathname: string, bucket: string | null): string | null {
  * artifact in the bundle bucket and carries a non-empty presigned signature.
  * Returns the parsed URL when allowed, else null.
  *
- * Fails closed: in production an unset `REPORT_BUNDLE_BUCKET` accepts nothing;
- * outside production it accepts only the configured endpoint override.
+ * Fails closed: with `REPORT_BUNDLE_BUCKET` unset, only the configured endpoint
+ * override is accepted, and a real deployment carries no override. (NODE_ENV
+ * is not consulted: `next build` bakes it to production, including for the
+ * LocalStack-backed compose stack and Docker Hub image.)
  */
 export function allowedHolonUrl(raw: string): URL | null {
   let u: URL
@@ -101,7 +103,6 @@ export function allowedHolonUrl(raw: string): URL | null {
   const host = u.hostname.toLowerCase()
   const bucket = bundleBucket()
   const override = overrideOrigin()
-  const isProduction = process.env.NODE_ENV === 'production'
 
   let key: string | null = null
   if (
@@ -109,7 +110,6 @@ export function allowedHolonUrl(raw: string): URL | null {
     u.protocol === override.protocol &&
     u.host.toLowerCase() === override.host.toLowerCase()
   ) {
-    if (isProduction && !bucket) return null
     key = overrideKey(u.pathname, bucket)
   } else {
     // Plaintext and explicit ports are tolerated only for the configured

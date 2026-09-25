@@ -155,13 +155,20 @@ describe('allowedHolonUrl', () => {
   })
 
   describe('fail closed', () => {
-    it('accepts nothing in production when the bucket is unset', () => {
+    it('accepts no AWS host when the bucket is unset', () => {
       vi.stubEnv('REPORT_BUNDLE_BUCKET', '')
-      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
       expect(
         allowedHolonUrl(`https://${BUCKET}.s3.amazonaws.com/${KEY}?${SIG}`)
       ).toBeNull()
-      expect(allowedHolonUrl(VALID)).toBeNull()
+    })
+
+    it('accepts the endpoint override in a production build with the bucket unset', () => {
+      // `next build` bakes NODE_ENV=production into server code, so the local
+      // compose stack and the Docker Hub image run as production against
+      // LocalStack. A real deployment carries no override.
+      vi.stubEnv('REPORT_BUNDLE_BUCKET', '')
+      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
+      expect(allowedHolonUrl(VALID)).not.toBeNull()
     })
 
     it('accepts only the endpoint override in development when the bucket is unset', () => {
