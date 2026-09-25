@@ -53,7 +53,7 @@ export function parseQuantity(raw: string): number | null {
   const text = raw.trim()
   if (!text || text.startsWith('$')) return null
   // `1.500` reads as 1.5 here and as 1,500 in much of Europe; refuse it.
-  if (/^\d{1,3}\.\d{3}$/.test(text)) return null
+  if (/^[1-9]\d{0,2}\.\d{3}$/.test(text)) return null
   const n = readNumber(text)
   return n !== null && n > 0 ? n : null
 }

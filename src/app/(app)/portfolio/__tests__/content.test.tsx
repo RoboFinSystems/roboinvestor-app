@@ -25,6 +25,7 @@ const listEntities = vi.hoisted(() => vi.fn())
 const getSecurity = vi.hoisted(() => vi.fn())
 const updateSecurity = vi.hoisted(() => vi.fn())
 const deleteSecurity = vi.hoisted(() => vi.fn())
+const listPositions = vi.hoisted(() => vi.fn())
 
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
@@ -44,6 +45,7 @@ vi.mock('@robosystems/core', async () => {
         getSecurity,
         updateSecurity,
         deleteSecurity,
+        listPositions,
       },
       ledger: { listEntities },
     },
@@ -73,6 +75,7 @@ describe('PortfolioPageContent', () => {
     createSecurity.mockResolvedValue({ id: 'sec-1' })
     updatePortfolioBlock.mockResolvedValue({})
     listEntities.mockResolvedValue([])
+    listPositions.mockResolvedValue({ positions: [] })
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
     graphs.selectedId = null
   })
@@ -190,6 +193,7 @@ describe('adding a security with a position', () => {
     createSecurity.mockResolvedValue({ id: 'sec-1' })
     updatePortfolioBlock.mockResolvedValue({})
     listEntities.mockResolvedValue([])
+    listPositions.mockResolvedValue({ positions: [] })
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
     graphs.selectedId = null
     listPortfolios.mockResolvedValue({
@@ -268,6 +272,51 @@ describe('adding a security with a position', () => {
     expect(updateSecurity).toHaveBeenCalledWith('graph-a', 'sec-1', {
       name: 'Series B',
     })
+  })
+
+  it('recreates rather than patches when the source graph changes before a retry', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('boom'))
+    createSecurity
+      .mockResolvedValueOnce({ id: 'sec-1' })
+      .mockResolvedValueOnce({ id: 'sec-2' })
+    fill('sec-name', 'Series A')
+    fill('sec-graph', 'kg_a')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('boom')
+
+    fill('sec-graph', 'kg_b')
+    submit()
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(updateSecurity).not.toHaveBeenCalled()
+    expect(deleteSecurity).toHaveBeenCalledWith('graph-a', 'sec-1')
+    expect(createSecurity).toHaveBeenLastCalledWith(
+      'graph-a',
+      expect.objectContaining({ source_graph_id: 'kg_b' })
+    )
+    expect(
+      updatePortfolioBlock.mock.calls[1][2].positions.add[0].security_id
+    ).toBe('sec-2')
+  })
+
+  it('does not add the position twice when a failed write actually landed', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('network error'))
+    fill('sec-name', 'Series A')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('network error')
+
+    listPositions.mockResolvedValueOnce({ positions: [{ id: 'pos-1' }] })
+    submit()
+    await waitFor(() =>
+      expect(listPositions).toHaveBeenCalledWith('graph-a', {
+        portfolioId: 'p-a1',
+        securityId: 'sec-1',
+      })
+    )
+    await waitFor(() => expect(screen.queryByText('network error')).toBeNull())
+    expect(updatePortfolioBlock).toHaveBeenCalledTimes(1)
+    expect(createSecurity).toHaveBeenCalledTimes(1)
   })
 
   it('finishes the same security after the modal is closed and reopened', async () => {
@@ -365,6 +414,7 @@ describe('portfolio page details', () => {
     vi.clearAllMocks()
     getHoldings.mockResolvedValue({ holdings: [] })
     listEntities.mockResolvedValue([])
+    listPositions.mockResolvedValue({ positions: [] })
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
     graphs.selectedId = null
   })

@@ -551,7 +551,9 @@ const PortfolioPageContent: FC = function () {
     }
     const quantity = parseQuantity(securityForm.quantity)
     if (quantity === null) {
-      setSecurityModalError('Enter a positive quantity, e.g. 1500.5')
+      setSecurityModalError(
+        'Enter a positive quantity, e.g. 1500.5 — write fifteen hundred as 1500 or 1,500'
+      )
       return
     }
     const costBasis = parseMoneyToCents(securityForm.cost_basis)
@@ -581,18 +583,47 @@ const PortfolioPageContent: FC = function () {
         })
         return (security as { id: string }).id
       }
+      const finish = () => {
+        setPendingSecurity(null)
+        setShowSecurityModal(false)
+        setSecurityModalError(null)
+        setSecurityForm(emptySecurityForm)
+        loadHoldings(requestPortfolioId)
+      }
       let securityId: string
       if (!pendingSecurity) {
         securityId = await created()
       } else {
+        // The last position write may have committed even though it reported
+        // an error (a dropped connection). If the position is there, the add
+        // is done: adding again would double-book it, and retiring the
+        // security would orphan a held position.
+        const existing = await clients.investor.listPositions(requestGraphId, {
+          portfolioId: requestPortfolioId,
+          securityId: pendingSecurity.id,
+        })
+        if (graphIdRef.current !== requestGraphId) return
+        if ((existing?.positions ?? []).length > 0) {
+          finish()
+          return
+        }
+
         const previous = pendingSecurity.fields
         const keys = Object.keys(fields) as Array<keyof SecurityFields>
         const changed = keys.filter((k) => fields[k] !== previous[k])
+        // Only descriptive fields are patched. The company link is resolved
+        // by the server on create (from the source graph), and an update just
+        // copies fields — so a changed link goes through a fresh create.
+        const patchable = new Set<keyof SecurityFields>([
+          'name',
+          'security_type',
+          'security_subtype',
+        ])
         if (changed.length === 0) {
           securityId = pendingSecurity.id
-        } else if (changed.some((k) => !fields[k])) {
-          // A cleared field can't be patched away; retire the unpositioned
-          // security rather than leave it behind, then create the new one.
+        } else if (changed.some((k) => !patchable.has(k) || !fields[k])) {
+          // Retire the unpositioned security rather than leave it behind,
+          // then create the new one.
           await clients.investor.deleteSecurity(
             requestGraphId,
             pendingSecurity.id
@@ -634,12 +665,7 @@ const PortfolioPageContent: FC = function () {
       )
 
       if (graphIdRef.current !== requestGraphId) return
-      setPendingSecurity(null)
-      setShowSecurityModal(false)
-      setSecurityModalError(null)
-      setSecurityForm(emptySecurityForm)
-      // Reload holdings
-      loadHoldings(requestPortfolioId)
+      finish()
     } catch (err) {
       if (graphIdRef.current !== requestGraphId) return
       setSecurityModalError(
@@ -1267,7 +1293,12 @@ const PortfolioPageContent: FC = function () {
             color="secondary"
             onClick={handleEditSecurity}
             disabled={
-              savingEdit || (!editEntityId && !editSourceGraphId.trim())
+              savingEdit ||
+              !(
+                (editEntityId && editEntityId !== editLoaded.entityId) ||
+                (editSourceGraphId.trim() &&
+                  editSourceGraphId.trim() !== editLoaded.sourceGraphId)
+              )
             }
           >
             {savingEdit ? (

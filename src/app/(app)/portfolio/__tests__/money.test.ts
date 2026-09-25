@@ -77,6 +77,7 @@ describe('parseQuantity', () => {
     expect(parseQuantity('$10')).toBeNull()
     // Reads as 1.5 or as 1,500 depending on the locale.
     expect(parseQuantity('1.500')).toBeNull()
+    expect(parseQuantity('0.500')).toBe(0.5)
     expect(parseQuantity('')).toBeNull()
     expect(parseQuantity('   ')).toBeNull()
   })
