@@ -15,8 +15,8 @@ import {
  * server fetches it (server→S3 isn't subject to browser CORS) and streams the
  * body back same-origin so `parseJsonld` can consume it.
  *
- * The proxy is deliberately narrow: the caller must send JSON with its bearer
- * token, `allowedHolonUrl` pins the target to the report-bundle bucket (see
+ * The proxy is deliberately narrow: the caller must send JSON with an
+ * Authorization header, `allowedHolonUrl` pins the target to the report-bundle bucket (see
  * ./validate), redirects are not followed, the body is capped while streaming,
  * and the response type comes from the artifact suffix, never from upstream.
  */
@@ -69,7 +69,12 @@ function isJsonRequest(req: NextRequest): boolean {
   return type.split(';')[0].trim().toLowerCase() === 'application/json'
 }
 
-function hasBearer(req: NextRequest): boolean {
+/**
+ * Whether the request carries a Bearer Authorization header. The token is not
+ * validated here: a cross-site form cannot set this header, which is all this
+ * guards. The presigned signature is the access control.
+ */
+function hasBearerHeader(req: NextRequest): boolean {
   const auth = req.headers.get('authorization') ?? ''
   return /^Bearer\s+\S+/i.test(auth)
 }
@@ -78,8 +83,8 @@ export async function POST(req: NextRequest) {
   if (!isJsonRequest(req)) {
     return refuse('Content-Type must be application/json', 415)
   }
-  if (!hasBearer(req)) {
-    return refuse('Authentication required', 401)
+  if (!hasBearerHeader(req)) {
+    return refuse('Bearer Authorization header required', 401)
   }
 
   let body: { url?: unknown }

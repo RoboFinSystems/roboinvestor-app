@@ -56,7 +56,7 @@ describe('POST /api/reports/holon', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('refuses a request without a bearer token with 401', async () => {
+  it('refuses a request without a Bearer Authorization header with 401', async () => {
     const res = await POST(
       post(JSON.stringify({ url: URL_OK }), {
         'content-type': 'application/json',
