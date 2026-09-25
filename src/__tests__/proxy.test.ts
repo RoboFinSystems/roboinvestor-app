@@ -30,3 +30,22 @@ describe('proxy CSP connect-src', () => {
     expect(connectSrc(res)).not.toContain('PLACEHOLDER')
   })
 })
+
+describe('proxy CSP connect-src (as the deployed server receives the request)', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  // A production server reports its own listen address in nextUrl, whatever
+  // Host the browser sent, so the hostname cannot mean "running locally".
+  it('serves the production policy to a request that reaches it as localhost', () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    const res = proxy(
+      new NextRequest('http://localhost:3000/home', {
+        headers: { host: 'roboinvestor.ai' },
+      })
+    )
+    expect(connectSrc(res)).toContain('https://api.robosystems.ai')
+    expect(connectSrc(res)).not.toContain('http://localhost:*')
+  })
+})

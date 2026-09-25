@@ -24,11 +24,6 @@ export function proxy(request: NextRequest) {
   const response = NextResponse.next()
   const isDevelopment = process.env.NODE_ENV === 'development'
 
-  // Check if running locally (localhost or 127.0.0.1)
-  const isLocalhost =
-    request.nextUrl.hostname === 'localhost' ||
-    request.nextUrl.hostname === '127.0.0.1'
-
   // CloudFront CDN serving the research portal's catalog, briefs, images,
   // video, and audio (produced by robosystems-content-machine). The research
   // pages fetch these client-side, so the host is needed in connect-src too.
@@ -82,7 +77,7 @@ export function proxy(request: NextRequest) {
       'https://cdnjs.cloudflare.com',
 
     // Connection sources - APIs, WebSockets, analytics, and development
-    isDevelopment || isLocalhost
+    isDevelopment
       ? "connect-src 'self' http://localhost:* ws://localhost:* wss://localhost:* " +
         'https://api.robosystems.ai https://staging.api.robosystems.ai ' +
         'https://cloudflareinsights.com https://static.cloudflareinsights.com ' +
