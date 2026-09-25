@@ -5,8 +5,9 @@
  *
  * `CloudFront-Viewer-Address` is CloudFront's own record of the address it
  * accepted the connection from. CloudFront sets it and overwrites anything the
- * caller sent, so it cannot be forged, and it does not depend on knowing how
- * many proxies sit in front of the app. When it is present, it is the answer.
+ * caller sent, and it does not depend on knowing how many proxies sit in front
+ * of the app. It is trusted only on requests that carry the origin secret
+ * CloudFront adds (see `arrivedViaCloudfront`); anything else could have set it.
  *
  * `X-Forwarded-For` is the fallback for requests that did not arrive through
  * CloudFront. It is a list each proxy appends to and the caller can seed, so
@@ -47,12 +48,37 @@ function cloudfrontViewerIp(request: Request): string | undefined {
   return address || undefined
 }
 
+/** Length-independent-timing string comparison for the origin secret. */
+function constantTimeEqual(a: string, b: string): boolean {
+  const length = Math.max(a.length, b.length)
+  let diff = a.length ^ b.length
+  for (let i = 0; i < length; i++) {
+    diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0)
+  }
+  return diff === 0
+}
+
+/**
+ * Whether the request provably came through our CloudFront distribution, which
+ * adds `X-Origin-Verify` carrying `ORIGIN_VERIFY_SECRET` on its way to the
+ * origin. With no secret configured this returns true, preserving the
+ * behaviour of deployments made before the secret existed.
+ */
+function arrivedViaCloudfront(request: Request): boolean {
+  const secret = process.env.ORIGIN_VERIFY_SECRET
+  if (!secret) return true
+  const presented = request.headers.get('x-origin-verify')
+  return presented !== null && constantTimeEqual(presented, secret)
+}
+
 /**
  * Extract the client IP from request headers, or undefined when no usable
  * header is present (e.g. a direct request in local development).
  */
 export function getClientIp(request: Request): string | undefined {
-  const viewerIp = cloudfrontViewerIp(request)
+  const viewerIp = arrivedViaCloudfront(request)
+    ? cloudfrontViewerIp(request)
+    : undefined
   if (viewerIp) return viewerIp
 
   const forwardedFor = request.headers.get('x-forwarded-for')

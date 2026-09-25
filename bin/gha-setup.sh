@@ -224,6 +224,7 @@ setup_config() {
     echo "📋 Optional secrets (not required for deployment):"
     echo "  gh secret set ACTIONS_TOKEN      # Protected branches, releases"
     echo "  gh secret set ANTHROPIC_API_KEY  # AI-powered release notes"
+    echo "  gh secret set ORIGIN_VERIFY_SECRET  # CloudFront → origin verification header"
     echo ""
     echo "📋 Optional variables:"
     echo "  gh variable set TURNSTILE_SITE_KEY --body \"your_key\"  # CAPTCHA"

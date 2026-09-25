@@ -1,44 +1,126 @@
 /** 25 MB — holons are well under this; a hard cap bounds the proxy. */
 export const MAX_HOLON_BYTES = 25 * 1024 * 1024
 
-/**
- * AWS-owned hostnames are always acceptable targets: AWS controls the whole
- * `amazonaws.com` namespace, so no name under it can be pointed at VPC-internal
- * services or the link-local instance-metadata endpoint.
- */
-function isAwsHost(hostname: string): boolean {
-  return hostname === 'amazonaws.com' || hostname.endsWith('.amazonaws.com')
-}
+/** Key prefix report bundles live under inside the bundle bucket. */
+const BUNDLE_PREFIX = 'report-bundles/'
 
 /**
- * Additional hosts this deployment serves bundles from: the S3 endpoint
- * override used by LocalStack in local development. Presigned URLs in staging
- * and production are signed against real AWS endpoints, which `isAwsHost`
- * already covers.
- *
- * Read per call rather than at module load so a runtime env change (and tests)
- * take effect without a rebuild.
+ * Artifact suffixes this proxy serves, and the content type each is returned
+ * with. The response type is derived from the suffix alone — never from the
+ * upstream response.
  */
-function configuredHosts(): Set<string> {
-  const hosts = new Set<string>()
-  const endpoint = process.env.NEXT_PUBLIC_S3_ENDPOINT_URL
-  if (endpoint) {
-    try {
-      hosts.add(new URL(endpoint).hostname.toLowerCase())
-    } catch {
-      // A malformed endpoint override simply contributes no host.
-    }
+const SUFFIX_CONTENT_TYPES: ReadonlyArray<readonly [string, string]> = [
+  ['.holon.jsonld', 'application/ld+json; charset=utf-8'],
+]
+
+export function contentTypeForPath(pathname: string): string | null {
+  for (const [suffix, type] of SUFFIX_CONTENT_TYPES) {
+    if (pathname.endsWith(suffix)) return type
   }
-  return hosts
+  return null
+}
+
+/** The bucket report bundles are presigned from (server env, never public). */
+function bundleBucket(): string | null {
+  const bucket = process.env.REPORT_BUNDLE_BUCKET?.trim().toLowerCase()
+  return bucket ? bucket : null
 }
 
 /**
- * Guard for the holon proxy: accept a URL only if it points at a bundle host we
- * serve from AND looks like a presigned report-bundle holon (path shape + a
- * non-empty AWS signature). The host check is what keeps this from being an
- * SSRF vector — without it the proxy would fetch any URL an unauthenticated
- * caller supplied, including internal addresses. Returns the parsed URL when
- * allowed, else null.
+ * The S3 endpoint override (LocalStack in local development), if any; matched
+ * on protocol, host and port. Read per call rather than at module load so a
+ * runtime env change (and tests) take effect without a rebuild.
+ */
+function overrideOrigin(): URL | null {
+  const endpoint = process.env.NEXT_PUBLIC_S3_ENDPOINT_URL
+  if (!endpoint) return null
+  try {
+    return new URL(endpoint)
+  } catch {
+    return null
+  }
+}
+
+/** The deployment's region; presigned URLs may use its regional S3 host. */
+function region(): string {
+  return (process.env.AWS_REGION || 'us-east-1').trim().toLowerCase()
+}
+
+/**
+ * The key (path without the leading slash) the URL addresses inside the bundle
+ * bucket, or null when the host/path pair is not that bucket. Virtual-hosted
+ * (`<bucket>.s3[.<region>].amazonaws.com/<key>`) and path-style
+ * (`s3[.<region>].amazonaws.com/<bucket>/<key>`) are both accepted, for the
+ * global host and the deployment region's host only.
+ */
+function bucketKey(
+  host: string,
+  pathname: string,
+  bucket: string
+): string | null {
+  const r = region()
+  if (
+    host === `${bucket}.s3.amazonaws.com` ||
+    host === `${bucket}.s3.${r}.amazonaws.com`
+  ) {
+    return pathname.slice(1)
+  }
+  if (host === 's3.amazonaws.com' || host === `s3.${r}.amazonaws.com`) {
+    const prefix = `/${bucket}/`
+    return pathname.startsWith(prefix) ? pathname.slice(prefix.length) : null
+  }
+  return null
+}
+
+/**
+ * The origin the proxy may fetch from for this host, built only from server
+ * configuration (bucket, region, endpoint override) and never from the
+ * request, or null when the host is not one of them.
+ */
+function trustedOrigin(u: URL, bucket: string | null): string | null {
+  const override = overrideOrigin()
+  if (
+    override &&
+    u.protocol === override.protocol &&
+    u.host.toLowerCase() === override.host.toLowerCase()
+  ) {
+    return override.origin
+  }
+  if (!bucket) return null
+  const r = region()
+  const hosts = [
+    `${bucket}.s3.amazonaws.com`,
+    `${bucket}.s3.${r}.amazonaws.com`,
+    's3.amazonaws.com',
+    `s3.${r}.amazonaws.com`,
+  ]
+  const host = hosts.find((h) => h === u.hostname.toLowerCase())
+  return host ? `https://${host}` : null
+}
+
+/**
+ * Key inside the LocalStack endpoint: path-style, so `/<bucket>/<key>`. With a
+ * configured bucket the segment must match it; without one (development only)
+ * any single bucket segment is accepted.
+ */
+function overrideKey(pathname: string, bucket: string | null): string | null {
+  if (bucket) {
+    const prefix = `/${bucket}/`
+    return pathname.startsWith(prefix) ? pathname.slice(prefix.length) : null
+  }
+  const match = /^\/[^/]+\/(.*)$/.exec(pathname)
+  return match ? match[1] : null
+}
+
+/**
+ * Guard for the holon proxy: accept a URL only if it addresses a report-bundle
+ * artifact in the bundle bucket and carries a non-empty presigned signature.
+ * Returns the parsed URL when allowed, else null.
+ *
+ * Fails closed: with `REPORT_BUNDLE_BUCKET` unset, only the configured endpoint
+ * override is accepted, and a real deployment carries no override. (NODE_ENV
+ * is not consulted: `next build` bakes it to production, including for the
+ * LocalStack-backed compose stack and Docker Hub image.)
  */
 export function allowedHolonUrl(raw: string): URL | null {
   let u: URL
@@ -48,32 +130,46 @@ export function allowedHolonUrl(raw: string): URL | null {
     return null
   }
   if (u.protocol !== 'http:' && u.protocol !== 'https:') return null
+  if (u.username || u.password) return null
 
-  // Exact host match only — never a substring/suffix test against the whole
-  // URL, or `https://evil.test/?x=.amazonaws.com` would slip through.
   const host = u.hostname.toLowerCase()
-  const configured = configuredHosts()
-  const isConfigured = configured.has(host)
-  if (!isAwsHost(host) && !isConfigured) return null
+  const bucket = bundleBucket()
+  const override = overrideOrigin()
 
-  // Plaintext is tolerated only for an explicitly configured endpoint, which in
-  // practice means LocalStack over loopback in development.
-  if (u.protocol === 'http:' && !isConfigured) return null
+  let key: string | null = null
+  if (
+    override &&
+    u.protocol === override.protocol &&
+    u.host.toLowerCase() === override.host.toLowerCase()
+  ) {
+    key = overrideKey(u.pathname, bucket)
+  } else {
+    // Plaintext and explicit ports are tolerated only for the configured
+    // endpoint override.
+    if (u.protocol !== 'https:' || u.port !== '' || !bucket) return null
+    key = bucketKey(host, u.pathname, bucket)
+  }
+  if (key === null) return null
 
-  // .../report-bundles/<graph>/<report>/*.holon.jsonld
-  if (!u.pathname.includes('/report-bundles/')) return null
-  if (!u.pathname.endsWith('.holon.jsonld')) return null
+  if (!key.startsWith(BUNDLE_PREFIX)) return null
+  if (key.split('/').some((seg) => seg === '..' || seg === '.')) return null
+  if (!contentTypeForPath(u.pathname)) return null
 
   // The signature is the caller's actual capability, so require real values —
   // `?X-Amz-Signature=` with an empty value must not count as signed.
   const q = u.searchParams
   const present = (...keys: string[]) =>
-    keys.some((key) => (q.get(key) ?? '') !== '')
+    keys.some((k) => (q.get(k) ?? '') !== '')
   const signed =
     present('Signature', 'X-Amz-Signature') &&
     present('Expires', 'X-Amz-Expires') &&
     present('AWSAccessKeyId', 'X-Amz-Credential')
   if (!signed) return null
 
-  return u
+  // Rebuild the target on a configured origin so the host that is fetched
+  // never comes from the request. Path and query are kept byte for byte: the
+  // presigned signature covers them.
+  const origin = trustedOrigin(u, bucket)
+  if (!origin) return null
+  return new URL(`${origin}${u.pathname}${u.search}`)
 }

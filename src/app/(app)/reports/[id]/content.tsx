@@ -14,7 +14,7 @@
  *
  * The bundle is fetched through the same-origin `/api/reports/holon` proxy —
  * the presigned S3 URL is an attachment from a bucket with no CORS, so a direct
- * browser fetch is blocked.
+ * browser fetch is blocked. The proxy requires the session bearer token.
  */
 
 import { useInvestorGraph } from '@/hooks/useInvestorGraph'
@@ -26,6 +26,7 @@ import {
 import type { ReportListItem } from '@robosystems/client/clients'
 import {
   clients,
+  getValidToken,
   PageHeader,
   PageLayout,
   ReportChat,
@@ -122,9 +123,14 @@ export default function ReceivedReportContent({
         return
       }
 
+      // The proxy only answers a caller that presents its session token.
+      const token = await getValidToken()
       const proxied = await fetch('/api/reports/holon', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ url: resp.downloadUrl }),
       })
       if (!proxied.ok) {
