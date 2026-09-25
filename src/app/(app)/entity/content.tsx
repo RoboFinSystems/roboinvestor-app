@@ -1,22 +1,15 @@
 'use client'
 
-import {
-  EmptyState,
-  PageHeader,
-  useEntity,
-  useGraphContext,
-} from '@robosystems/core'
+import { useInvestorGraph } from '@/hooks/useInvestorGraph'
+import { EmptyState, PageHeader, useEntity } from '@robosystems/core'
 import { Alert, Badge, Card } from 'flowbite-react'
 import { type FC } from 'react'
 import { HiOfficeBuilding } from 'react-icons/hi'
 
 const EntityInfoPageContent: FC = function () {
-  const { state: graphState } = useGraphContext()
   const { currentEntity } = useEntity()
-
-  const currentGraph = graphState.graphs.find(
-    (g) => g.graphId === graphState.currentGraphId
-  )
+  // Resolved on the same rule as every other investor page.
+  const currentGraph = useInvestorGraph()
 
   return (
     <>
@@ -39,7 +32,7 @@ const EntityInfoPageContent: FC = function () {
               description="Please select an entity from the Entity selector in the header to view its details."
               className="py-8"
               action={
-                !graphState.currentGraphId && (
+                !currentGraph && (
                   <Alert color="info" className="text-left">
                     <span className="font-medium">No graph selected.</span>{' '}
                     Please select a graph first.
