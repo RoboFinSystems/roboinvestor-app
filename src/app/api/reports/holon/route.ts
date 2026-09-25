@@ -1,5 +1,9 @@
 import type { NextRequest } from 'next/server'
-import { allowedHolonUrl, MAX_HOLON_BYTES } from './validate'
+import {
+  allowedHolonUrl,
+  contentTypeForPath,
+  MAX_HOLON_BYTES,
+} from './validate'
 
 /**
  * Same-origin proxy for a Report's holon JSON-LD bundle.
@@ -11,11 +15,10 @@ import { allowedHolonUrl, MAX_HOLON_BYTES } from './validate'
  * server fetches it (server→S3 isn't subject to browser CORS) and streams the
  * body back same-origin so `parseJsonld` can consume it.
  *
- * The proxy is deliberately narrow: `allowedHolonUrl` pins the target to a
- * bundle host (see ./validate), redirects are not followed so a 3xx cannot
- * walk the fetch off that host, and the body is capped while streaming. The
- * presigned signature remains the caller's capability — this endpoint grants
- * no access to a bundle whose signed URL the caller doesn't already hold.
+ * The proxy is deliberately narrow: the caller must send JSON with its bearer
+ * token, `allowedHolonUrl` pins the target to the report-bundle bucket (see
+ * ./validate), redirects are not followed, the body is capped while streaming,
+ * and the response type comes from the artifact suffix, never from upstream.
  */
 
 /**
@@ -50,24 +53,50 @@ async function readCapped(
   return new TextDecoder().decode(joined)
 }
 
+/** Headers every response from this route carries, success or refusal. */
+const SAFE_HEADERS = {
+  'x-content-type-options': 'nosniff',
+  'content-security-policy': "default-src 'none'; sandbox",
+  'cache-control': 'private, no-store',
+} as const
+
+function refuse(error: string, status: number): Response {
+  return Response.json({ error }, { status, headers: SAFE_HEADERS })
+}
+
+function isJsonRequest(req: NextRequest): boolean {
+  const type = req.headers.get('content-type') ?? ''
+  return type.split(';')[0].trim().toLowerCase() === 'application/json'
+}
+
+function hasBearer(req: NextRequest): boolean {
+  const auth = req.headers.get('authorization') ?? ''
+  return /^Bearer\s+\S+/i.test(auth)
+}
+
 export async function POST(req: NextRequest) {
-  let body: { url?: string }
-  try {
-    body = (await req.json()) as { url?: string }
-  } catch {
-    return Response.json({ error: 'Invalid request body' }, { status: 400 })
+  if (!isJsonRequest(req)) {
+    return refuse('Content-Type must be application/json', 415)
+  }
+  if (!hasBearer(req)) {
+    return refuse('Authentication required', 401)
   }
 
-  if (!body.url) {
-    return Response.json({ error: 'Missing url' }, { status: 400 })
+  let body: { url?: unknown }
+  try {
+    body = (await req.json()) as { url?: unknown }
+  } catch {
+    return refuse('Invalid request body', 400)
+  }
+
+  if (typeof body?.url !== 'string' || !body.url) {
+    return refuse('Missing url', 400)
   }
 
   const target = allowedHolonUrl(body.url)
-  if (!target) {
-    return Response.json(
-      { error: 'URL is not an allowed holon bundle URL' },
-      { status: 400 }
-    )
+  const contentType = target ? contentTypeForPath(target.pathname) : null
+  if (!target || !contentType) {
+    return refuse('URL is not an allowed holon bundle URL', 400)
   }
 
   let upstream: Response
@@ -75,39 +104,26 @@ export async function POST(req: NextRequest) {
     // `manual` keeps a redirect from relocating the fetch to a host that
     // allowedHolonUrl never vetted; a 3xx simply fails the !ok check below.
     upstream = await fetch(target.toString(), { redirect: 'manual' })
-  } catch (err) {
-    return Response.json(
-      {
-        error: `Upstream fetch failed: ${
-          err instanceof Error ? err.message : String(err)
-        }`,
-      },
-      { status: 502 }
-    )
+  } catch {
+    return refuse('Upstream fetch failed', 502)
   }
 
   if (!upstream.ok) {
-    return Response.json(
-      { error: `Upstream returned ${upstream.status}` },
-      { status: 502 }
-    )
+    return refuse(`Upstream returned ${upstream.status}`, 502)
   }
 
   const declaredLen = Number(upstream.headers.get('content-length') ?? '0')
   if (declaredLen > MAX_HOLON_BYTES) {
-    return Response.json({ error: 'Holon exceeds size limit' }, { status: 413 })
+    return refuse('Holon exceeds size limit', 413)
   }
 
   const text = await readCapped(upstream, MAX_HOLON_BYTES)
   if (text === null) {
-    return Response.json({ error: 'Holon exceeds size limit' }, { status: 413 })
+    return refuse('Holon exceeds size limit', 413)
   }
 
   return new Response(text, {
     status: 200,
-    headers: {
-      'content-type': 'application/ld+json; charset=utf-8',
-      'cache-control': 'private, no-store',
-    },
+    headers: { ...SAFE_HEADERS, 'content-type': contentType },
   })
 }

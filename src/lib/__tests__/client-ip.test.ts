@@ -11,6 +11,51 @@ describe('getClientIp', () => {
   afterEach(() => {
     if (originalHops === undefined) delete process.env.TRUSTED_PROXY_HOPS
     else process.env.TRUSTED_PROXY_HOPS = originalHops
+    delete process.env.ORIGIN_VERIFY_SECRET
+  })
+
+  describe('origin verification', () => {
+    const viaEdge = {
+      'cloudfront-viewer-address': '203.0.113.7:54969',
+      'x-forwarded-for': '203.0.113.7, 15.158.61.134',
+    }
+
+    it('trusts the viewer address when the origin secret matches', () => {
+      process.env.ORIGIN_VERIFY_SECRET = 's3cret'
+      expect(
+        getClientIp(requestWith({ ...viaEdge, 'x-origin-verify': 's3cret' }))
+      ).toBe('203.0.113.7')
+    })
+
+    it('ignores a viewer address sent without the origin secret', () => {
+      process.env.ORIGIN_VERIFY_SECRET = 's3cret'
+      const direct = (forged: string) =>
+        getClientIp(
+          requestWith({
+            'cloudfront-viewer-address': `${forged}:1`,
+            'x-forwarded-for': `${forged}, 198.51.100.4`,
+          })
+        )
+      expect(direct('10.0.0.1')).toBe('198.51.100.4')
+      expect(direct('10.0.0.2')).toBe('198.51.100.4')
+    })
+
+    it('ignores a viewer address sent with the wrong origin secret', () => {
+      process.env.ORIGIN_VERIFY_SECRET = 's3cret'
+      expect(
+        getClientIp(
+          requestWith({
+            'cloudfront-viewer-address': '10.0.0.1:1',
+            'x-forwarded-for': '10.0.0.1, 198.51.100.4',
+            'x-origin-verify': 's3cres',
+          })
+        )
+      ).toBe('198.51.100.4')
+    })
+
+    it('keeps trusting the viewer address while no secret is configured', () => {
+      expect(getClientIp(requestWith(viaEdge))).toBe('203.0.113.7')
+    })
   })
 
   describe('cloudfront-viewer-address', () => {

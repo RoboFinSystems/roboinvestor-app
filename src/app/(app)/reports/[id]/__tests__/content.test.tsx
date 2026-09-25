@@ -14,6 +14,7 @@ const graphState = vi.hoisted(() => ({
 
 const listReports = vi.hoisted(() => vi.fn())
 const getReportDownloadUrl = vi.hoisted(() => vi.fn())
+const getValidToken = vi.hoisted(() => vi.fn())
 
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
@@ -21,6 +22,7 @@ vi.mock('@robosystems/core', async () => {
     ...actual,
     useGraphContext: () => ({ state: graphState }),
     clients: { ledger: { listReports, getReportDownloadUrl } },
+    getValidToken,
     ReportChat: vi.fn(({ graphId }) => (
       <div data-testid="report-chat">{graphId}</div>
     )),
@@ -66,6 +68,7 @@ describe('ReceivedReportContent', () => {
     // No bundle keeps the page from reaching the holon fetch; the graph it
     // asked is what these tests are about.
     getReportDownloadUrl.mockResolvedValue(null)
+    getValidToken.mockResolvedValue('session-token')
   })
 
   it('reads the RoboInvestor graph when a repository is selected', async () => {
@@ -116,5 +119,32 @@ describe('ReceivedReportContent', () => {
       screen.queryByText('This report is no longer available.')
     ).not.toBeInTheDocument()
     expect(listReports).not.toHaveBeenCalled()
+  })
+
+  it('sends the session token to the holon proxy', async () => {
+    graphState.currentGraphId = 'kg-fund'
+    getReportDownloadUrl.mockResolvedValue({
+      downloadUrl:
+        'https://bucket.s3.amazonaws.com/report-bundles/x.holon.jsonld',
+    })
+    const fetchMock = vi.fn(async () =>
+      Response.json({ error: 'nope' }, { status: 502 })
+    )
+    vi.stubGlobal('fetch', fetchMock)
+    try {
+      render(<ReceivedReportContent reportId="rpt-1" />)
+      await screen.findByText('Could not load this report: nope')
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/reports/holon',
+        expect.objectContaining({
+          headers: {
+            'content-type': 'application/json',
+            authorization: 'Bearer session-token',
+          },
+        })
+      )
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })

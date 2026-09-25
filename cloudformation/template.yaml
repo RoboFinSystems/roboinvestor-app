@@ -128,6 +128,13 @@ Parameters:
     Default: ''
     Description: Email address for admin notifications (leave empty to skip SNS setup)
 
+  # Origin Verification
+  OriginVerifySecret:
+    Type: String
+    Default: ''
+    NoEcho: true
+    Description: Shared secret CloudFront sends to the origin as X-Origin-Verify (leave empty to disable)
+
   # Tagging Configuration
   ServiceTag:
     Type: String
@@ -143,6 +150,12 @@ Conditions:
   # Access mode conditions
   IsPublicMode: !Equals [!Ref AppAccessMode, 'public']
   IsPublicHttpMode: !Equals [!Ref AppAccessMode, 'public-http']
+
+  # Check if the origin-verification header should be sent
+  HasOriginVerifySecret: !Not
+    - !Equals
+      - !Ref OriginVerifySecret
+      - ''
 
   # Check if SNS notification should be created
   CreateSNSTopic: !Not
@@ -320,6 +333,10 @@ Resources:
                 Value: !If [CreateSNSTopic, !Ref ContactFormTopic, '']
               - Name: REQUIRE_CAPTCHA
                 Value: 'true'
+              - Name: REPORT_BUNDLE_BUCKET
+                Value: !Sub robosystems-${AWS::AccountId}-user-${Environment}
+              - Name: ORIGIN_VERIFY_SECRET
+                Value: !Ref OriginVerifySecret
             RuntimeEnvironmentSecrets:
               - Name: TURNSTILE_SECRET_KEY
                 Value: !Sub '${RoboSystemsSecretsArn}:TURNSTILE_SECRET_KEY::'
@@ -493,6 +510,11 @@ Resources:
           # App Runner always uses HTTPS
           - Id: AppRunner-Dynamic-Content
             DomainName: !GetAtt AppRunnerService.ServiceUrl
+            OriginCustomHeaders: !If
+              - HasOriginVerifySecret
+              - - HeaderName: X-Origin-Verify
+                  HeaderValue: !Ref OriginVerifySecret
+              - !Ref AWS::NoValue
             CustomOriginConfig:
               HTTPSPort: 443
               OriginProtocolPolicy: https-only
@@ -677,6 +699,11 @@ Resources:
           # Dummy origin - required by CloudFront but never hit because the function redirects
           - Id: Dummy-Origin
             DomainName: !GetAtt AppRunnerService.ServiceUrl
+            OriginCustomHeaders: !If
+              - HasOriginVerifySecret
+              - - HeaderName: X-Origin-Verify
+                  HeaderValue: !Ref OriginVerifySecret
+              - !Ref AWS::NoValue
             CustomOriginConfig:
               HTTPSPort: 443
               OriginProtocolPolicy: https-only
