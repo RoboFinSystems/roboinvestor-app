@@ -22,6 +22,8 @@ const createSecurity = vi.hoisted(() => vi.fn())
 const updatePortfolioBlock = vi.hoisted(() => vi.fn())
 const createPortfolioBlock = vi.hoisted(() => vi.fn())
 const listEntities = vi.hoisted(() => vi.fn())
+const getSecurity = vi.hoisted(() => vi.fn())
+const updateSecurity = vi.hoisted(() => vi.fn())
 
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
@@ -38,6 +40,8 @@ vi.mock('@robosystems/core', async () => {
         createSecurity,
         updatePortfolioBlock,
         createPortfolioBlock,
+        getSecurity,
+        updateSecurity,
       },
       ledger: { listEntities },
     },
@@ -455,5 +459,64 @@ describe('portfolio page details', () => {
     await new Promise((r) => setTimeout(r, 20))
     expect(screen.queryByText('Alpha Co')).toBeNull()
     expect(screen.getByText('Bravo Co')).toBeInTheDocument()
+  })
+
+  it('opens the link modal on the security’s current link and sends only changes', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Growth Fund')],
+    })
+    getHoldings.mockResolvedValue({
+      holdings: [
+        {
+          entityId: 'unlinked',
+          entityName: 'Unlinked Securities',
+          sourceGraphId: null,
+          totalCostBasisDollars: 10,
+          totalCurrentValueDollars: null,
+          positionCount: 1,
+          securities: [
+            {
+              securityId: 's1',
+              securityName: 'Series A',
+              securityType: 'preferred_stock',
+              quantity: 1,
+              quantityType: 'shares',
+              costBasisDollars: 10,
+              currentValueDollars: null,
+            },
+          ],
+        },
+      ],
+    })
+    getSecurity.mockResolvedValue({
+      id: 's1',
+      entityId: null,
+      sourceGraphId: 'kg_x',
+    })
+    updateSecurity.mockResolvedValue({})
+    render(<PortfolioPageContent />)
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Link Series A' })
+    )
+    await waitFor(() =>
+      expect(
+        (document.getElementById('edit-graph') as HTMLInputElement).value
+      ).toBe('kg_x')
+    )
+    expect(getSecurity).toHaveBeenCalledWith('graph-a', 's1')
+
+    fireEvent.change(
+      document.getElementById('edit-graph') as HTMLInputElement,
+      {
+        target: { value: 'kg_y' },
+      }
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() =>
+      expect(updateSecurity).toHaveBeenCalledWith('graph-a', 's1', {
+        source_graph_id: 'kg_y',
+      })
+    )
   })
 })

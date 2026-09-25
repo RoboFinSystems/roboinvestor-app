@@ -367,17 +367,51 @@ const PortfolioPageContent: FC = function () {
     [graphId]
   )
 
+  // What the security currently carries, so the modal opens on it and a save
+  // sends only what the user changed.
+  const [editLoaded, setEditLoaded] = useState({
+    entityId: '',
+    sourceGraphId: '',
+  })
+  const editSeq = useRef(0)
+
   const openEditSecurity = useCallback(
     (securityId: string, securityName: string) => {
       setEditSecurityId(securityId)
       setEditSecurityName(securityName)
       setEditEntityId('')
       setEditSourceGraphId('')
+      setEditLoaded({ entityId: '', sourceGraphId: '' })
       setEditError(null)
       loadLinkedEntities()
       setShowEditSecurityModal(true)
+      if (!graphId) return
+      const requestGraphId = graphId
+      const seq = ++editSeq.current
+      clients.investor
+        .getSecurity(requestGraphId, securityId)
+        .then((security) => {
+          if (seq !== editSeq.current || graphIdRef.current !== requestGraphId)
+            return
+          const loaded = {
+            entityId: security?.entityId ?? '',
+            sourceGraphId: security?.sourceGraphId ?? '',
+          }
+          setEditLoaded(loaded)
+          setEditEntityId(loaded.entityId)
+          setEditSourceGraphId(loaded.sourceGraphId)
+        })
+        .catch((err: unknown) => {
+          if (seq !== editSeq.current || graphIdRef.current !== requestGraphId)
+            return
+          setEditError(
+            `Could not load this security's current link: ${
+              err instanceof Error ? err.message : String(err)
+            }`
+          )
+        })
     },
-    [loadLinkedEntities]
+    [graphId, loadLinkedEntities]
   )
 
   const handleEditSecurity = useCallback(async () => {
@@ -387,9 +421,16 @@ const PortfolioPageContent: FC = function () {
       setSavingEdit(true)
       setEditError(null)
       const updates: Record<string, string | null> = {}
-      if (editEntityId) updates.entity_id = editEntityId
-      if (editSourceGraphId.trim())
-        updates.source_graph_id = editSourceGraphId.trim()
+      // Only changed, non-empty values: clearing a link is not offered here.
+      if (editEntityId && editEntityId !== editLoaded.entityId)
+        updates.entity_id = editEntityId
+      const sourceGraphId = editSourceGraphId.trim()
+      if (sourceGraphId && sourceGraphId !== editLoaded.sourceGraphId)
+        updates.source_graph_id = sourceGraphId
+      if (Object.keys(updates).length === 0) {
+        setShowEditSecurityModal(false)
+        return
+      }
 
       await clients.investor.updateSecurity(
         requestGraphId,
@@ -415,6 +456,7 @@ const PortfolioPageContent: FC = function () {
     editSecurityId,
     editEntityId,
     editSourceGraphId,
+    editLoaded,
     activeSelection,
     loadHoldings,
   ])
@@ -441,6 +483,7 @@ const PortfolioPageContent: FC = function () {
     setShowSecurityModal(false)
     setShowEditSecurityModal(false)
     setEditSecurityId(null)
+    editSeq.current++
     setEditError(null)
     setSecurityModalError(null)
 
@@ -826,6 +869,7 @@ const PortfolioPageContent: FC = function () {
                                           )
                                         }
                                         className="hover:text-secondary-500 rounded p-1 text-gray-400"
+                                        aria-label={`Link ${s.security_name}`}
                                       >
                                         <HiPencil className="h-4 w-4" />
                                       </button>
