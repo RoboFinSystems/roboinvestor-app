@@ -41,29 +41,61 @@ function overrideOrigin(): URL | null {
   }
 }
 
-const REGION = '[a-z0-9-]+'
-const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+/** The deployment's region; presigned URLs may use its regional S3 host. */
+function region(): string {
+  return (process.env.AWS_REGION || 'us-east-1').trim().toLowerCase()
+}
 
 /**
  * The key (path without the leading slash) the URL addresses inside the bundle
  * bucket, or null when the host/path pair is not that bucket. Virtual-hosted
  * (`<bucket>.s3[.<region>].amazonaws.com/<key>`) and path-style
- * (`s3[.<region>].amazonaws.com/<bucket>/<key>`) are both accepted.
+ * (`s3[.<region>].amazonaws.com/<bucket>/<key>`) are both accepted, for the
+ * global host and the deployment region's host only.
  */
 function bucketKey(
   host: string,
   pathname: string,
   bucket: string
 ): string | null {
-  const b = escapeRe(bucket)
-  if (new RegExp(`^${b}\\.s3(\\.${REGION})?\\.amazonaws\\.com$`).test(host)) {
+  const r = region()
+  if (
+    host === `${bucket}.s3.amazonaws.com` ||
+    host === `${bucket}.s3.${r}.amazonaws.com`
+  ) {
     return pathname.slice(1)
   }
-  if (new RegExp(`^s3(\\.${REGION})?\\.amazonaws\\.com$`).test(host)) {
+  if (host === 's3.amazonaws.com' || host === `s3.${r}.amazonaws.com`) {
     const prefix = `/${bucket}/`
     return pathname.startsWith(prefix) ? pathname.slice(prefix.length) : null
   }
   return null
+}
+
+/**
+ * The origin the proxy may fetch from for this host, built only from server
+ * configuration (bucket, region, endpoint override) and never from the
+ * request, or null when the host is not one of them.
+ */
+function trustedOrigin(u: URL, bucket: string | null): string | null {
+  const override = overrideOrigin()
+  if (
+    override &&
+    u.protocol === override.protocol &&
+    u.host.toLowerCase() === override.host.toLowerCase()
+  ) {
+    return override.origin
+  }
+  if (!bucket) return null
+  const r = region()
+  const hosts = [
+    `${bucket}.s3.amazonaws.com`,
+    `${bucket}.s3.${r}.amazonaws.com`,
+    's3.amazonaws.com',
+    `s3.${r}.amazonaws.com`,
+  ]
+  const host = hosts.find((h) => h === u.hostname.toLowerCase())
+  return host ? `https://${host}` : null
 }
 
 /**
@@ -134,5 +166,10 @@ export function allowedHolonUrl(raw: string): URL | null {
     present('AWSAccessKeyId', 'X-Amz-Credential')
   if (!signed) return null
 
-  return u
+  // Rebuild the target on a configured origin so the host that is fetched
+  // never comes from the request. Path and query are kept byte for byte: the
+  // presigned signature covers them.
+  const origin = trustedOrigin(u, bucket)
+  if (!origin) return null
+  return new URL(`${origin}${u.pathname}${u.search}`)
 }
