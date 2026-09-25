@@ -1,6 +1,25 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
+/**
+ * The origin of the API this deployment talks to, so a deployment pointed at
+ * its own API (staging, a fork, a self-hosted image) is not refused by
+ * `connect-src`. Returns '' when unset or not an http(s) URL — the Docker
+ * image's unreplaced placeholder included.
+ */
+function configuredApiOrigin(): string {
+  const raw = process.env.NEXT_PUBLIC_ROBOSYSTEMS_API_URL
+  if (!raw) return ''
+  try {
+    const url = new URL(raw)
+    return url.protocol === 'https:' || url.protocol === 'http:'
+      ? url.origin
+      : ''
+  } catch {
+    return ''
+  }
+}
+
 export function proxy(request: NextRequest) {
   const response = NextResponse.next()
   const isDevelopment = process.env.NODE_ENV === 'development'
@@ -20,6 +39,8 @@ export function proxy(request: NextRequest) {
   // viewer's ExternalTextBlock fetches these client-side, so the host is needed
   // in connect-src (the fetch) and img-src (images embedded in the fetched HTML).
   const SEC_FILING_ASSETS = 'https://public.robosystems.ai'
+
+  const API_ORIGIN = configuredApiOrigin()
 
   // Comprehensive CSP configuration for modern web apps
   const cspDirectives = [
@@ -70,7 +91,8 @@ export function proxy(request: NextRequest) {
         'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com ' +
         RESEARCH_ASSETS +
         ' ' +
-        SEC_FILING_ASSETS
+        SEC_FILING_ASSETS +
+        (API_ORIGIN ? ` ${API_ORIGIN}` : '')
       : "connect-src 'self' " +
         'https://api.robosystems.ai https://staging.api.robosystems.ai ' +
         'https://cloudflareinsights.com https://static.cloudflareinsights.com ' +
@@ -79,7 +101,8 @@ export function proxy(request: NextRequest) {
         'https://tagmanager.google.com wss://ws-us3.pusher.com https://sockjs-us3.pusher.com ' +
         RESEARCH_ASSETS +
         ' ' +
-        SEC_FILING_ASSETS,
+        SEC_FILING_ASSETS +
+        (API_ORIGIN ? ` ${API_ORIGIN}` : ''),
 
     // Frame sources - Allow Cloudflare CAPTCHA and common embeds
     "frame-src 'self' " +
