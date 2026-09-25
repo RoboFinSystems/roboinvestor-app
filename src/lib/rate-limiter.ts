@@ -71,8 +71,15 @@ function getClientIdentifier(request: NextRequest): string {
   return getClientIp(request) ?? 'unknown'
 }
 
-// Pre-configured rate limiters for different endpoints
+// Pre-configured rate limiters for different endpoints. Each route has its own
+// counter: sharing one let landing-page contact submissions from an office NAT
+// exhaust the in-app support form for everyone behind it.
 export const contactRateLimiter = rateLimit({
+  interval: 60 * 60 * 1000, // 1 hour
+  uniqueTokenPerInterval: 1000,
+})
+
+export const supportRateLimiter = rateLimit({
   interval: 60 * 60 * 1000, // 1 hour
   uniqueTokenPerInterval: 1000,
 })

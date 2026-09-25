@@ -1,4 +1,4 @@
-import { contactRateLimiter } from '@/lib/rate-limiter'
+import { supportRateLimiter } from '@/lib/rate-limiter'
 import { snsService } from '@/lib/sns'
 import {
   getClientIp,
@@ -11,7 +11,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     // Apply rate limiting (5 requests per hour for support)
-    const rateLimitResult = await contactRateLimiter.check(request, 5)
+    const rateLimitResult = await supportRateLimiter.check(request, 5)
 
     if (!rateLimitResult.success) {
       return NextResponse.json(
@@ -95,15 +95,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Build metadata section for the message
-    const metadata = body.metadata || {}
+    // Build metadata section for the message. Metadata is caller-supplied
+    // context, so only short strings are forwarded; anything else is dropped
+    // rather than rendered as `[object Object]` or allowed to push the SNS
+    // message past its size limit.
+    const rawMetadata =
+      body.metadata && typeof body.metadata === 'object' ? body.metadata : {}
+    const metadataField = (key: string): string | undefined => {
+      const value = (rawMetadata as Record<string, unknown>)[key]
+      if (typeof value !== 'string') return undefined
+      const trimmed = value.trim()
+      return trimmed && trimmed.length <= 200 ? trimmed : undefined
+    }
+    const orgName = metadataField('orgName')
     const metadataLines = [
-      metadata.orgName && `Organization: ${metadata.orgName}`,
-      metadata.orgId && `Org ID: ${metadata.orgId}`,
-      metadata.orgType && `Org Type: ${metadata.orgType}`,
-      metadata.graphName && `Graph: ${metadata.graphName}`,
-      metadata.graphId && `Graph ID: ${metadata.graphId}`,
-      metadata.userRole && `Role: ${metadata.userRole}`,
+      orgName && `Organization: ${orgName}`,
+      metadataField('orgId') && `Org ID: ${metadataField('orgId')}`,
+      metadataField('orgType') && `Org Type: ${metadataField('orgType')}`,
+      metadataField('graphName') && `Graph: ${metadataField('graphName')}`,
+      metadataField('graphId') && `Graph ID: ${metadataField('graphId')}`,
+      metadataField('userRole') && `Role: ${metadataField('userRole')}`,
     ].filter(Boolean)
 
     const metadataSection =
@@ -112,13 +123,23 @@ export async function POST(request: NextRequest) {
         : ''
 
     // Send SNS notification via the contact form publisher
-    await snsService.publishContactForm({
+    const delivered = await snsService.publishContactForm({
       name: body.name,
       email: body.email,
-      company: metadata.orgName || 'N/A',
+      company: orgName || 'N/A',
       message: `[RoboInvestor Support] [Subject: ${body.subject}]\n\n${body.message}${metadataSection}`,
       formType: 'support',
     })
+
+    if (!delivered) {
+      return NextResponse.json(
+        {
+          error: 'Your message could not be delivered. Please try again later.',
+          code: 'SUBMISSION_NOT_DELIVERED',
+        },
+        { status: 503 }
+      )
+    }
 
     return NextResponse.json(
       { message: 'Support message sent successfully' },
