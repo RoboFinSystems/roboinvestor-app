@@ -40,7 +40,7 @@ import {
 } from '@robosystems/report-components'
 import { parseJsonld } from '@robosystems/report-components/adapters'
 import { Alert, Card, Spinner } from 'flowbite-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { HiDocumentReport, HiExclamationCircle, HiShare } from 'react-icons/hi'
 
 const formatDate = (value: string | null | undefined): string | null => {
@@ -88,11 +88,25 @@ export default function ReceivedReportContent({
     if (report) setSelectedSectionId(reportSections(report)[0]?.id ?? null)
   }, [report])
 
+  // Each load gets a sequence number; a load that is no longer the latest (the
+  // graph or report changed underneath it) drops its results.
+  const loadSeq = useRef(0)
+
   const load = useCallback(async () => {
+    const seq = ++loadSeq.current
+    const stale = () => seq !== loadSeq.current
+    // Nothing from the previous graph or report may stay on screen, or anchor
+    // the chat, while this one loads.
+    setReport(null)
+    setMeta(null)
+    setSelectedSectionId(null)
     if (!graphId) {
       // Once the graphs have loaded, no RoboInvestor graph means there is
       // nowhere this report could be; say so rather than spin.
-      if (!graphsLoading) {
+      if (graphsLoading) {
+        setError(null)
+        setIsLoading(true)
+      } else {
         setError('This report is no longer available.')
         setIsLoading(false)
       }
@@ -104,6 +118,7 @@ export default function ReceivedReportContent({
       // Metadata first: it drives the header, and it is also how a report that
       // was revoked between the list and this page surfaces as a clean miss.
       const list = await clients.ledger.listReports(graphId)
+      if (stale()) return
       const found = (list ?? []).find((r) => r.id === reportId) ?? null
       setMeta(found)
       if (!found) {
@@ -118,6 +133,7 @@ export default function ReceivedReportContent({
           format: 'HOLON_JSONLD',
         }
       )
+      if (stale()) return
       if (!resp) {
         setError('This report has no published bundle to render.')
         return
@@ -141,19 +157,21 @@ export default function ReceivedReportContent({
       }
 
       const parsed = await parseJsonld(await proxied.text())
+      if (stale()) return
       if (!parsed.informationBlocks.length) {
         setError('No statements found in this report.')
         return
       }
       setReport(parsed)
     } catch (err) {
+      if (stale()) return
       setError(
         `Could not load this report: ${
           err instanceof Error ? err.message : String(err)
         }`
       )
     } finally {
-      setIsLoading(false)
+      if (!stale()) setIsLoading(false)
     }
   }, [graphId, graphsLoading, reportId])
 

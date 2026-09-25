@@ -327,6 +327,10 @@ Resources:
           ImageConfiguration:
             Port: !Ref ContainerPort
             RuntimeEnvironmentVariables:
+              # next.config.js is re-read at server start; its Server Actions
+              # origin allow-list is derived from this.
+              - Name: NEXT_PUBLIC_ROBOINVESTOR_APP_URL
+                Value: !If [IsPublicMode, !Sub 'https://${DomainName}', '']
               - Name: NODE_ENV
                 Value: production
               - Name: SNS_CONTACT_TOPIC_ARN

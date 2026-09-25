@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import PortfolioPageContent from '../content'
 
@@ -14,6 +20,12 @@ const listPortfolios = vi.hoisted(() => vi.fn())
 const getHoldings = vi.hoisted(() => vi.fn())
 const createSecurity = vi.hoisted(() => vi.fn())
 const updatePortfolioBlock = vi.hoisted(() => vi.fn())
+const createPortfolioBlock = vi.hoisted(() => vi.fn())
+const listEntities = vi.hoisted(() => vi.fn())
+const getSecurity = vi.hoisted(() => vi.fn())
+const updateSecurity = vi.hoisted(() => vi.fn())
+const deleteSecurity = vi.hoisted(() => vi.fn())
+const listPositions = vi.hoisted(() => vi.fn())
 
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
@@ -29,19 +41,24 @@ vi.mock('@robosystems/core', async () => {
         getHoldings,
         createSecurity,
         updatePortfolioBlock,
+        createPortfolioBlock,
+        getSecurity,
+        updateSecurity,
+        deleteSecurity,
+        listPositions,
       },
-      ledger: { listEntities: vi.fn().mockResolvedValue([]) },
+      ledger: { listEntities },
     },
   }
 })
 
-const portfolio = (id: string, name: string) => ({
+const portfolio = (id: string, name: string, baseCurrency = 'USD') => ({
   id,
   name,
   description: null,
   strategy: null,
   inceptionDate: null,
-  baseCurrency: 'USD',
+  baseCurrency,
   createdAt: '2026-01-01',
   updatedAt: '2026-01-01',
 })
@@ -57,6 +74,8 @@ describe('PortfolioPageContent', () => {
     getHoldings.mockResolvedValue({ holdings: [] })
     createSecurity.mockResolvedValue({ id: 'sec-1' })
     updatePortfolioBlock.mockResolvedValue({})
+    listEntities.mockResolvedValue([])
+    listPositions.mockResolvedValue({ positions: [] })
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
     graphs.selectedId = null
   })
@@ -173,6 +192,8 @@ describe('adding a security with a position', () => {
     getHoldings.mockResolvedValue({ holdings: [] })
     createSecurity.mockResolvedValue({ id: 'sec-1' })
     updatePortfolioBlock.mockResolvedValue({})
+    listEntities.mockResolvedValue([])
+    listPositions.mockResolvedValue({ positions: [] })
     graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
     graphs.selectedId = null
     listPortfolios.mockResolvedValue({
@@ -211,12 +232,173 @@ describe('adding a security with a position', () => {
     })
   })
 
-  it('creates the security without a position when no quantity is given', async () => {
+  it('requires a quantity, since a security with no position shows nowhere', async () => {
     fill('sec-name', 'Warrant')
     submit()
 
-    await waitFor(() => expect(createSecurity).toHaveBeenCalled())
-    expect(updatePortfolioBlock).not.toHaveBeenCalled()
+    expect(await screen.findByText(/Enter a quantity/i)).toBeInTheDocument()
+    expect(createSecurity).not.toHaveBeenCalled()
+  })
+
+  it('reuses the created security when the position write is retried', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(
+      new Error('Update portfolio block failed: 500')
+    )
+    fill('sec-name', 'Series A Preferred')
+    fill('sec-qty', '1000')
+    fill('sec-cost', '150000')
+    submit()
+    await screen.findByText(/Update portfolio block failed/)
+
+    submit()
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(createSecurity).toHaveBeenCalledTimes(1)
+    expect(
+      updatePortfolioBlock.mock.calls[1][2].positions.add[0]
+    ).toMatchObject({ security_id: 'sec-1' })
+  })
+
+  it('corrects the created security when the name changes before a retry', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('boom'))
+    fill('sec-name', 'Series A')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('boom')
+
+    fill('sec-name', 'Series B')
+    submit()
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(createSecurity).toHaveBeenCalledTimes(1)
+    expect(updateSecurity).toHaveBeenCalledWith('graph-a', 'sec-1', {
+      name: 'Series B',
+    })
+  })
+
+  it('recreates rather than patches when the source graph changes before a retry', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('boom'))
+    createSecurity
+      .mockResolvedValueOnce({ id: 'sec-1' })
+      .mockResolvedValueOnce({ id: 'sec-2' })
+    fill('sec-name', 'Series A')
+    fill('sec-graph', 'kg_a')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('boom')
+
+    fill('sec-graph', 'kg_b')
+    submit()
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(updateSecurity).not.toHaveBeenCalled()
+    expect(deleteSecurity).toHaveBeenCalledWith('graph-a', 'sec-1')
+    expect(createSecurity).toHaveBeenLastCalledWith(
+      'graph-a',
+      expect.objectContaining({ source_graph_id: 'kg_b' })
+    )
+    expect(
+      updatePortfolioBlock.mock.calls[1][2].positions.add[0].security_id
+    ).toBe('sec-2')
+  })
+
+  it('does not add the position twice when a failed write actually landed', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('network error'))
+    fill('sec-name', 'Series A')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('network error')
+
+    listPositions.mockResolvedValueOnce({ positions: [{ id: 'pos-1' }] })
+    submit()
+    await waitFor(() =>
+      expect(listPositions).toHaveBeenCalledWith('graph-a', {
+        portfolioId: 'p-a1',
+        securityId: 'sec-1',
+      })
+    )
+    await waitFor(() => expect(screen.queryByText('network error')).toBeNull())
+    expect(updatePortfolioBlock).toHaveBeenCalledTimes(1)
+    expect(createSecurity).toHaveBeenCalledTimes(1)
+  })
+
+  it('finishes the same security after the modal is closed and reopened', async () => {
+    updatePortfolioBlock.mockRejectedValueOnce(new Error('boom'))
+    fill('sec-name', 'Series A')
+    fill('sec-qty', '10')
+    submit()
+    await screen.findByText('boom')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+    submit()
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalledTimes(2))
+    expect(createSecurity).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens a fresh form after a cancel that wrote nothing', async () => {
+    fill('sec-name', 'Series A')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+    expect(document.getElementById('sec-name')).toHaveValue('')
+  })
+
+  it('refuses a cost basis it cannot read before writing anything', async () => {
+    fill('sec-name', 'Common')
+    fill('sec-qty', '1000')
+    fill('sec-cost', '1.525,50')
+    submit()
+
+    expect(
+      await screen.findByText(/Enter the cost basis as an amount/i)
+    ).toBeInTheDocument()
+    expect(createSecurity).not.toHaveBeenCalled()
+  })
+
+  it('reads a US-formatted cost basis', async () => {
+    fill('sec-name', 'Common')
+    fill('sec-qty', '1,000')
+    fill('sec-cost', '$1,525.50')
+    submit()
+
+    await waitFor(() => expect(updatePortfolioBlock).toHaveBeenCalled())
+    expect(
+      updatePortfolioBlock.mock.calls[0][2].positions.add[0]
+    ).toMatchObject({ quantity: 1000, cost_basis: 152550 })
+  })
+
+  it('refuses a negative cost basis', async () => {
+    fill('sec-name', 'Common')
+    fill('sec-qty', '10')
+    fill('sec-cost', '-1500')
+    submit()
+
+    expect(
+      await screen.findByText(/Enter the cost basis as an amount/i)
+    ).toBeInTheDocument()
+    expect(createSecurity).not.toHaveBeenCalled()
+  })
+
+  it('takes quantity and cost as text so the browser cannot rewrite them', () => {
+    // A `type=number` input blanks (Firefox/Safari) or rewrites (Chromium)
+    // input it can't read before the parser ever sees it.
+    for (const id of ['sec-qty', 'sec-cost']) {
+      const input = document.getElementById(id) as HTMLInputElement
+      expect(input.type).toBe('text')
+      expect(input.inputMode).toBe('decimal')
+    }
+  })
+
+  it('offers the API’s documented security types and units', () => {
+    const types = Array.from(
+      (document.getElementById('sec-type') as HTMLSelectElement).options
+    ).map((o) => o.value)
+    expect(types).toEqual(
+      expect.arrayContaining(['llc_unit', 'restricted_stock_unit'])
+    )
+    expect(types).not.toContain('llc_units')
+    expect(types).not.toContain('kiss')
+    const units = Array.from(
+      (document.getElementById('sec-qty-type') as HTMLSelectElement).options
+    ).map((o) => o.value)
+    expect(units).toEqual(['shares', 'units', 'principal'])
   })
 
   it('rejects a non-positive quantity before creating an orphan security', async () => {
@@ -231,5 +413,184 @@ describe('adding a security with a position', () => {
     ).toBeInTheDocument()
     expect(createSecurity).not.toHaveBeenCalled()
     expect(updatePortfolioBlock).not.toHaveBeenCalled()
+  })
+})
+
+describe('portfolio page details', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    getHoldings.mockResolvedValue({ holdings: [] })
+    listEntities.mockResolvedValue([])
+    listPositions.mockResolvedValue({ positions: [] })
+    graphs.current = [{ graphId: 'graph-a', graphName: 'Graph A' }]
+    graphs.selectedId = null
+  })
+
+  it('formats amounts in the portfolio’s base currency', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Fund EU', 'EUR')],
+    })
+    getHoldings.mockResolvedValue({
+      holdings: [
+        {
+          entityId: 'e1',
+          entityName: 'Acme GmbH',
+          sourceGraphId: null,
+          totalCostBasisDollars: 1000,
+          totalCurrentValueDollars: null,
+          positionCount: 1,
+          securities: [
+            {
+              securityId: 's1',
+              securityName: 'Ordinary',
+              securityType: 'common_stock',
+              quantity: 1,
+              quantityType: 'shares',
+              costBasisDollars: 1000,
+              currentValueDollars: null,
+            },
+          ],
+        },
+      ],
+    })
+
+    render(<PortfolioPageContent />)
+    await screen.findByText('Acme GmbH')
+    expect(screen.queryAllByText(/\$1,000/)).toHaveLength(0)
+    expect(screen.queryAllByText(/€1,000/).length).toBeGreaterThan(0)
+  })
+
+  it('shows a failed portfolio create inside the dialog', async () => {
+    listPortfolios.mockResolvedValue({ portfolios: [] })
+    createPortfolioBlock.mockRejectedValue(
+      new Error('Create portfolio block failed: 422')
+    )
+    render(<PortfolioPageContent />)
+    await waitFor(() => expect(listPortfolios).toHaveBeenCalled())
+
+    fireEvent.click(screen.getByRole('button', { name: /New Portfolio/i }))
+    fireEvent.change(document.getElementById('name') as HTMLInputElement, {
+      target: { value: 'Fund II' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Create' }))
+
+    const dialog = await screen.findByRole('dialog')
+    expect(
+      await within(dialog).findByText(/Create portfolio block failed/)
+    ).toBeInTheDocument()
+  })
+
+  it('shows a load error for linked companies, not the empty state', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Growth Fund')],
+    })
+    listEntities.mockRejectedValue(new Error('LEDGER_NOT_INITIALIZED'))
+    render(<PortfolioPageContent />)
+    await waitFor(() =>
+      expect(getHoldings).toHaveBeenCalledWith('graph-a', 'p-a1')
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+
+    expect(
+      await screen.findByText(/Could not load companies/i)
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('No companies have shared reports with you yet.')
+    ).toBeNull()
+  })
+
+  it('drops a linked-companies load that lands after a graph switch', async () => {
+    listPortfolios.mockImplementation(async (g: string) => ({
+      portfolios: [portfolio(g === 'graph-a' ? 'p-a1' : 'p-b1', 'Fund')],
+    }))
+    let resolveA: (v: unknown) => void = () => {}
+    listEntities.mockImplementation((g: string) =>
+      g === 'graph-a'
+        ? new Promise((r) => {
+            resolveA = r
+          })
+        : Promise.resolve([{ id: 'ent-b', name: 'Bravo Co', source: 'linked' }])
+    )
+
+    const { rerender } = render(<PortfolioPageContent />)
+    await waitFor(() =>
+      expect(getHoldings).toHaveBeenCalledWith('graph-a', 'p-a1')
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+    await waitFor(() =>
+      expect(listEntities).toHaveBeenCalledWith('graph-a', expect.anything())
+    )
+
+    graphs.current = [{ graphId: 'graph-b', graphName: 'Graph B' }]
+    rerender(<PortfolioPageContent />)
+    await waitFor(() =>
+      expect(getHoldings).toHaveBeenCalledWith('graph-b', 'p-b1')
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+    await screen.findByText('Bravo Co')
+
+    resolveA([{ id: 'ent-a', name: 'Alpha Co', source: 'linked' }])
+    await new Promise((r) => setTimeout(r, 20))
+    expect(screen.queryByText('Alpha Co')).toBeNull()
+    expect(screen.getByText('Bravo Co')).toBeInTheDocument()
+  })
+
+  it('opens the link modal on the security’s current link and sends only changes', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Growth Fund')],
+    })
+    getHoldings.mockResolvedValue({
+      holdings: [
+        {
+          entityId: 'unlinked',
+          entityName: 'Unlinked Securities',
+          sourceGraphId: null,
+          totalCostBasisDollars: 10,
+          totalCurrentValueDollars: null,
+          positionCount: 1,
+          securities: [
+            {
+              securityId: 's1',
+              securityName: 'Series A',
+              securityType: 'preferred_stock',
+              quantity: 1,
+              quantityType: 'shares',
+              costBasisDollars: 10,
+              currentValueDollars: null,
+            },
+          ],
+        },
+      ],
+    })
+    getSecurity.mockResolvedValue({
+      id: 's1',
+      entityId: null,
+      sourceGraphId: 'kg_x',
+    })
+    updateSecurity.mockResolvedValue({})
+    render(<PortfolioPageContent />)
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Link Series A' })
+    )
+    await waitFor(() =>
+      expect(
+        (document.getElementById('edit-graph') as HTMLInputElement).value
+      ).toBe('kg_x')
+    )
+    expect(getSecurity).toHaveBeenCalledWith('graph-a', 's1')
+
+    fireEvent.change(
+      document.getElementById('edit-graph') as HTMLInputElement,
+      {
+        target: { value: 'kg_y' },
+      }
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() =>
+      expect(updateSecurity).toHaveBeenCalledWith('graph-a', 's1', {
+        source_graph_id: 'kg_y',
+      })
+    )
   })
 })

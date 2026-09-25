@@ -2,11 +2,11 @@
 
 import type { Entity } from '@robosystems/core'
 import {
+  clients,
   EmptyState,
   GraphFilters,
   LoadingState,
   PageHeader,
-  SDK,
   useGraphContext,
 } from '@robosystems/core'
 import {
@@ -38,74 +38,61 @@ const EntitiesListPageContent: FC = function () {
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // Load all entities from all roboinvestor graphs
+  // Load each RoboInvestor graph's own entities through the ledger entity
+  // API — the same source and the same rule as the entity selector. A raw
+  // `MATCH (e:Entity)` read only materialized nodes (so a fresh graph listed
+  // nothing) and counted `linked` portfolio companies as the fund's own. The
+  // facade throws on an API error, so a failed graph is reported, not shown
+  // as an empty one.
   useEffect(() => {
+    let cancelled = false
     const loadAllEntities = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
+      setIsLoading(true)
+      setError(null)
 
-        // Filter to only roboinvestor graphs
-        const roboinvestorGraphs = graphState.graphs.filter(
-          GraphFilters.roboinvestor
+      const roboinvestorGraphs = graphState.graphs.filter(
+        GraphFilters.roboinvestor
+      )
+
+      const results = await Promise.allSettled(
+        roboinvestorGraphs.map(async (graph) => {
+          const list = await clients.ledger.listEntities(graph.graphId)
+          return list
+            .filter((e) => e.source !== 'linked')
+            .map((e): EntityWithGraph => ({
+              identifier: e.id || '',
+              name: e.name || e.id || 'Unnamed Entity',
+              entityType: e.entityType ?? undefined,
+              parentEntityId: e.parentEntityId ?? undefined,
+              isParent: e.isParent ?? undefined,
+              _graphId: graph.graphId,
+              _graphName: graph.graphName,
+              _graphCreatedAt: graph.createdAt,
+            }))
+        })
+      )
+      if (cancelled) return
+
+      const failed = roboinvestorGraphs.filter(
+        (_, i) => results[i].status === 'rejected'
+      )
+      setEntities(
+        results.flatMap((r) => (r.status === 'fulfilled' ? r.value : []))
+      )
+      if (failed.length > 0) {
+        setError(
+          `Could not load entities from ${failed
+            .map((g) => g.graphName)
+            .join(', ')}. Please try again.`
         )
-
-        // Load entities from all roboinvestor graphs
-        const allEntities: EntityWithGraph[] = []
-
-        for (const graph of roboinvestorGraphs) {
-          try {
-            const response = await SDK.executeCypher({
-              path: { graph_id: graph.graphId },
-              query: { mode: 'sync' },
-              body: {
-                query: `MATCH (e:Entity)
-                        RETURN
-                          e.identifier as identifier,
-                          e.name as name,
-                          e.entity_type as entityType,
-                          e.parent_entity_id as parentEntityId,
-                          e.is_parent as isParent
-                        ORDER BY e.name`,
-                parameters: {},
-              },
-            })
-
-            if (response.data) {
-              const data = response.data as any
-              const rows = data.data || []
-
-              const graphEntities: EntityWithGraph[] = rows.map((row: any) => ({
-                identifier: row.identifier || '',
-                name: row.name || row.identifier || 'Unnamed Entity',
-                entityType: row.entityType,
-                parentEntityId: row.parentEntityId,
-                isParent: row.isParent,
-                _graphId: graph.graphId,
-                _graphName: graph.graphName,
-                _graphCreatedAt: graph.createdAt,
-              }))
-
-              allEntities.push(...graphEntities)
-            }
-          } catch (error) {
-            console.error(
-              `Error loading entities from graph ${graph.graphName}:`,
-              error
-            )
-          }
-        }
-
-        setEntities(allEntities)
-      } catch (error) {
-        console.error('Error loading entities:', error)
-        setError('Failed to load entities. Please try again.')
-      } finally {
-        setIsLoading(false)
       }
+      setIsLoading(false)
     }
 
     loadAllEntities()
+    return () => {
+      cancelled = true
+    }
   }, [graphState.graphs])
 
   // Filter entities based on search term

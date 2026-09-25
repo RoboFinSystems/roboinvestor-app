@@ -1,5 +1,24 @@
 import withFlowbiteReact from 'flowbite-react/plugin/nextjs'
 
+/**
+ * Hosts Server Actions accept as `Origin`: the production apex, plus the host
+ * of the app URL this build was made for (`NEXT_PUBLIC_ROBOINVESTOR_APP_URL`),
+ * so staging and self-hosted deployments pass the same check. A value that is
+ * not a URL (the Docker image's placeholder) contributes nothing.
+ */
+function serverActionOrigins() {
+  const hosts = new Set(['roboinvestor.ai'])
+  const appUrl = process.env.NEXT_PUBLIC_ROBOINVESTOR_APP_URL
+  if (appUrl) {
+    try {
+      hosts.add(new URL(appUrl).host)
+    } catch {
+      // Not a URL; keep the defaults.
+    }
+  }
+  return [...hosts]
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -37,9 +56,9 @@ const nextConfig = {
     // Next always sees that host, never `roboinvestor.ai`, and every action
     // (graph/entity/sidebar cookie persistence) 500s. Allow the public origin
     // explicitly so the CSRF origin check passes behind the CDN. www redirects
-    // to the apex, so only the apex is listed.
+    // to the apex, so only the apex is listed (plus the build's own app host).
     serverActions: {
-      allowedOrigins: ['roboinvestor.ai'],
+      allowedOrigins: serverActionOrigins(),
     },
   },
 }

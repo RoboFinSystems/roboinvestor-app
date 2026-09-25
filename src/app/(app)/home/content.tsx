@@ -1,5 +1,6 @@
 'use client'
 
+import { useInvestorGraph } from '@/hooks/useInvestorGraph'
 import { useCreateGraphHandoff } from '@/lib/cross-app'
 import {
   GraphFilters,
@@ -97,9 +98,12 @@ const HomePageContent: FC = function () {
       null,
     [graphState.graphs, graphState.currentGraphId]
   )
-  const isInvestorGraph =
-    !!currentGraph && GraphFilters.roboinvestor(currentGraph)
   const isRepository = !!currentGraph && onlyRepositories(currentGraph)
+  // The investor pages resolve their graph through `useInvestorGraph` (the
+  // selected RoboInvestor graph, else the first one), so the home page offers
+  // them on the same rule — only a selected repository has its own actions.
+  const investorGraph = useInvestorGraph()
+  const isInvestorGraph = !isRepository && !!investorGraph
 
   // Owning a roboinvestor graph anywhere decides dashboard vs. create-graph.
   const hasInvestorGraph = useMemo(

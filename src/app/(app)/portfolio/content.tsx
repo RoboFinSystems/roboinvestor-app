@@ -141,26 +141,70 @@ function toHolding(h: RawHolding): Holding {
   }
 }
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-
-const securityTypeLabel: Record<string, string> = {
-  common_stock: 'Common',
-  preferred_stock: 'Preferred',
-  warrant: 'Warrant',
-  convertible_note: 'Conv. Note',
-  llc_units: 'LLC Units',
-  lp_interest: 'LP Interest',
-  safe: 'SAFE',
-  kiss: 'KISS',
-  option: 'Option',
-  other: 'Other',
+/** Amounts in the portfolio's own base currency; USD when none is set. */
+const formatCurrency = (
+  amount: number,
+  currency: string | null | undefined
+) => {
+  const code = currency?.trim().toUpperCase() || 'USD'
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  } catch {
+    // An unrecognised code still shows the number and says which unit it is.
+    return `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount)} ${code}`
+  }
 }
+
+/**
+ * The security types offered when adding a security: the API's documented
+ * vocabulary (`CreateSecurityRequest.security_type`), so rows written here and
+ * through MCP or the SDK carry the same strings.
+ */
+const securityTypeOptions: Array<[string, string]> = [
+  ['common_stock', 'Common'],
+  ['preferred_stock', 'Preferred'],
+  ['warrant', 'Warrant'],
+  ['convertible_note', 'Conv. Note'],
+  ['safe', 'SAFE'],
+  ['option', 'Option'],
+  ['restricted_stock_unit', 'RSU'],
+  ['llc_unit', 'LLC Units'],
+  ['lp_interest', 'LP Interest'],
+  ['other', 'Other'],
+]
+
+/** Display labels, including values earlier versions of this form wrote. */
+const securityTypeLabel: Record<string, string> = {
+  ...Object.fromEntries(securityTypeOptions),
+  llc_units: 'LLC Units',
+  kiss: 'KISS',
+}
+
+const emptySecurityForm = {
+  name: '',
+  security_type: 'common_stock',
+  security_subtype: '',
+  source_graph_id: '',
+  entity_id: '',
+  quantity: '',
+  quantity_type: 'shares',
+  cost_basis: '',
+}
+
+/** The fields that define the security itself, as opposed to its position. */
+const securityFields = (f: typeof emptySecurityForm) => ({
+  name: f.name.trim(),
+  security_type: f.security_type,
+  security_subtype: f.security_subtype.trim(),
+  entity_id: f.entity_id,
+  source_graph_id: f.source_graph_id.trim(),
+})
+type SecurityFields = ReturnType<typeof securityFields>
 
 const PortfolioPageContent: FC = function () {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([])
@@ -185,17 +229,18 @@ const PortfolioPageContent: FC = function () {
     strategy: '',
   })
   const [creating, setCreating] = useState(false)
+  const [createModalError, setCreateModalError] = useState<string | null>(null)
   const [showSecurityModal, setShowSecurityModal] = useState(false)
-  const [securityForm, setSecurityForm] = useState({
-    name: '',
-    security_type: 'common_stock',
-    security_subtype: '',
-    source_graph_id: '',
-    entity_id: '',
-    quantity: '',
-    quantity_type: 'shares',
-    cost_basis: '',
-  })
+  const [securityForm, setSecurityForm] = useState(emptySecurityForm)
+  // The security this modal session already created, and the fields it was
+  // created from. "Add Security" is two writes; when the position write fails
+  // the retry must reuse this security rather than mint a second one.
+  // It survives closing the modal (the form keeps its values too), and is
+  // cleared on success and on a graph switch.
+  const [pendingSecurity, setPendingSecurity] = useState<{
+    id: string
+    fields: SecurityFields
+  } | null>(null)
   const [creatingSecurity, setCreatingSecurity] = useState(false)
   const [securityModalError, setSecurityModalError] = useState<string | null>(
     null
@@ -204,6 +249,7 @@ const PortfolioPageContent: FC = function () {
     Array<{ id: string; name: string; source_graph_id: string | null }>
   >([])
   const [loadingEntities, setLoadingEntities] = useState(false)
+  const [entitiesError, setEntitiesError] = useState<string | null>(null)
 
   // Edit security modal
   const [showEditSecurityModal, setShowEditSecurityModal] = useState(false)
@@ -229,6 +275,7 @@ const PortfolioPageContent: FC = function () {
   }, [graphId])
   const portfoliosSeq = useRef(0)
   const holdingsSeq = useRef(0)
+  const entitiesSeq = useRef(0)
 
   // The only selection anything may act on: one that belongs to the graph
   // currently in view. Everything downstream — the holdings read, the detail
@@ -240,11 +287,14 @@ const PortfolioPageContent: FC = function () {
 
   const loadLinkedEntities = useCallback(async () => {
     if (!graphId) return
+    const seq = ++entitiesSeq.current
     try {
       setLoadingEntities(true)
+      setEntitiesError(null)
       const entitiesList = await clients.ledger.listEntities(graphId, {
         source: 'linked',
       })
+      if (seq !== entitiesSeq.current) return
       setLinkedEntities(
         entitiesList.map((e) => ({
           id: e.id,
@@ -252,11 +302,16 @@ const PortfolioPageContent: FC = function () {
           source_graph_id: e.sourceGraphId ?? null,
         }))
       )
-    } catch {
-      // Silently fail — linked entities are optional
+    } catch (err) {
+      if (seq !== entitiesSeq.current) return
       setLinkedEntities([])
+      setEntitiesError(
+        `Could not load companies: ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      )
     } finally {
-      setLoadingEntities(false)
+      if (seq === entitiesSeq.current) setLoadingEntities(false)
     }
   }, [graphId])
 
@@ -314,17 +369,55 @@ const PortfolioPageContent: FC = function () {
     [graphId]
   )
 
+  // What the security currently carries, so the modal opens on it and a save
+  // sends only what the user changed.
+  const [editLoaded, setEditLoaded] = useState({
+    entityId: '',
+    sourceGraphId: '',
+  })
+  const editSeq = useRef(0)
+  // Set once the user edits a field, so a late prefill cannot overwrite it.
+  const editTouched = useRef(false)
+
   const openEditSecurity = useCallback(
     (securityId: string, securityName: string) => {
       setEditSecurityId(securityId)
       setEditSecurityName(securityName)
       setEditEntityId('')
       setEditSourceGraphId('')
+      setEditLoaded({ entityId: '', sourceGraphId: '' })
+      editTouched.current = false
       setEditError(null)
       loadLinkedEntities()
       setShowEditSecurityModal(true)
+      if (!graphId) return
+      const requestGraphId = graphId
+      const seq = ++editSeq.current
+      clients.investor
+        .getSecurity(requestGraphId, securityId)
+        .then((security) => {
+          if (seq !== editSeq.current || graphIdRef.current !== requestGraphId)
+            return
+          const loaded = {
+            entityId: security?.entityId ?? '',
+            sourceGraphId: security?.sourceGraphId ?? '',
+          }
+          setEditLoaded(loaded)
+          if (editTouched.current) return
+          setEditEntityId(loaded.entityId)
+          setEditSourceGraphId(loaded.sourceGraphId)
+        })
+        .catch((err: unknown) => {
+          if (seq !== editSeq.current || graphIdRef.current !== requestGraphId)
+            return
+          setEditError(
+            `Could not load this security's current link: ${
+              err instanceof Error ? err.message : String(err)
+            }`
+          )
+        })
     },
-    [loadLinkedEntities]
+    [graphId, loadLinkedEntities]
   )
 
   const handleEditSecurity = useCallback(async () => {
@@ -334,9 +427,16 @@ const PortfolioPageContent: FC = function () {
       setSavingEdit(true)
       setEditError(null)
       const updates: Record<string, string | null> = {}
-      if (editEntityId) updates.entity_id = editEntityId
-      if (editSourceGraphId.trim())
-        updates.source_graph_id = editSourceGraphId.trim()
+      // Only changed, non-empty values: clearing a link is not offered here.
+      if (editEntityId && editEntityId !== editLoaded.entityId)
+        updates.entity_id = editEntityId
+      const sourceGraphId = editSourceGraphId.trim()
+      if (sourceGraphId && sourceGraphId !== editLoaded.sourceGraphId)
+        updates.source_graph_id = sourceGraphId
+      if (Object.keys(updates).length === 0) {
+        setShowEditSecurityModal(false)
+        return
+      }
 
       await clients.investor.updateSecurity(
         requestGraphId,
@@ -362,6 +462,7 @@ const PortfolioPageContent: FC = function () {
     editSecurityId,
     editEntityId,
     editSourceGraphId,
+    editLoaded,
     activeSelection,
     loadHoldings,
   ])
@@ -377,10 +478,18 @@ const PortfolioPageContent: FC = function () {
     setHoldings([])
     setError(null)
     setHoldingsError(null)
+    // Invalidate any linked-companies load still in flight for the old graph.
+    entitiesSeq.current++
     setLinkedEntities([])
+    setEntitiesError(null)
+    setLoadingEntities(false)
+    setPendingSecurity(null)
+    setShowCreateModal(false)
+    setCreateModalError(null)
     setShowSecurityModal(false)
     setShowEditSecurityModal(false)
     setEditSecurityId(null)
+    editSeq.current++
     setEditError(null)
     setSecurityModalError(null)
 
@@ -400,6 +509,7 @@ const PortfolioPageContent: FC = function () {
     const requestGraphId = graphId
     try {
       setCreating(true)
+      setCreateModalError(null)
       const raw = await clients.investor.createPortfolioBlock(requestGraphId, {
         portfolio: {
           name: createForm.name.trim(),
@@ -418,7 +528,8 @@ const PortfolioPageContent: FC = function () {
       setSelectionGraphId(requestGraphId)
     } catch (err) {
       if (graphIdRef.current !== requestGraphId) return
-      setError(
+      // Shown inside the dialog: a page-level alert sits behind its backdrop.
+      setCreateModalError(
         err instanceof Error ? err.message : 'Failed to create portfolio'
       )
     } finally {
@@ -429,11 +540,27 @@ const PortfolioPageContent: FC = function () {
   const handleCreateSecurity = async () => {
     if (!graphId || !activeSelection || !securityForm.name.trim()) return
 
-    // Reject an unusable quantity before creating anything: the security is
-    // written first, so failing after it leaves an orphan behind.
+    // Validate everything before creating anything: the security is written
+    // first, so failing after it leaves an orphan behind. A position is
+    // required — a security with none appears nowhere in this app.
+    if (!securityForm.quantity.trim()) {
+      setSecurityModalError(
+        'Enter a quantity. A security with no position does not appear in holdings.'
+      )
+      return
+    }
     const quantity = parseQuantity(securityForm.quantity)
-    if (securityForm.quantity.trim() && quantity === null) {
-      setSecurityModalError('Enter a positive quantity, e.g. 1500.5')
+    if (quantity === null) {
+      setSecurityModalError(
+        'Enter a positive quantity, e.g. 1500.5 — write fifteen hundred as 1500 or 1,500'
+      )
+      return
+    }
+    const costBasis = parseMoneyToCents(securityForm.cost_basis)
+    if (costBasis === null) {
+      setSecurityModalError(
+        'Enter the cost basis as an amount, e.g. 1525.50 or 1,525.50'
+      )
       return
     }
 
@@ -443,52 +570,102 @@ const PortfolioPageContent: FC = function () {
       setCreatingSecurity(true)
       setSecurityModalError(null)
 
-      // 1. Create the security
-      const security = await clients.investor.createSecurity(requestGraphId, {
-        name: securityForm.name.trim(),
-        security_type: securityForm.security_type,
-        security_subtype: securityForm.security_subtype.trim() || null,
-        entity_id: securityForm.entity_id || null,
-        source_graph_id: securityForm.source_graph_id.trim() || null,
-      })
-
-      // 2. Add the position via portfolio block update if quantity was provided
-      if (quantity !== null) {
-        // Both ids were captured together, so this cannot post one graph's
-        // portfolio id against another graph.
-        await clients.investor.updatePortfolioBlock(
-          requestGraphId,
-          requestPortfolioId,
-          {
-            positions: {
-              add: [
-                {
-                  security_id: (security as { id: string }).id,
-                  quantity,
-                  quantity_type: securityForm.quantity_type,
-                  cost_basis: parseMoneyToCents(securityForm.cost_basis),
-                },
-              ],
-            },
-          }
-        )
+      // 1. Create the security — unless this modal session already created
+      // it and only the position write failed.
+      const fields = securityFields(securityForm)
+      const created = async () => {
+        const security = await clients.investor.createSecurity(requestGraphId, {
+          name: fields.name,
+          security_type: fields.security_type,
+          security_subtype: fields.security_subtype || null,
+          entity_id: fields.entity_id || null,
+          source_graph_id: fields.source_graph_id || null,
+        })
+        return (security as { id: string }).id
       }
+      const finish = () => {
+        setPendingSecurity(null)
+        setShowSecurityModal(false)
+        setSecurityModalError(null)
+        setSecurityForm(emptySecurityForm)
+        loadHoldings(requestPortfolioId)
+      }
+      let securityId: string
+      if (!pendingSecurity) {
+        securityId = await created()
+      } else {
+        // The last position write may have committed even though it reported
+        // an error (a dropped connection). If the position is there, the add
+        // is done: adding again would double-book it, and retiring the
+        // security would orphan a held position.
+        const existing = await clients.investor.listPositions(requestGraphId, {
+          portfolioId: requestPortfolioId,
+          securityId: pendingSecurity.id,
+        })
+        if (graphIdRef.current !== requestGraphId) return
+        if ((existing?.positions ?? []).length > 0) {
+          finish()
+          return
+        }
+
+        const previous = pendingSecurity.fields
+        const keys = Object.keys(fields) as Array<keyof SecurityFields>
+        const changed = keys.filter((k) => fields[k] !== previous[k])
+        // Only descriptive fields are patched. The company link is resolved
+        // by the server on create (from the source graph), and an update just
+        // copies fields — so a changed link goes through a fresh create.
+        const patchable = new Set<keyof SecurityFields>([
+          'name',
+          'security_type',
+          'security_subtype',
+        ])
+        if (changed.length === 0) {
+          securityId = pendingSecurity.id
+        } else if (changed.some((k) => !patchable.has(k) || !fields[k])) {
+          // Retire the unpositioned security rather than leave it behind,
+          // then create the new one.
+          await clients.investor.deleteSecurity(
+            requestGraphId,
+            pendingSecurity.id
+          )
+          if (graphIdRef.current !== requestGraphId) return
+          setPendingSecurity(null)
+          securityId = await created()
+        } else {
+          // Edited before the retry (a typo fixed): correct the security this
+          // session already created instead of minting a second one.
+          await clients.investor.updateSecurity(
+            requestGraphId,
+            pendingSecurity.id,
+            Object.fromEntries(changed.map((k) => [k, fields[k]]))
+          )
+          securityId = pendingSecurity.id
+        }
+      }
+      if (graphIdRef.current !== requestGraphId) return
+      setPendingSecurity({ id: securityId, fields })
+
+      // 2. Add the position. Both ids were captured together, so this cannot
+      // post one graph's portfolio id against another graph.
+      await clients.investor.updatePortfolioBlock(
+        requestGraphId,
+        requestPortfolioId,
+        {
+          positions: {
+            add: [
+              {
+                security_id: securityId,
+                quantity,
+                quantity_type: securityForm.quantity_type,
+                cost_basis: costBasis,
+              },
+            ],
+          },
+        }
+      )
 
       if (graphIdRef.current !== requestGraphId) return
-      setShowSecurityModal(false)
-      setSecurityModalError(null)
-      setSecurityForm({
-        name: '',
-        security_type: 'common_stock',
-        security_subtype: '',
-        source_graph_id: '',
-        entity_id: '',
-        quantity: '',
-        quantity_type: 'shares',
-        cost_basis: '',
-      })
-      // Reload holdings
-      loadHoldings(requestPortfolioId)
+      finish()
     } catch (err) {
       if (graphIdRef.current !== requestGraphId) return
       setSecurityModalError(
@@ -497,6 +674,17 @@ const PortfolioPageContent: FC = function () {
     } finally {
       if (graphIdRef.current === requestGraphId) setCreatingSecurity(false)
     }
+  }
+
+  const closeCreateModal = () => {
+    setShowCreateModal(false)
+    setCreateModalError(null)
+  }
+
+  const closeSecurityModal = () => {
+    // The form and any security already created for it stay, so reopening and
+    // adding again finishes that security rather than creating another.
+    setShowSecurityModal(false)
   }
 
   // No graph with roboinvestor extension
@@ -535,7 +723,10 @@ const PortfolioPageContent: FC = function () {
         actions={
           <Button
             color="secondary"
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              setCreateModalError(null)
+              setShowCreateModal(true)
+            }}
             disabled={isLoading}
           >
             <HiPlus className="mr-2 h-4 w-4" />
@@ -613,6 +804,9 @@ const PortfolioPageContent: FC = function () {
                     color="secondary"
                     onClick={() => {
                       setSecurityModalError(null)
+                      // Keep the form only while a written security awaits
+                      // its position; otherwise a reopen starts clean.
+                      if (!pendingSecurity) setSecurityForm(emptySecurityForm)
                       loadLinkedEntities()
                       setShowSecurityModal(true)
                     }}
@@ -654,13 +848,17 @@ const PortfolioPageContent: FC = function () {
                             <div className="flex flex-wrap items-center gap-4 text-sm">
                               <span className="text-gray-500 dark:text-gray-400">
                                 Cost:{' '}
-                                {formatCurrency(h.total_cost_basis_dollars)}
+                                {formatCurrency(
+                                  h.total_cost_basis_dollars,
+                                  activeSelection.base_currency
+                                )}
                               </span>
                               {h.total_current_value_dollars != null && (
                                 <span className="font-medium text-gray-900 dark:text-white">
                                   Value:{' '}
                                   {formatCurrency(
-                                    h.total_current_value_dollars
+                                    h.total_current_value_dollars,
+                                    activeSelection.base_currency
                                   )}
                                 </span>
                               )}
@@ -703,14 +901,18 @@ const PortfolioPageContent: FC = function () {
                                       {s.quantity_type}
                                     </TableCell>
                                     <TableCell>
-                                      {formatCurrency(s.cost_basis_dollars)}
+                                      {formatCurrency(
+                                        s.cost_basis_dollars,
+                                        activeSelection.base_currency
+                                      )}
                                     </TableCell>
                                     <TableCell>
                                       {s.current_value_dollars != null ? (
                                         <span className="flex items-center gap-1">
                                           <HiCurrencyDollar className="h-4 w-4 text-green-500" />
                                           {formatCurrency(
-                                            s.current_value_dollars
+                                            s.current_value_dollars,
+                                            activeSelection.base_currency
                                           )}
                                         </span>
                                       ) : (
@@ -728,6 +930,7 @@ const PortfolioPageContent: FC = function () {
                                           )
                                         }
                                         className="hover:text-secondary-500 rounded p-1 text-gray-400"
+                                        aria-label={`Link ${s.security_name}`}
                                       >
                                         <HiPencil className="h-4 w-4" />
                                       </button>
@@ -757,14 +960,15 @@ const PortfolioPageContent: FC = function () {
       )}
 
       {/* Create Portfolio Modal */}
-      <Modal
-        show={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        size="md"
-      >
+      <Modal show={showCreateModal} onClose={closeCreateModal} size="md">
         <ModalHeader>Create Portfolio</ModalHeader>
         <ModalBody>
           <div className="space-y-4">
+            {createModalError && (
+              <Alert color="failure" icon={HiExclamationCircle}>
+                {createModalError}
+              </Alert>
+            )}
             <div>
               <Label htmlFor="name">Name</Label>
               <TextInput
@@ -812,18 +1016,14 @@ const PortfolioPageContent: FC = function () {
             ) : null}
             Create
           </Button>
-          <Button color="gray" onClick={() => setShowCreateModal(false)}>
+          <Button color="gray" onClick={closeCreateModal}>
             Cancel
           </Button>
         </ModalFooter>
       </Modal>
 
       {/* Add Security Modal */}
-      <Modal
-        show={showSecurityModal}
-        onClose={() => setShowSecurityModal(false)}
-        size="md"
-      >
+      <Modal show={showSecurityModal} onClose={closeSecurityModal} size="md">
         <ModalHeader>Add Security</ModalHeader>
         <ModalBody>
           <div className="space-y-4">
@@ -856,7 +1056,7 @@ const PortfolioPageContent: FC = function () {
                   }))
                 }
               >
-                {Object.entries(securityTypeLabel).map(([value, label]) => (
+                {securityTypeOptions.map(([value, label]) => (
                   <option key={value} value={value}>
                     {label}
                   </option>
@@ -910,6 +1110,10 @@ const PortfolioPageContent: FC = function () {
                     </option>
                   ))}
                 </Select>
+              ) : entitiesError ? (
+                <p className="py-2 text-sm text-red-600 dark:text-red-400">
+                  {entitiesError}
+                </p>
               ) : (
                 <p className="py-2 text-sm text-gray-400">
                   No companies have shared reports with you yet.
@@ -938,14 +1142,16 @@ const PortfolioPageContent: FC = function () {
             </div>
             <hr className="border-gray-200 dark:border-gray-700" />
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Position (optional)
+              Position
             </p>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="sec-qty">Quantity</Label>
                 <TextInput
                   id="sec-qty"
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
                   placeholder="10000"
                   value={securityForm.quantity}
                   onChange={(e) =>
@@ -970,15 +1176,17 @@ const PortfolioPageContent: FC = function () {
                 >
                   <option value="shares">Shares</option>
                   <option value="units">Units</option>
-                  <option value="percentage">Percentage</option>
+                  <option value="principal">Principal</option>
                 </Select>
               </div>
             </div>
             <div>
-              <Label htmlFor="sec-cost">Cost Basis ($)</Label>
+              <Label htmlFor="sec-cost">Cost Basis (optional)</Label>
               <TextInput
                 id="sec-cost"
-                type="number"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
                 placeholder="150000"
                 value={securityForm.cost_basis}
                 onChange={(e) =>
@@ -1002,7 +1210,7 @@ const PortfolioPageContent: FC = function () {
             ) : null}
             Add
           </Button>
-          <Button color="gray" onClick={() => setShowSecurityModal(false)}>
+          <Button color="gray" onClick={closeSecurityModal}>
             Cancel
           </Button>
         </ModalFooter>
@@ -1037,6 +1245,7 @@ const PortfolioPageContent: FC = function () {
                     const entity = linkedEntities.find(
                       (ent) => ent.id === entityId
                     )
+                    editTouched.current = true
                     setEditEntityId(entityId)
                     if (entity?.source_graph_id) {
                       setEditSourceGraphId(entity.source_graph_id)
@@ -1044,12 +1253,24 @@ const PortfolioPageContent: FC = function () {
                   }}
                 >
                   <option value="">No company linked</option>
+                  {editLoaded.entityId &&
+                    !linkedEntities.some(
+                      (ent) => ent.id === editLoaded.entityId
+                    ) && (
+                      <option value={editLoaded.entityId}>
+                        Current link ({editLoaded.entityId})
+                      </option>
+                    )}
                   {linkedEntities.map((e) => (
                     <option key={e.id} value={e.id}>
                       {e.name}
                     </option>
                   ))}
                 </Select>
+              ) : entitiesError ? (
+                <p className="py-2 text-sm text-red-600 dark:text-red-400">
+                  {entitiesError}
+                </p>
               ) : (
                 <p className="py-2 text-sm text-gray-400">
                   No companies have shared reports with you yet.
@@ -1062,7 +1283,10 @@ const PortfolioPageContent: FC = function () {
                 id="edit-graph"
                 placeholder="e.g., kg19d46a8029980520"
                 value={editSourceGraphId}
-                onChange={(e) => setEditSourceGraphId(e.target.value)}
+                onChange={(e) => {
+                  editTouched.current = true
+                  setEditSourceGraphId(e.target.value)
+                }}
               />
             </div>
           </div>
@@ -1072,7 +1296,12 @@ const PortfolioPageContent: FC = function () {
             color="secondary"
             onClick={handleEditSecurity}
             disabled={
-              savingEdit || (!editEntityId && !editSourceGraphId.trim())
+              savingEdit ||
+              !(
+                (editEntityId && editEntityId !== editLoaded.entityId) ||
+                (editSourceGraphId.trim() &&
+                  editSourceGraphId.trim() !== editLoaded.sourceGraphId)
+              )
             }
           >
             {savingEdit ? (

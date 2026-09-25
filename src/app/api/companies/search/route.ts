@@ -9,18 +9,22 @@ import type { NextRequest } from 'next/server'
  *
  * The index is a few megabytes — past Next's data-cache cap — so it is held
  * per server instance and refreshed hourly, the window the company pages
- * regenerate on. A failed refresh keeps serving the last copy. The data is
+ * regenerate on. A stale or failed refresh keeps serving the last copy. The data is
  * public, so the route needs no session; it sits under `/api/`, which
  * robots.txt already disallows.
  */
 const TTL_MS = 60 * 60 * 1000
+/** A CDN that stalls rather than errors must not hold searches open. */
+const FETCH_TIMEOUT_MS = 10_000
 let cached: { at: number; rows: IndexRow[] } | null = null
 let inflight: Promise<IndexRow[]> | null = null
 
-async function loadIndex(): Promise<IndexRow[]> {
-  if (cached && Date.now() - cached.at < TTL_MS) return cached.rows
+function refresh(): Promise<IndexRow[]> {
   if (!inflight) {
-    inflight = fetch(COMPANY_INDEX_URL, { cache: 'no-store' })
+    inflight = fetch(COMPANY_INDEX_URL, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    })
       .then(async (res) => {
         if (!res.ok)
           throw new Error(`Company index fetch failed: ${res.status}`)
@@ -28,15 +32,29 @@ async function loadIndex(): Promise<IndexRow[]> {
         cached = { at: Date.now(), rows: body.companies ?? [] }
         return cached.rows
       })
-      .catch((e: unknown) => {
-        if (cached) return cached.rows
-        throw e
-      })
       .finally(() => {
         inflight = null
       })
   }
   return inflight
+}
+
+/**
+ * The index, answered from memory whenever a copy exists: an expired copy is
+ * served at once while a single background refresh replaces it, so a slow or
+ * failing CDN never delays a search that has something to answer with. Only
+ * the first load on an instance waits (bounded by the fetch timeout).
+ */
+async function loadIndex(): Promise<IndexRow[]> {
+  if (cached) {
+    if (Date.now() - cached.at >= TTL_MS) {
+      refresh().catch(() => {
+        // Keep serving the last copy; the next expired read retries.
+      })
+    }
+    return cached.rows
+  }
+  return refresh()
 }
 
 export async function GET(req: NextRequest) {

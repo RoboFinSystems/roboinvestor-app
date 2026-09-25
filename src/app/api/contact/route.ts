@@ -130,13 +130,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Send SNS notification
-    await snsService.publishContactForm({
+    const delivered = await snsService.publishContactForm({
       name: contactSubmission.name,
       email: contactSubmission.email,
       company: contactSubmission.company,
       message: contactSubmission.message,
       formType: contactSubmission.type,
     })
+
+    if (!delivered) {
+      return NextResponse.json(
+        {
+          error: 'Your message could not be delivered. Please try again later.',
+          code: 'SUBMISSION_NOT_DELIVERED',
+        },
+        { status: 503 }
+      )
+    }
 
     return NextResponse.json(
       {
