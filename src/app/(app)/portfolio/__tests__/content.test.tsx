@@ -333,6 +333,13 @@ describe('adding a security with a position', () => {
     expect(createSecurity).toHaveBeenCalledTimes(1)
   })
 
+  it('opens a fresh form after a cancel that wrote nothing', async () => {
+    fill('sec-name', 'Series A')
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+    expect(document.getElementById('sec-name')).toHaveValue('')
+  })
+
   it('refuses a cost basis it cannot read before writing anything', async () => {
     fill('sec-name', 'Common')
     fill('sec-qty', '1000')

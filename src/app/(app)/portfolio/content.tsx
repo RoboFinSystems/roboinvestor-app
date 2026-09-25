@@ -804,6 +804,9 @@ const PortfolioPageContent: FC = function () {
                     color="secondary"
                     onClick={() => {
                       setSecurityModalError(null)
+                      // Keep the form only while a written security awaits
+                      // its position; otherwise a reopen starts clean.
+                      if (!pendingSecurity) setSecurityForm(emptySecurityForm)
                       loadLinkedEntities()
                       setShowSecurityModal(true)
                     }}

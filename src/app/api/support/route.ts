@@ -110,11 +110,18 @@ export async function POST(request: NextRequest) {
     const orgName = metadataField('orgName')
     const metadataLines = [
       orgName && `Organization: ${orgName}`,
-      metadataField('orgId') && `Org ID: ${metadataField('orgId')}`,
-      metadataField('orgType') && `Org Type: ${metadataField('orgType')}`,
-      metadataField('graphName') && `Graph: ${metadataField('graphName')}`,
-      metadataField('graphId') && `Graph ID: ${metadataField('graphId')}`,
-      metadataField('userRole') && `Role: ${metadataField('userRole')}`,
+      ...(
+        [
+          ['orgId', 'Org ID'],
+          ['orgType', 'Org Type'],
+          ['graphName', 'Graph'],
+          ['graphId', 'Graph ID'],
+          ['userRole', 'Role'],
+        ] as const
+      ).map(([key, label]) => {
+        const value = metadataField(key)
+        return value && `${label}: ${value}`
+      }),
     ].filter(Boolean)
 
     const metadataSection =
