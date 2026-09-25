@@ -2,8 +2,10 @@
 
 import { createUserApiKey } from '@robosystems/client/sdk'
 import {
+  isApiError,
   PageHeader,
   PageLayout,
+  unwrapSdk,
   useGraphContext,
   useServiceOfferings,
   useToast,
@@ -94,18 +96,22 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
       // Scoped to this repository: the key works only here (least privilege),
       // which is also what makes the pasteable Claude connector URL below
       // acceptable — account-wide keys are rejected in URLs server-side.
-      const response = await createUserApiKey({
-        body: {
-          name: `Repository Access - ${repository.toUpperCase()} - ${new Date().toLocaleDateString()}`,
-          graph_id: repository,
-        },
-      })
+      // The SDK resolves an HTTP error rather than rejecting; unwrapSdk turns
+      // it into an ApiError carrying the API's detail.
+      const created = unwrapSdk(
+        await createUserApiKey({
+          body: {
+            name: `Repository Access - ${repository.toUpperCase()} - ${new Date().toLocaleDateString()}`,
+            graph_id: repository,
+          },
+        })
+      )
 
-      if (!response.data?.key) {
-        throw new Error('Failed to create API key')
+      if (!created?.key) {
+        throw new Error('The API returned no key')
       }
 
-      setApiKey(response.data.key)
+      setApiKey(created.key)
       setKeyCreated(true)
 
       showSuccess('Repository-scoped API key created!')
@@ -121,9 +127,14 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
           block: 'start',
         })
       }, 300)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to create API key:', error)
-      showError(`Failed to create API key: ${error.message || 'Unknown error'}`)
+      const detail = isApiError(error)
+        ? error.detail
+        : error instanceof Error
+          ? error.message
+          : ''
+      showError(`Failed to create API key: ${detail || 'Unknown error'}`)
     } finally {
       setIsCreatingKey(false)
     }
