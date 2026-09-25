@@ -1,17 +1,24 @@
-// Site-wide Schema.org structured data. The Organization block is rendered in the root
-// layout so every page carries publisher identity; the SoftwareApplication block is rendered
-// on the homepage. `sameAs` mirrors the shared RoboFinSystems social profiles linked from
-// the footer.
+// Site-wide Schema.org structured data. The site block is rendered in the root layout so
+// every page carries publisher identity; the SoftwareApplication block is rendered on the
+// homepage.
+//
+// RoboInvestor is a product, not a company: the publisher is the RoboSystems Organization,
+// referenced by the `@id` robosystems.ai declares, so every Robo* site reads as one company
+// and one founder whose credentials live on robosystems.ai/about. The WebSite node keeps
+// this site's own name.
 
 import { SITE_DESCRIPTION, SITE_NAME } from './site'
 
-export const organizationJsonLd = {
-  '@context': 'https://schema.org',
+const SITE_URL = 'https://roboinvestor.ai'
+const ORGANIZATION_ID = 'https://robosystems.ai/#organization'
+
+const organization = {
   '@type': 'Organization',
-  name: SITE_NAME,
-  url: 'https://roboinvestor.ai',
-  logo: 'https://roboinvestor.ai/images/logos/roboinvestor-icon.png',
-  description: SITE_DESCRIPTION,
+  '@id': ORGANIZATION_ID,
+  name: 'RoboSystems',
+  legalName: 'RFS LLC',
+  url: 'https://robosystems.ai',
+  logo: 'https://robosystems.ai/images/logos/robosystems-icon.png',
   sameAs: [
     'https://github.com/RoboFinSystems',
     'https://x.com/robofinsystems',
@@ -20,8 +27,24 @@ export const organizationJsonLd = {
   ],
   founder: {
     '@type': 'Person',
-    name: 'Joseph French',
+    '@id': 'https://robosystems.ai/about#founder',
+    name: 'Joseph T. French',
+    url: 'https://robosystems.ai/about',
   },
+}
+
+export const websiteJsonLd = {
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  publisher: { '@id': ORGANIZATION_ID },
+}
+
+export const siteJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [organization, websiteJsonLd],
 }
 
 export const softwareJsonLd = {
@@ -34,5 +57,7 @@ export const softwareJsonLd = {
   // `price: '0'` Offer told search engines the app was free. It is not. roboledger-app
   // dropped the same block for the same reason.
   description: SITE_DESCRIPTION,
-  url: 'https://roboinvestor.ai',
+  url: SITE_URL,
+  image: `${SITE_URL}/images/logos/roboinvestor-icon.png`,
+  publisher: { '@id': ORGANIZATION_ID },
 }
