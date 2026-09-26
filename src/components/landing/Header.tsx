@@ -12,7 +12,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 const NAV_LINKS = [
   { href: '/#features', label: 'Features' },
   { href: '/#schema', label: 'Platform' },
-  { href: '/#ai-analysis', label: 'Console' },
+  { href: '/#console', label: 'Console' },
   { href: '/research', label: 'Research' },
   { href: '/docs', label: 'Docs' },
 ]

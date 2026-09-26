@@ -2,6 +2,7 @@ import { McpLogo } from '@/components/mcp/McpLogo'
 import { AnimatedLogo } from '@robosystems/core/ui-components'
 import Link from 'next/link'
 import FloatingElementsVariant from './FloatingElementsVariant'
+import LiveDemo from './LiveDemo'
 
 export default function HeroSection() {
   return (
@@ -15,109 +16,25 @@ export default function HeroSection() {
 
       <div className="relative mx-auto max-w-7xl px-4 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-24 md:pt-48 md:pb-32 lg:px-8">
         <div className="text-center">
+          <div className="bg-primary-500/20 text-primary-400 mb-6 inline-block rounded-full px-4 py-1 text-sm font-semibold">
+            For venture, growth, and private equity funds
+          </div>
           <h1 className="font-heading mb-6 text-4xl leading-tight font-extrabold sm:text-5xl md:mb-8 md:text-7xl lg:text-8xl">
-            <span className="block text-white">AI-Powered</span>
+            <span className="block text-white">Know your portfolio</span>
             <span className="from-primary-400 via-secondary-400 to-accent-400 mt-2 block bg-linear-to-r bg-clip-text pb-2 text-transparent">
-              Investment Intelligence
+              from their books
             </span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:text-lg md:mt-8 md:text-2xl">
-            Track investment portfolios, research public company filings, and
-            get AI-powered insights. RoboInvestor pairs RoboSystems' knowledge
-            graph with{' '}
+            Portfolio companies share reports straight from their ledgers into
+            your fund&apos;s graph. Track every private position, compare
+            companies with public filers, and ask about all of it from{' '}
             <strong className="text-primary-400">
               Claude, ChatGPT, or any MCP client
-            </strong>{' '}
-            to organize your holdings and connect them to SEC data for
-            intelligent investment analysis.
+            </strong>
+            .
           </p>
-
-          <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-4 sm:gap-6 md:mt-16 md:grid-cols-3">
-            <div className="group border-primary-500/20 bg-primary-950/20 hover:border-primary-500/50 hover:bg-primary-950/30 relative overflow-hidden rounded-2xl border p-4 backdrop-blur-sm transition-all duration-300 sm:p-6">
-              <div className="from-primary-500/10 absolute inset-0 bg-linear-to-br to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <div className="relative">
-                <div className="bg-primary-500/20 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                  <svg
-                    className="text-primary-400 h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="mb-2 text-center text-lg font-semibold text-white">
-                  Portfolio Tracking
-                </h3>
-                <p className="text-center text-sm text-gray-400">
-                  Track positions across PE, VC, and public market holdings with
-                  cost basis and current valuations
-                </p>
-              </div>
-            </div>
-
-            <div className="group border-secondary-500/20 bg-secondary-950/20 hover:border-secondary-500/50 hover:bg-secondary-950/30 relative overflow-hidden rounded-2xl border p-4 backdrop-blur-sm transition-all duration-300 sm:p-6">
-              <div className="from-secondary-500/10 absolute inset-0 bg-linear-to-br to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <div className="relative">
-                <div className="bg-secondary-500/20 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                  <svg
-                    className="text-secondary-400 h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="mb-2 text-center text-lg font-semibold text-white">
-                  SEC Research Console
-                </h3>
-                <p className="text-center text-sm text-gray-400">
-                  Query 8,000+ public company filings in plain English — powered
-                  by the Analyst Operator
-                </p>
-              </div>
-            </div>
-
-            <div className="group border-accent-500/20 bg-accent-950/20 hover:border-accent-500/50 hover:bg-accent-950/30 relative overflow-hidden rounded-2xl border p-4 backdrop-blur-sm transition-all duration-300 sm:p-6">
-              <div className="from-accent-500/10 absolute inset-0 bg-linear-to-br to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <div className="relative">
-                <div className="bg-accent-500/20 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                  <svg
-                    className="text-accent-400 h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="mb-2 text-center text-lg font-semibold text-white">
-                  Agent-Managed Portfolio
-                </h3>
-                <p className="text-center text-sm text-gray-400">
-                  Connect Claude, ChatGPT, or any MCP client — query your graph
-                  and record portfolios, securities, and positions
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* CTA Buttons */}
           <div className="mx-auto mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center md:mt-16">
@@ -172,6 +89,18 @@ export default function HeroSection() {
               </svg>
               <span>Open Source</span>
             </div>
+          </div>
+
+          {/* Product preview */}
+          <div className="relative mx-auto mt-14 max-w-6xl md:mt-20">
+            <div className="from-primary-500/20 to-accent-500/20 absolute -inset-1 rounded-3xl bg-linear-to-br opacity-50 blur-xl"></div>
+            <LiveDemo
+              name="hero"
+              aspect={16 / 9}
+              phoneAspect={720 / 1080}
+              label="A fund manager asks their AI what the fund is marked at, reads a portfolio company's shared annual report, compares it with public software filers, checks its cash runway, and approves a new valuation mark, while RoboInvestor updates beside the chat."
+              className="rounded-2xl border border-gray-800 bg-black shadow-2xl"
+            />
           </div>
         </div>
       </div>

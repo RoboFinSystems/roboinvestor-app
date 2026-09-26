@@ -12,7 +12,7 @@ export default function Footer() {
       productLinks={[
         { label: 'Features', href: '/#features' },
         { label: 'Platform', href: '/#schema' },
-        { label: 'Console', href: '/#ai-analysis' },
+        { label: 'Console', href: '/#console' },
         { label: 'Research', href: '/research' },
         { label: 'Docs', href: '/docs' },
       ]}
