@@ -311,7 +311,12 @@ export function mount(host, def, { autoplay = true, phone = false } = {}) {
     root.innerHTML = `<style>${CSS}${v.css || ''}</style>
     <div class="stage" style="width:${v.width}px;height:${v.height}px">${v.html}</div>`
     stage = root.querySelector('.stage')
-    const pose = v.setup(makeCtx(root, stage, () => scale))
+    const ctx = makeCtx(root, stage, () => scale)
+    // the pill starts under the item appChrome marked active, so a demo that
+    // never calls nav() does not show it on the first item
+    const on = root.querySelector('.nv.on')
+    if (on) ctx.nav(on.dataset.k)
+    const pose = v.setup(ctx)
     // [data-loop] content fades in at the start of the loop and out at its end,
     // so the wrap back to the first frame is a dissolve, not a jump.
     const looped = [...root.querySelectorAll('[data-loop]')]
