@@ -1,5 +1,5 @@
+import { LiveDemo } from '@robosystems/core/ui-components'
 import FloatingElementsVariant from './FloatingElementsVariant'
-import LiveDemo from './LiveDemo'
 
 // A PDF update keeps the numbers and loses everything behind them, and the fund retypes it
 // into a tracker. A report shared from the company's ledger arrives as data the fund can ask
