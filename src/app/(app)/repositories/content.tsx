@@ -3,6 +3,7 @@
 import {
   ActiveSubscriptions,
   BrowseRepositories,
+  openConsoleDrawer,
   PageLayout,
 } from '@robosystems/core'
 import { useRouter } from 'next/navigation'
@@ -13,7 +14,7 @@ export function RepositoriesContent() {
   return (
     <PageLayout>
       <ActiveSubscriptions
-        onOpenConsole={() => router.push('/console')}
+        onOpenConsole={openConsoleDrawer}
         onGettingStarted={(repoId) =>
           router.push(`/repositories/${repoId}/getting-started`)
         }

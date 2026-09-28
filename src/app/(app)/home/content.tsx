@@ -5,13 +5,14 @@ import { useCreateGraphHandoff } from '@/lib/cross-app'
 import {
   GraphFilters,
   onlyRepositories,
+  openConsoleDrawer,
   PageHeader,
   PageLayout,
   useGraphContext,
 } from '@robosystems/core'
 import { Button, Card } from 'flowbite-react'
 import Link from 'next/link'
-import type { ComponentType, FC } from 'react'
+import type { ComponentType, FC, MouseEvent } from 'react'
 import { useMemo } from 'react'
 import {
   HiDocumentReport,
@@ -31,8 +32,20 @@ interface ActionCard {
   description: string
   icon: ComponentType<{ className?: string }>
   href: string
+  // Opens in place instead of navigating; href stays for a new tab.
+  onOpen?: () => void
   iconBg: string
   iconColor: string
+}
+
+function openInPlace(action: ActionCard) {
+  if (!action.onOpen) return undefined
+  const open = action.onOpen
+  return (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey) return
+    event.preventDefault()
+    open()
+  }
 }
 
 // Shared tools available against any usable graph (entity graph or repository).
@@ -42,6 +55,7 @@ const TOOL_ACTIONS: ActionCard[] = [
     description: 'Ask questions in natural language',
     icon: HiTerminal,
     href: '/console',
+    onOpen: openConsoleDrawer,
     iconBg: 'bg-cyan-100 dark:bg-cyan-900',
     iconColor: 'text-cyan-600 dark:text-cyan-400',
   },
@@ -180,6 +194,7 @@ const HomePageContent: FC = function () {
             description: 'Query repositories with natural language',
             icon: HiTerminal,
             href: '/console',
+            onOpen: openConsoleDrawer,
             iconBg: 'bg-cyan-100 dark:bg-cyan-900',
             iconColor: 'text-cyan-600 dark:text-cyan-400',
           },
@@ -250,6 +265,7 @@ const HomePageContent: FC = function () {
               <Link
                 key={action.title}
                 href={action.href}
+                onClick={openInPlace(action)}
                 className={actionCardClass}
               >
                 <div className={`rounded-lg ${action.iconBg} p-3`}>
@@ -364,6 +380,7 @@ const HomePageContent: FC = function () {
               <Link
                 key={action.title}
                 href={action.href}
+                onClick={openInPlace(action)}
                 className={actionCardClass}
               >
                 <div className={`rounded-lg ${action.iconBg} p-3`}>

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import HomePageContent from '../content'
 
@@ -7,9 +7,15 @@ const graphState = vi.hoisted(() => ({
   currentGraphId: null as string | null,
 }))
 
+const openConsoleDrawer = vi.hoisted(() => vi.fn())
+
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
-  return { ...actual, useGraphContext: () => ({ state: graphState }) }
+  return {
+    ...actual,
+    openConsoleDrawer,
+    useGraphContext: () => ({ state: graphState }),
+  }
 })
 vi.mock('@/lib/cross-app', () => ({
   useCreateGraphHandoff: () => ({ openCreateGraph: vi.fn() }),
@@ -46,5 +52,15 @@ describe('HomePageContent graph resolution', () => {
     graphState.currentGraphId = 'sec'
     render(<HomePageContent />)
     expect(screen.queryByText('Portfolio')).toBeNull()
+  })
+
+  it('opens the console drawer in place from the Console card', () => {
+    graphState.currentGraphId = 'kg-fund'
+    openConsoleDrawer.mockReset()
+    render(<HomePageContent />)
+    const card = screen.getByText('Console').closest('a')!
+    const navigated = fireEvent.click(card)
+    expect(openConsoleDrawer).toHaveBeenCalledTimes(1)
+    expect(navigated).toBe(false)
   })
 })
