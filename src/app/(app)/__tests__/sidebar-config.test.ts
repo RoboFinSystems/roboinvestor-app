@@ -24,4 +24,11 @@ describe('getNavigationItems', () => {
 
     expect(hrefs.some((href) => href?.includes('/docs'))).toBe(false)
   })
+
+  // The console is the bottom drawer on every page, not a sidebar item.
+  it.each(states)('has no Console item with %s', (_, options) => {
+    const labels = getNavigationItems(options).map((item) => item.label)
+
+    expect(labels).not.toContain('Console')
+  })
 })

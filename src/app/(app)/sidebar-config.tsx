@@ -6,7 +6,6 @@ import {
   HiHome,
   HiOutlineOfficeBuilding,
   HiSearch,
-  HiTerminal,
 } from 'react-icons/hi'
 import { TbTrendingUp } from 'react-icons/tb'
 
@@ -75,11 +74,6 @@ export const getNavigationItems = ({
 
   const graphToolItems: SidebarItemData[] = hasAnyGraph
     ? [
-        {
-          icon: HiTerminal,
-          label: 'Console',
-          href: '/console',
-        },
         {
           icon: HiSearch,
           label: 'Search',

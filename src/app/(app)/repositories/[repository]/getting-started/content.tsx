@@ -3,6 +3,7 @@
 import { createUserApiKey } from '@robosystems/client/sdk'
 import {
   isApiError,
+  openConsoleDrawer,
   PageHeader,
   PageLayout,
   unwrapSdk,
@@ -87,7 +88,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
 
   const handleOpenConsole = async () => {
     await setCurrentGraph(repository)
-    router.push('/console')
+    openConsoleDrawer()
   }
 
   const generateApiKey = async () => {
