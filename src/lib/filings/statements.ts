@@ -1,4 +1,4 @@
-// From a filing's report file (its Tavi model, or its holon) to what the company page renders: the primary
+// From a filing's report file (its holon, or its Tavi model) to what the company page renders: the primary
 // financial statements as pivot tables (server-side, through the shared
 // report components' pure projection), and the handful of headline figures a
 // searcher wants first, each traced to the fact it came from.
@@ -254,9 +254,10 @@ export function statementBlocks(report: NormalizedReport): InformationBlock[] {
 
 /**
  * The statements a filing carries, projected for rendering, from whichever
- * file the catalog offers: the Tavi model (walked directly, tens of
- * milliseconds) or the holon (through its RDF expansion). Only the primary
- * statements are projected; the viewer carries the disclosures.
+ * file the catalog offers: the holon (through its RDF expansion, a few hundred
+ * milliseconds) or the Tavi model (walked directly, tens of milliseconds).
+ * Only the primary statements are projected; the viewer carries the
+ * disclosures.
  */
 export async function loadPrimaryStatements(
   reportFileUrl: string,
