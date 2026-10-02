@@ -86,15 +86,14 @@ export function primaryFiling(company: CompanyCatalog): CatalogFiling | null {
 }
 
 /**
- * The file the page renders a filing from: the Tavi model when the filing has
- * one (parsed directly, no RDF step), else the holon. Both carry the same
- * facts and render the same statements.
+ * The file the page renders a filing from: the holon when the filing has one
+ * (the complete report), else the Tavi model.
  */
 export function reportUrl(filing: CatalogFiling): string | null {
   const reps = filing.representations
   return (
-    reps.find((r) => r.kind === 'tavi')?.url ??
     reps.find((r) => r.kind === 'holon')?.url ??
+    reps.find((r) => r.kind === 'tavi')?.url ??
     null
   )
 }

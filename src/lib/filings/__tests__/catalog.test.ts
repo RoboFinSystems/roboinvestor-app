@@ -196,18 +196,18 @@ describe('primaryFiling', () => {
 })
 
 describe('reportUrl', () => {
-  it('prefers the Tavi model over the holon', () => {
+  it('prefers the holon over the Tavi model', () => {
     const f = filing('a', '10-K', [
-      rep('holon', 'https://cdn/h'),
       rep('tavi', 'https://cdn/t'),
+      rep('holon', 'https://cdn/h'),
     ])
-    expect(reportUrl(f)).toBe('https://cdn/t')
+    expect(reportUrl(f)).toBe('https://cdn/h')
   })
 
-  it('falls back to the holon', () => {
-    expect(
-      reportUrl(filing('a', '10-K', [rep('holon', 'https://cdn/h')]))
-    ).toBe('https://cdn/h')
+  it('falls back to the Tavi model', () => {
+    expect(reportUrl(filing('a', '10-K', [rep('tavi', 'https://cdn/t')]))).toBe(
+      'https://cdn/t'
+    )
   })
 
   it('is null with neither', () => {

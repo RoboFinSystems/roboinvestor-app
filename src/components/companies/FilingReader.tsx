@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * One filing, read whole: fetch its Tavi model (or holon) from the public data
+ * One filing, read whole: fetch its holon (or Tavi model) from the public data
  * CDN, parse it in the browser, and hand its sections to `SectionedReport`.
  * Every section is in memory once the file is parsed, so a section loads
  * instantly — no graph, no API, one fetch per filing.

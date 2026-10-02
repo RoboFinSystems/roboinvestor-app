@@ -47,7 +47,7 @@ export function FilingsBar({ company, selected, onSelect }: FilingsBarProps) {
   const reps = Object.fromEntries(
     selected.representations.map((r) => [r.kind, r])
   )
-  const viewer = selected.viewer.tavi ?? selected.viewer.holon
+  const viewer = selected.viewer.holon ?? selected.viewer.tavi
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <label className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
