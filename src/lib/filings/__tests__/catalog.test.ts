@@ -1,23 +1,26 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  FILINGS_CDN_URL,
   companyCatalogUrl,
+  FILINGS_CDN_URL,
   getCompany,
   primaryFiling,
   reportUrl,
+  SERVER_RENDER_MAX_BYTES,
+  serverRenderUrl,
   tickerSlug,
 } from '../catalog'
 import type { CatalogFiling, CompanyCatalog, Representation } from '../types'
 
 function rep(
   kind: Representation['kind'],
-  url = `https://cdn.example/${kind}`
+  url = `https://cdn.example/${kind}`,
+  bytes = 1
 ): Representation {
   return {
     kind,
     name: `${kind}.json`,
     media_type: 'application/json',
-    bytes: 1,
+    bytes,
     url,
   }
 }
@@ -212,5 +215,36 @@ describe('reportUrl', () => {
 
   it('is null with neither', () => {
     expect(reportUrl(filing('a', '10-K', [rep('document')]))).toBeNull()
+  })
+})
+
+describe('serverRenderUrl', () => {
+  const tavi = SERVER_RENDER_MAX_BYTES.tavi
+  const holon = SERVER_RENDER_MAX_BYTES.holon
+
+  it.each([
+    [
+      'the Tavi model over the holon',
+      [rep('holon', 'h'), rep('tavi', 't')],
+      't',
+    ],
+    ['a small holon when there is no Tavi', [rep('holon', 'h', holon)], 'h'],
+    [
+      'a holon too large to parse',
+      [rep('holon', 'h', holon + 1), rep('document')],
+      null,
+    ],
+    [
+      'a Tavi too large, falling back to a small holon',
+      [rep('tavi', 't', tavi + 1), rep('holon', 'h', holon)],
+      'h',
+    ],
+    [
+      'a large filer with both over budget',
+      [rep('tavi', 't', tavi + 1), rep('holon', 'h', 20_368_211)],
+      null,
+    ],
+  ])('picks %s', (_case, reps, expected) => {
+    expect(serverRenderUrl(filing('a', '10-K', reps))).toBe(expected)
   })
 })

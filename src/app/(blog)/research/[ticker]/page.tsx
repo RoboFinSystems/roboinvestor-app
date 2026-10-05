@@ -4,7 +4,11 @@ import { CompareYourCompany } from '@/components/research/CompareYourCompany'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
 import { ResearchJsonLd } from '@/components/research/ResearchJsonLd'
 import { ResearchTopBar } from '@/components/research/ResearchTopBar'
-import { getCompany, primaryFiling, reportUrl } from '@/lib/filings/catalog'
+import {
+  getCompany,
+  primaryFiling,
+  serverRenderUrl,
+} from '@/lib/filings/catalog'
 import { loadPrimaryStatements } from '@/lib/filings/statements'
 import { fetchBrief, getCoverage, getCoverageTickers } from '@/lib/research'
 import {
@@ -136,7 +140,7 @@ export default async function ResearchTickerPage({
   // are not written yet still gets the page, with the filings listed.
   if (company) {
     const filing = primaryFiling(company)
-    const url = filing ? reportUrl(filing) : null
+    const url = filing ? serverRenderUrl(filing) : null
     const statements = url
       ? await loadPrimaryStatements(url, filing?.form).catch((e) => {
           console.error(`Statements failed for ${company.ticker}: ${e}`)
