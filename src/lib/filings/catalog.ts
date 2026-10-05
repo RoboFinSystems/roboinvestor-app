@@ -99,6 +99,30 @@ export function reportUrl(filing: CatalogFiling): string | null {
 }
 
 /**
+ * Largest file the server parses to render a page's statements, by kind. A
+ * holon costs about five times a Tavi model's heap per byte (its RDF
+ * expansion), and the server shares one Node heap with the logged-in app.
+ */
+export const SERVER_RENDER_MAX_BYTES = {
+  tavi: 32_000_000,
+  holon: 6_000_000,
+} as const
+
+/**
+ * The file the server renders a filing's statements from: the Tavi model,
+ * else a holon small enough to parse. Null when neither fits, and the page
+ * renders without statements; the reader in the browser still opens the
+ * holon (`reportUrl`).
+ */
+export function serverRenderUrl(filing: CatalogFiling): string | null {
+  for (const kind of ['tavi', 'holon'] as const) {
+    const rep = filing.representations.find((r) => r.kind === kind)
+    if (rep?.url && rep.bytes <= SERVER_RENDER_MAX_BYTES[kind]) return rep.url
+  }
+  return null
+}
+
+/**
  * A filing's report file (Tavi or holon) as text. Fetched with Next's default
  * cache option, so it is read once per page regeneration and never enters the
  * data cache (several megabytes, past its 2 MB cap); the rendered page is what
