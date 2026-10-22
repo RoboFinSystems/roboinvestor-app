@@ -22,6 +22,8 @@ function serverActionOrigins() {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Stops `next dev` writing AGENTS.md whenever it detects an AI agent.
+  agentRules: false,
   // Cap the `stale-while-revalidate` window CloudFront is handed on ISR pages.
   // Next derives it as `expireTime - revalidate`, so the default of one year gave
   // research pages `s-maxage=3600, stale-while-revalidate=31532400`: past the first
