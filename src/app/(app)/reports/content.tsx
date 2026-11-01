@@ -161,15 +161,17 @@ const ReceivedReportsContent: FC = function () {
           <div className="overflow-x-auto">
             <Table hoverable>
               <TableHead>
-                <TableRow>
-                  <TableHeadCell>Report</TableHeadCell>
-                  <TableHeadCell>From</TableHeadCell>
-                  <TableHeadCell>Period</TableHeadCell>
-                  <TableHeadCell>Received</TableHeadCell>
-                  <TableHeadCell>
-                    <span className="sr-only">View</span>
-                  </TableHeadCell>
-                </TableRow>
+                <tr>
+                  <TableRow>
+                    <TableHeadCell>Report</TableHeadCell>
+                    <TableHeadCell>From</TableHeadCell>
+                    <TableHeadCell>Period</TableHeadCell>
+                    <TableHeadCell>Received</TableHeadCell>
+                    <TableHeadCell>
+                      <span className="sr-only">View</span>
+                    </TableHeadCell>
+                  </TableRow>
+                </tr>
               </TableHead>
               <TableBody className="divide-y">
                 {reports.map((report) => (
