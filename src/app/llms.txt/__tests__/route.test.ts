@@ -17,6 +17,7 @@ import { GET } from '../route'
 
 describe('GET /llms.txt', () => {
   afterEach(() => {
+    vi.unstubAllEnvs()
     vi.clearAllMocks()
   })
 
@@ -78,7 +79,6 @@ describe('GET /llms.txt', () => {
     mockGetDocsCatalog.mockRejectedValue(new Error('CDN down'))
 
     const res = await GET()
-    vi.unstubAllEnvs()
 
     expect(res.status).toBe(200)
     expect(await res.text()).toContain('# RoboInvestor')
