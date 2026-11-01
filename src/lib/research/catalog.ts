@@ -41,12 +41,16 @@ export async function getCoverageTickers(): Promise<string[]> {
   return items.map((i) => i.ticker)
 }
 
-/** Fetch a brief's raw markdown (rendered to HTML by ResearchArticle). */
+/**
+ * Fetch a brief's raw markdown (rendered to HTML by ResearchArticle). A brief the CDN does
+ * not have reads as none (it answers a missing object with 403); an outage throws.
+ */
 export async function fetchBrief(
   url: string,
   revalidate = 3600
 ): Promise<string> {
   const res = await fetch(url, { next: { revalidate } })
+  if (res.status === 404 || res.status === 403) return ''
   if (!res.ok) throw new Error(`Brief fetch failed: ${res.status}`)
   return await res.text()
 }

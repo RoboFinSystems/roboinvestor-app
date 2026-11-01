@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   companyCatalogUrl,
+  fetchReportText,
   FILINGS_CDN_URL,
   getCompany,
   primaryFiling,
+  ReportUnavailableError,
   reportUrl,
   SERVER_RENDER_MAX_BYTES,
   serverRenderUrl,
@@ -246,5 +248,45 @@ describe('serverRenderUrl', () => {
     ],
   ])('picks %s', (_case, reps, expected) => {
     expect(serverRenderUrl(filing('a', '10-K', reps))).toBe(expected)
+  })
+})
+
+// The page keeps its last good render on an outage, and goes on without statements for a
+// report the CDN does not have, so the two must not look alike.
+describe('fetchReportText', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('reads an outage as unavailable', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('', { status: 503 }))
+    )
+    await expect(fetchReportText('https://cdn.example/r')).rejects.toThrow(
+      ReportUnavailableError
+    )
+  })
+
+  it('reads a failed connection as unavailable', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new TypeError('fetch failed')
+      })
+    )
+    await expect(fetchReportText('https://cdn.example/r')).rejects.toThrow(
+      ReportUnavailableError
+    )
+  })
+
+  it.each([403, 404])('reads a %i as a missing report', async (status) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('', { status }))
+    )
+    const failure = await fetchReportText('https://cdn.example/r').catch(
+      (e: unknown) => e
+    )
+    expect(failure).toBeInstanceOf(Error)
+    expect(failure).not.toBeInstanceOf(ReportUnavailableError)
   })
 })

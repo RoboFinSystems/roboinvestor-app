@@ -30,7 +30,7 @@ export async function GET() {
   const [catalog, coverage] = await Promise.all([
     orBuildFallback(getDocsCatalog(), null),
     RESEARCH_IS_CANONICAL_HERE
-      ? getAllCoverage().catch(() => [])
+      ? orBuildFallback(getAllCoverage(), [])
       : Promise.resolve([]),
   ])
   const docs = catalog
