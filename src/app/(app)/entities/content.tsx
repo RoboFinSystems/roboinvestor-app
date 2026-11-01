@@ -159,11 +159,13 @@ const EntitiesListPageContent: FC = function () {
               ) : (
                 <Table>
                   <TableHead>
-                    <TableHeadCell>Entity</TableHeadCell>
-                    <TableHeadCell>Type</TableHeadCell>
-                    <TableHeadCell>Graph</TableHeadCell>
-                    <TableHeadCell>Relationship</TableHeadCell>
-                    <TableHeadCell>Created</TableHeadCell>
+                    <tr>
+                      <TableHeadCell>Entity</TableHeadCell>
+                      <TableHeadCell>Type</TableHeadCell>
+                      <TableHeadCell>Graph</TableHeadCell>
+                      <TableHeadCell>Relationship</TableHeadCell>
+                      <TableHeadCell>Created</TableHeadCell>
+                    </tr>
                   </TableHead>
                   <TableBody>
                     {filteredEntities.map((entity) => (

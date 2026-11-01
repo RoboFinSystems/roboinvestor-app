@@ -877,12 +877,14 @@ const PortfolioPageContent: FC = function () {
                           <div className="overflow-x-auto">
                             <Table>
                               <TableHead>
-                                <TableHeadCell>Security</TableHeadCell>
-                                <TableHeadCell>Type</TableHeadCell>
-                                <TableHeadCell>Quantity</TableHeadCell>
-                                <TableHeadCell>Cost Basis</TableHeadCell>
-                                <TableHeadCell>Current Value</TableHeadCell>
-                                <TableHeadCell className="w-12"></TableHeadCell>
+                                <tr>
+                                  <TableHeadCell>Security</TableHeadCell>
+                                  <TableHeadCell>Type</TableHeadCell>
+                                  <TableHeadCell>Quantity</TableHeadCell>
+                                  <TableHeadCell>Cost Basis</TableHeadCell>
+                                  <TableHeadCell>Current Value</TableHeadCell>
+                                  <TableHeadCell className="w-12"></TableHeadCell>
+                                </tr>
                               </TableHead>
                               <TableBody className="divide-y">
                                 {h.securities.map((s) => (
