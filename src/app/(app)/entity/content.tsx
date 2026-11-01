@@ -2,7 +2,7 @@
 
 import { useInvestorGraph } from '@/hooks/useInvestorGraph'
 import { EmptyState, PageHeader, useEntity } from '@robosystems/core'
-import { Alert, Badge, Card } from 'flowbite-react'
+import { Alert, Badge, Card } from '@robosystems/core/ui'
 import { type FC } from 'react'
 import { HiOfficeBuilding } from 'react-icons/hi'
 

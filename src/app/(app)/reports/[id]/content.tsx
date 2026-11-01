@@ -32,6 +32,7 @@ import {
   ReportChat,
   useGraphContext,
 } from '@robosystems/core'
+import { Alert, Card, Spinner } from '@robosystems/core/ui'
 import type { NormalizedReport } from '@robosystems/report-components'
 import {
   reportSections,
@@ -39,7 +40,6 @@ import {
   sliceReportSection,
 } from '@robosystems/report-components'
 import { parseJsonld } from '@robosystems/report-components/adapters'
-import { Alert, Card, Spinner } from 'flowbite-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { HiDocumentReport, HiExclamationCircle, HiShare } from 'react-icons/hi'
 

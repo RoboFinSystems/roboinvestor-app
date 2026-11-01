@@ -1,5 +1,3 @@
-import withFlowbiteReact from 'flowbite-react/plugin/nextjs'
-
 /**
  * Hosts Server Actions accept as `Origin`: the production apex, plus the host
  * of the app URL this build was made for (`NEXT_PUBLIC_ROBOINVESTOR_APP_URL`),
@@ -65,4 +63,4 @@ const nextConfig = {
   },
 }
 
-export default withFlowbiteReact(nextConfig)
+export default nextConfig

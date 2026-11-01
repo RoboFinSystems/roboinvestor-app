@@ -259,9 +259,7 @@ npm run dev
                 <div className="text-sm text-gray-400">Styling</div>
               </div>
               <div className="rounded-lg border border-gray-800 bg-zinc-900 p-4 text-center">
-                <div className="text-2xl font-bold text-green-400">
-                  Flowbite
-                </div>
+                <div className="text-2xl font-bold text-green-400">Core UI</div>
                 <div className="text-sm text-gray-400">Design System</div>
               </div>
             </div>

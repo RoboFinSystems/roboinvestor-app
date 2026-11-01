@@ -6,7 +6,7 @@
  * blanks anything it can't read, differently per browser) and are sent to the
  * API as numbers. A parse that "succeeds" on garbage books a wrong position,
  * so anything ambiguous is refused rather than guessed. Kept as a pure module
- * so the contract can be tested without the page's SDK, browser and flowbite
+ * so the contract can be tested without the page's SDK, browser and UI
  * dependencies.
  */
 

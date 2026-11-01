@@ -1,6 +1,6 @@
 'use client'
 
-import { TextInput } from 'flowbite-react'
+import { TextInput } from '@robosystems/core/ui'
 import { useMemo, useState } from 'react'
 import { HiSearch } from 'react-icons/hi'
 
