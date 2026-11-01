@@ -72,4 +72,21 @@ describe('GET /llms.txt', () => {
     )
     expect(body).toContain('https://robosystems.ai/about')
   })
+
+  it('falls back to a page without docs when a build cannot read the catalog', async () => {
+    vi.stubEnv('NEXT_PHASE', 'phase-production-build')
+    mockGetDocsCatalog.mockRejectedValue(new Error('CDN down'))
+
+    const res = await GET()
+    vi.unstubAllEnvs()
+
+    expect(res.status).toBe(200)
+    expect(await res.text()).toContain('# RoboInvestor')
+  })
+
+  it('throws at runtime, so the last good render is kept', async () => {
+    mockGetDocsCatalog.mockRejectedValue(new Error('CDN down'))
+
+    await expect(GET()).rejects.toThrow('CDN down')
+  })
 })

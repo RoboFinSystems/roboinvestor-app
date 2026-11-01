@@ -1,5 +1,10 @@
 import type { DocsPage } from '@/lib/docs'
-import { DOCS_SITE, getDocsCatalog, getDocsNav } from '@/lib/docs'
+import {
+  DOCS_SITE,
+  getDocsCatalog,
+  getDocsNav,
+  orBuildFallback,
+} from '@/lib/docs'
 import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site'
@@ -23,7 +28,7 @@ function docsLinks(pages: DocsPage[]): string[] {
 
 export async function GET() {
   const [catalog, coverage] = await Promise.all([
-    getDocsCatalog(),
+    orBuildFallback(getDocsCatalog(), null),
     RESEARCH_IS_CANONICAL_HERE
       ? getAllCoverage().catch(() => [])
       : Promise.resolve([]),
