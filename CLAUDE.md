@@ -37,23 +37,26 @@ npm run format:check # Check code formatting
 
 **API Routes:**
 
-- `/api/utilities/health` - Health check endpoint for App Runner
+- `/api/utilities/health` - Health check endpoint
+- `/api/companies/search` - Company search
 - `/api/contact` - Contact form submission via SNS
 - `/api/support` - Support request submission via SNS
+- `/api/reports/holon` - Holon JSON-LD validation for report rendering
 - `/api/session/sidebar` - Sidebar state management
 
 **Route Structure:**
 
-- `(app)` route group: Authenticated pages (home, companies, console, graphs, entities, entity, portfolio, repositories, search, settings)
-- `(landing)` route group: Public pages (login, register, legal pages, landing page)
+- `(app)` route group: Authenticated pages (home, companies, console, graphs, entities, entity, portfolio, reports, repositories, search, settings)
+- `(landing)` route group: Public pages (login, register, auth, legal pages, landing page)
+- `(blog)` route group: Public equity research pages (`/research`)
+- `(docs)` route group: Public docs
 - API routes follow RESTful patterns with proper session validation
 
 **RoboInvestor-Specific Features:**
 
-- Console configured with investment-specific sample queries and `@robosystems/mcp` integration for AI analytics
+- Console examples come from core and follow the graph type (portfolio on a RoboInvestor graph, filing analysis on the SEC repository); this app supplies only the branding, in `src/lib/console-branding.ts`
 - Portfolio page: create portfolios, add securities and positions, and view holdings grouped by entity (`clients.investor.*`); cost basis is submitted in integer cents, parsed by `portfolio/money.ts`
-- Graph creation enforces `roboinvestor` schema extension
-- Entity browser with multi-graph traversal
+- Entity browser across the user's RoboInvestor graphs
 
 ## Key Development Patterns
 
@@ -80,8 +83,8 @@ npm run format:check # Check code formatting
 
 ## Deployment
 
-- Deployed on AWS App Runner behind CloudFront
-- **Release notes**: `tag-release.yml` auto-generates the changelog from changes since the last tag (via the Claude API). For milestone releases, commit curated notes to `.github/release-notes/v<version>.md` _before_ dispatching `create-release.yml` — when that file exists at the tagged ref it replaces the generated changelog (and the stats section is skipped)
+- Deployed on AWS App Runner or ECS Express Mode (the `APP_COMPUTE` GitHub variable) behind CloudFront
+- **Release notes**: `tag-release.yml` (the reusable workflow in `robosystems`) auto-generates the changelog from changes since the last tag (via the Claude API). For milestone releases, commit curated notes to `.github/release-notes/v<version>.md` _before_ dispatching `create-release.yml` — when that file exists at the tagged ref it replaces the generated changelog (and the stats section is skipped)
 - Environment variables needed:
   - `NEXT_PUBLIC_ROBOSYSTEMS_API_URL` - RoboSystems API endpoint
   - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` - CAPTCHA configuration
@@ -96,7 +99,7 @@ npm run format:check # Check code formatting
 
 ## Core Library (npm Package)
 
-Shared components are consumed from the [`@robosystems/core`](https://www.npmjs.com/package/@robosystems/core) npm package (repo: `RoboFinSystems/robosystems-core`), shared across all RoboSystems frontend apps (robosystems-app, roboledger-app, roboinvestor-app). Import from `@robosystems/core` or its subpaths (e.g. `@robosystems/core/ui-components`).
+Shared components are consumed from the [`@robosystems/core`](https://www.npmjs.com/package/@robosystems/core) npm package (repo: `RoboFinSystems/robosystems-core`), shared across all RoboSystems frontend apps (robosystems-app, roboledger-app, roboinvestor-app). Import from `@robosystems/core` or its subpaths (e.g. `@robosystems/core/ui`, `@robosystems/core/ui-components`).
 
 ### Working with Core
 
@@ -110,11 +113,13 @@ Shared components are consumed from the [`@robosystems/core`](https://www.npmjs.
 - **auth-components/**: Login, register, password reset forms
 - **auth-core/**: Session management and JWT handling
 - **components/**: Graph creation wizard and shared components
+- **ui/**: UI primitives (Button, Modal, Table, ...)
 - **ui-components/**: Layout, forms, chat, and settings components
 - **contexts/**: Graph, organization, entity, service-offerings, and sidebar contexts
 - **task-monitoring/**: SSE-based background job tracking
 - **hooks/**: Shared React hooks
-- **theme/**: theme customization
+- **styles/**: Palette and form CSS
+- **docs/**: Docs rendering
 
 <!-- BEGIN:nextjs-agent-rules -->
 
