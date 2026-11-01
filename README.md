@@ -2,7 +2,7 @@
 
 RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and AI-powered investment insights via the RoboSystems knowledge graph.
 
-- **Portfolio Intelligence**: Track and analyze investment holdings with AI-powered insights and recommendations
+- **Portfolio Intelligence**: Track and analyze investment holdings, with analysis from the AI assistant you already use
 - **Natural Language Queries**: Ask questions about your portfolio in plain English and get instant answers
 - **AI-Powered Guidance**: Investment analysis from the AI assistant you already use, via the knowledge graph
 - **Knowledge Graph Foundation**: Investment data modeled as a semantic graph preserving relationships
@@ -20,7 +20,7 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 - **Shared Repository Access**: Subscribe to SEC XBRL filings and browse rendered financial reports for public-company holdings
 - **Research**: SEC-filing-grounded equity research browser, every figure traceable to a filing
 - **Document Search**: Full-text and semantic search across connected sources
-- **Graph Creation**: Wizard-based portfolio graph setup with schema selection
+- **Portfolio Reports**: Reports shared from RoboLedger
 - **Repository API Keys**: Generate a repository-scoped key from a repository's getting-started page for programmatic and MCP connector access
 
 ### Roadmap
