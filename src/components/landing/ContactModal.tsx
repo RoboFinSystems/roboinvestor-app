@@ -23,8 +23,8 @@ export default function ContactModal({
       show={isOpen}
       onClose={onClose}
       size="2xl"
-      // Overlay classes carried over from the former per-call theme; the panel below styles itself.
-      className="bg-opacity-50 bg-zinc-900"
+      // Overlay tint; the former per-call theme used the Tailwind v3 `bg-opacity-50`, which v4 ignores.
+      className="bg-zinc-900/50"
     >
       <div className="relative rounded-lg border border-gray-700 bg-linear-to-br from-zinc-900 to-zinc-800">
         {/* Close button */}
