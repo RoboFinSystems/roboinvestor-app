@@ -8,13 +8,13 @@
  */
 import { fetchReportText, reportUrl } from '@/lib/filings/catalog'
 import type { CatalogFiling } from '@/lib/filings/types'
+import { Spinner } from '@robosystems/core/ui'
 import type { NormalizedReport } from '@robosystems/report-components'
 import {
   reportSections,
   sliceReportSection,
 } from '@robosystems/report-components'
 import { parseReportDocument } from '@robosystems/report-components/adapters'
-import { Spinner } from 'flowbite-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SectionedReport } from './SectionedReport'
 

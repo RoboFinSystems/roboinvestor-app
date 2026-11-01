@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 /**
  * A coverage tile: full-bleed thumbnail on top, then ticker/label, title, summary, and
- * prior-report count. Self-contained (not the shared Flowbite Card) so the cover image
+ * prior-report count. Self-contained (not the shared Card) so the cover image
  * sits flush at the top of every card regardless of how much text each one has — the
  * shared card theme centers its content (`justify-center`), which left the covers at
  * different heights across a row.

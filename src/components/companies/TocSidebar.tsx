@@ -5,7 +5,7 @@
  * list matching how the report reads; no re-grouping. A dot marks sections
  * already rendered once; a spinner marks the one loading.
  */
-import { Spinner } from 'flowbite-react'
+import { Spinner } from '@robosystems/core/ui'
 
 export interface SectionRef {
   id: string

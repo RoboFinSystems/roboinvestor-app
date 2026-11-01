@@ -10,7 +10,7 @@ import {
   PageLayout,
   useGraphContext,
 } from '@robosystems/core'
-import { Button, Card } from 'flowbite-react'
+import { Button, Card } from '@robosystems/core/ui'
 import Link from 'next/link'
 import type { ComponentType, FC, MouseEvent } from 'react'
 import { useMemo } from 'react'

@@ -20,7 +20,7 @@ import {
   TableHeadCell,
   TableRow,
   TextInput,
-} from 'flowbite-react'
+} from '@robosystems/core/ui'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { HiExclamationCircle, HiOfficeBuilding, HiSearch } from 'react-icons/hi'

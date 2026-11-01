@@ -12,9 +12,9 @@
  * Mount this with a `key` per filing (its accession) so each report gets fresh state;
  * the initial selection then falls out of `sections[0]`.
  */
+import { Spinner } from '@robosystems/core/ui'
 import type { NormalizedReport } from '@robosystems/report-components'
 import { ReportView } from '@robosystems/report-components'
-import { Spinner } from 'flowbite-react'
 import { useEffect, useRef, useState } from 'react'
 import { TocSidebar, type SectionRef } from './TocSidebar'
 

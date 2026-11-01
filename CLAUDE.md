@@ -59,7 +59,7 @@ npm run format:check # Check code formatting
 
 **Component Organization:**
 
-- Flowbite React components for consistent UI
+- Shared UI primitives from `@robosystems/core/ui` for consistent UI
 - Dark mode support via Tailwind CSS
 - Responsive design with mobile-first approach
 - Component testing with React Testing Library
@@ -114,7 +114,7 @@ Shared components are consumed from the [`@robosystems/core`](https://www.npmjs.
 - **contexts/**: Graph, organization, entity, service-offerings, and sidebar contexts
 - **task-monitoring/**: SSE-based background job tracking
 - **hooks/**: Shared React hooks
-- **theme/**: Flowbite theme customization
+- **theme/**: theme customization
 
 <!-- BEGIN:nextjs-agent-rules -->
 
