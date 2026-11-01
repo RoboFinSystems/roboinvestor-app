@@ -127,11 +127,12 @@ const coverage = [
 describe('sitemap', () => {
   beforeEach(() => {
     researchSite.canonicalHere = true
-    mockGetDocsCatalog.mockRejectedValue(new Error('catalog unreachable'))
+    mockGetDocsCatalog.mockResolvedValue(null)
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.unstubAllEnvs()
   })
 
   it('sends no lastmod for the homepage or a covered company with no date', async () => {
@@ -157,7 +158,8 @@ describe('sitemap', () => {
     )
   })
 
-  it('sends no lastmod for the hub when coverage is unreachable', async () => {
+  it('sends no lastmod for the hub when a build cannot read coverage', async () => {
+    vi.stubEnv('NEXT_PHASE', 'phase-production-build')
     mockGetAllCoverage.mockRejectedValue(new Error('catalog down'))
     const hub = (await sitemap()).find(
       (e) => e.url === 'https://roboinvestor.ai/research'
@@ -182,7 +184,17 @@ describe('sitemap', () => {
     expect(docs).toEqual(expectedDocs)
   })
 
-  it('leaves the docs out, and keeps everything else, when the docs catalog is unreachable', async () => {
+  it('throws at runtime when a catalog fails, so the last good sitemap is kept', async () => {
+    mockGetAllCoverage.mockRejectedValue(new Error('research down'))
+    await expect(sitemap()).rejects.toThrow('research down')
+
+    mockGetAllCoverage.mockResolvedValue(coverage)
+    mockGetDocsCatalog.mockRejectedValue(new Error('docs down'))
+    await expect(sitemap()).rejects.toThrow('docs down')
+  })
+
+  it('leaves the docs out, and keeps everything else, when a build cannot read the docs catalog', async () => {
+    vi.stubEnv('NEXT_PHASE', 'phase-production-build')
     mockGetAllCoverage.mockResolvedValue(coverage)
     mockGetDocsCatalog.mockRejectedValue(new Error('catalog unreachable'))
     const urls = (await sitemap()).map((e) => e.url)

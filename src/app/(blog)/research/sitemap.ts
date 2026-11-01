@@ -7,6 +7,7 @@ import {
   RESEARCH_RELEASED_COHORTS,
   SELF_ORIGIN,
 } from '@/lib/research-site'
+import { orBuildFallback } from '@robosystems/core/docs/catalog'
 import type { MetadataRoute } from 'next'
 
 // One sitemap file per released cohort of generated filer pages, at
@@ -39,8 +40,8 @@ export default async function sitemap(props: {
     return []
   }
   const [index, coverage] = await Promise.all([
-    getCompanyIndex(revalidate).catch(() => null),
-    getAllCoverage(revalidate).catch(() => []),
+    orBuildFallback(getCompanyIndex(revalidate), null),
+    orBuildFallback(getAllCoverage(revalidate), []),
   ])
   const covered = new Set(coverage.map((c) => c.ticker.toUpperCase()))
   const cohorts = cohortsOf(

@@ -122,6 +122,9 @@ export function serverRenderUrl(filing: CatalogFiling): string | null {
   return null
 }
 
+/** The CDN could not serve a report right now, as against one it does not have. */
+export class ReportUnavailableError extends Error {}
+
 /**
  * A filing's report file (Tavi or holon) as text. Fetched with Next's default
  * cache option, so it is read once per page regeneration and never enters the
@@ -129,7 +132,14 @@ export function serverRenderUrl(filing: CatalogFiling): string | null {
  * ISR caches. `no-store` would refetch on every request instead.
  */
 export async function fetchReportText(url: string): Promise<string> {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Report fetch failed: ${res.status}`)
+  const res = await fetch(url).catch((error) => {
+    throw new ReportUnavailableError(`Report fetch failed: ${error}`)
+  })
+  if (res.status === 404 || res.status === 403) {
+    throw new Error(`Report not found: ${res.status}`)
+  }
+  if (!res.ok) {
+    throw new ReportUnavailableError(`Report fetch failed: ${res.status}`)
+  }
   return await res.text()
 }

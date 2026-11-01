@@ -1,4 +1,9 @@
-import { DOCS_SITE, getDocsCatalog, getDocsNav } from '@/lib/docs'
+import {
+  DOCS_SITE,
+  getDocsCatalog,
+  getDocsNav,
+  orBuildFallback,
+} from '@/lib/docs'
 import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
 import type { MetadataRoute } from 'next'
@@ -33,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1,
   }
 
-  const catalog = await getDocsCatalog().catch(() => null)
+  const catalog = await orBuildFallback(getDocsCatalog(), null)
   const docs = catalog && getDocsNav(catalog, DOCS_SITE, 'product')
   const docsPages: MetadataRoute.Sitemap = (docs?.ordered ?? []).map(
     (page) => ({
@@ -46,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (!RESEARCH_IS_CANONICAL_HERE) return [home, ...docsPages]
 
-  const coverage = await getAllCoverage().catch(() => [])
+  const coverage = await orBuildFallback(getAllCoverage(), [])
   const researchPages = coverage.map((item) => ({
     url: `${baseUrl}/research/${item.ticker.toLowerCase()}`,
     lastModified: item.date ? new Date(item.date) : undefined,

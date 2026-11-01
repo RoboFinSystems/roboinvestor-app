@@ -9,6 +9,7 @@ import {
   SELF_ORIGIN,
   researchCanonical,
 } from '@/lib/research-site'
+import { orBuildFallback } from '@robosystems/core/docs/catalog'
 import type { Metadata } from 'next'
 
 const TITLE = 'Research | RoboInvestor'
@@ -19,7 +20,7 @@ const URL = `${SELF_ORIGIN}/research`
 export async function generateMetadata(): Promise<Metadata> {
   // Use the newest report's thumbnail as the OG preview when available; otherwise
   // Next falls back to the brand image set in the root layout.
-  const items = await getAllCoverage().catch(() => [])
+  const items = await orBuildFallback(getAllCoverage(), [])
   const image = items.find((i) => i.assets.thumbnail)?.assets.thumbnail
   return {
     title: TITLE,
@@ -52,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const revalidate = 3600
 
 export default async function ResearchPage() {
-  const items = await getAllCoverage().catch(() => [])
+  const items = await orBuildFallback(getAllCoverage(), [])
 
   return (
     <div className="dark min-h-screen bg-black">

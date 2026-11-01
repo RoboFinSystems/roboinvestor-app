@@ -7,15 +7,17 @@ import { ResearchTopBar } from '@/components/research/ResearchTopBar'
 import {
   getCompany,
   primaryFiling,
+  ReportUnavailableError,
   serverRenderUrl,
 } from '@/lib/filings/catalog'
 import { loadPrimaryStatements } from '@/lib/filings/statements'
 import { fetchBrief, getCoverage, getCoverageTickers } from '@/lib/research'
 import {
   RESEARCH_IS_CANONICAL_HERE,
-  SELF_ORIGIN,
   researchCanonical,
+  SELF_ORIGIN,
 } from '@/lib/research-site'
+import { orBuildFallback } from '@robosystems/core/docs/catalog'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -32,6 +34,9 @@ import { notFound } from 'next/navigation'
 // waiting out a clock.
 export const revalidate = 3600
 
+// The reads below throw on a CDN outage, so a page regenerating keeps its last good render
+// instead of caching a 404 or a page with pieces missing for the whole hour.
+//
 // Next takes the *lowest* revalidate across a route's fetches as the route's own, so every
 // catalog read below is passed this window explicitly. A default left at minutes on any one
 // of them would re-pin the whole page to minutes and undo the line above.
@@ -59,8 +64,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { ticker } = await params
   const [item, company] = await Promise.all([
-    getCoverage(ticker, revalidate).catch(() => null),
-    getCompany(ticker, revalidate).catch(() => null),
+    orBuildFallback(getCoverage(ticker, revalidate), null),
+    orBuildFallback(getCompany(ticker, revalidate), null),
   ])
   const url = `${SELF_ORIGIN}/research/${ticker.toLowerCase()}`
   if (!item) {
@@ -125,13 +130,13 @@ export default async function ResearchTickerPage({
 }) {
   const { ticker } = await params
   const [item, company] = await Promise.all([
-    getCoverage(ticker, revalidate).catch(() => null),
-    getCompany(ticker, revalidate).catch(() => null),
+    orBuildFallback(getCoverage(ticker, revalidate), null),
+    orBuildFallback(getCompany(ticker, revalidate), null),
   ])
   if (!item && !company) notFound()
 
   const briefMarkdown = item?.assets.brief
-    ? await fetchBrief(item.assets.brief, revalidate).catch(() => '')
+    ? await orBuildFallback(fetchBrief(item.assets.brief, revalidate), '')
     : ''
 
   // A filer in the catalog gets the company page: the facts are the page and
@@ -142,10 +147,16 @@ export default async function ResearchTickerPage({
     const filing = primaryFiling(company)
     const url = filing ? serverRenderUrl(filing) : null
     const statements = url
-      ? await loadPrimaryStatements(url, filing?.form).catch((e) => {
-          console.error(`Statements failed for ${company.ticker}: ${e}`)
-          return null
-        })
+      ? await orBuildFallback(
+          loadPrimaryStatements(url, filing?.form).catch((e) => {
+            // An outage keeps the last good render. A filing that cannot be read at all
+            // would fail every time, so the page goes on without its statements.
+            if (e instanceof ReportUnavailableError) throw e
+            console.error(`Statements failed for ${company.ticker}: ${e}`)
+            return null
+          }),
+          null
+        )
       : null
     return (
       <div className="dark min-h-screen bg-black text-gray-100">
