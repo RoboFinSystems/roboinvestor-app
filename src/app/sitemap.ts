@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1,
   }
 
-  const catalog = await getDocsCatalog()
+  const catalog = await getDocsCatalog().catch(() => null)
   const docs = catalog && getDocsNav(catalog, DOCS_SITE, 'product')
   const docsPages: MetadataRoute.Sitemap = (docs?.ordered ?? []).map(
     (page) => ({

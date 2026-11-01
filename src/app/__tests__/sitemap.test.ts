@@ -17,7 +17,7 @@ vi.mock('@/lib/research-site', () => ({
 // Only the fetch is replaced; the nav grouping is the real one.
 vi.mock('@/lib/docs', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
-  getDocsCatalog: () => mockGetDocsCatalog(),
+  getDocsCatalog: async () => mockGetDocsCatalog(),
 }))
 
 import type { DocsCatalog, DocsPage } from '@/lib/docs'
@@ -127,7 +127,7 @@ const coverage = [
 describe('sitemap', () => {
   beforeEach(() => {
     researchSite.canonicalHere = true
-    mockGetDocsCatalog.mockResolvedValue(null)
+    mockGetDocsCatalog.mockRejectedValue(new Error('catalog unreachable'))
   })
 
   afterEach(() => {
@@ -184,7 +184,7 @@ describe('sitemap', () => {
 
   it('leaves the docs out, and keeps everything else, when the docs catalog is unreachable', async () => {
     mockGetAllCoverage.mockResolvedValue(coverage)
-    mockGetDocsCatalog.mockResolvedValue(null)
+    mockGetDocsCatalog.mockRejectedValue(new Error('catalog unreachable'))
     const urls = (await sitemap()).map((e) => e.url)
 
     expect(urls.some((u) => u.includes('/docs'))).toBe(false)
