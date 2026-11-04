@@ -47,6 +47,19 @@ describe('searchIndex', () => {
     expect(searchIndex(ROWS, 'h', 2)).toHaveLength(2)
   })
 
+  it('finds a filer by the ticker it left, ahead of prefixes', () => {
+    const aliases = { HVX: { cik: 'PLQ', ticker: 'PLQ', since: '2026-11-05' } }
+    expect(searchIndex(ROWS, 'hvx', 20, aliases).map((r) => r.ticker)).toEqual([
+      'PLQ',
+    ])
+    const onPrefix = { HV: { cik: 'PLQ', ticker: 'PLQ', since: '2026-11-05' } }
+    expect(searchIndex(ROWS, 'hv', 20, onPrefix).map((r) => r.ticker)).toEqual([
+      'HV',
+      'PLQ',
+      'HVI',
+    ])
+  })
+
   it('is empty for an empty term', () => {
     expect(searchIndex(ROWS, '   ')).toEqual([])
   })

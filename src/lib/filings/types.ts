@@ -47,6 +47,21 @@ export interface CompanyCatalog {
   filings: CatalogFiling[]
   /** The latest filing per form that has representations to open. */
   latest: Record<string, string>
+  /** Set on a ticker's file once its filer has moved to another ticker. */
+  moved_to?: string
+  /** The tickers this filer has left. */
+  former_tickers?: string[]
+}
+
+/** An old ticker and the filer that left it. */
+export interface TickerAlias {
+  cik: string
+  ticker: string
+  since: string
+}
+
+export interface TickerAliases {
+  aliases: Record<string, TickerAlias>
 }
 
 export interface IndexFiling {

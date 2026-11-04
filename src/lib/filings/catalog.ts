@@ -30,6 +30,7 @@ export function companyCatalogUrl(ticker: string): string | null {
 }
 
 export const COMPANY_INDEX_URL = `${FILINGS_CDN_URL}/companies/index.json`
+export const TICKER_ALIASES_URL = `${FILINGS_CDN_URL}/companies/aliases.json`
 
 /** One filer's catalog, or null when the CDN has no file for the ticker. */
 export async function getCompany(

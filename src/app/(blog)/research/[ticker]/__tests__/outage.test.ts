@@ -15,6 +15,10 @@ vi.mock('@/lib/filings/catalog', async (importOriginal) => ({
   ...(await importOriginal<typeof CatalogLib>()),
   getCompany: vi.fn(),
 }))
+vi.mock('next/navigation', () => ({
+  notFound: vi.fn(),
+  permanentRedirect: vi.fn(),
+}))
 vi.mock('@/lib/filings/statements', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   loadPrimaryStatements: vi.fn(),
@@ -23,6 +27,7 @@ vi.mock('@/lib/filings/statements', async (importOriginal) => ({
 import { getCompany, ReportUnavailableError } from '@/lib/filings/catalog'
 import { loadPrimaryStatements } from '@/lib/filings/statements'
 import { getCoverage } from '@/lib/research'
+import { permanentRedirect } from 'next/navigation'
 import ResearchTickerPage, { generateMetadata } from '../page'
 
 // A fictional filer with a filing the page can render.
@@ -105,5 +110,40 @@ describe('a research page when the CDN fails', () => {
       new ReportUnavailableError('report down')
     )
     await expect(ResearchTickerPage(props)).resolves.toBeTruthy()
+  })
+})
+
+describe('a ticker its filer has left', () => {
+  const moved = {
+    ...company,
+    ticker: 'HVX',
+    moved_to: 'HVX',
+  } as unknown as CompanyCatalog
+  const props = { params: Promise.resolve({ ticker: 'hvi' }) }
+
+  afterEach(() => vi.resetAllMocks())
+
+  it('redirects permanently to the new ticker', async () => {
+    vi.mocked(getCoverage).mockResolvedValue(null)
+    vi.mocked(getCompany).mockResolvedValue(moved)
+    vi.mocked(permanentRedirect).mockImplementation(() => {
+      throw new Error('redirected')
+    })
+
+    await expect(ResearchTickerPage(props)).rejects.toThrow('redirected')
+    expect(permanentRedirect).toHaveBeenCalledWith('/research/hvx')
+  })
+
+  it('keeps its page while a brief is still filed under it', async () => {
+    vi.mocked(getCoverage).mockResolvedValue({
+      ticker: 'HVI',
+      assets: {},
+    } as never)
+    vi.mocked(getCompany).mockResolvedValue(moved)
+    vi.mocked(loadPrimaryStatements).mockResolvedValue(null as never)
+
+    await ResearchTickerPage(props)
+
+    expect(permanentRedirect).not.toHaveBeenCalled()
   })
 })
