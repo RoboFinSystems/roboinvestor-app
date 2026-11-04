@@ -20,7 +20,7 @@ import {
 import { orBuildFallback } from '@robosystems/core/docs/catalog'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 
 // An hour, where this was five minutes. A filer page regenerates by fetching and parsing
 // a multi-MB Tavi or holon, and this route will serve one page per SEC filer, so a
@@ -134,6 +134,10 @@ export default async function ResearchTickerPage({
     orBuildFallback(getCompany(ticker, revalidate), null),
   ])
   if (!item && !company) notFound()
+  // A brief still filed under the old ticker keeps its page until it is moved.
+  if (!item && company?.moved_to) {
+    permanentRedirect(`/research/${company.moved_to.toLowerCase()}`)
+  }
 
   const briefMarkdown = item?.assets.brief
     ? await orBuildFallback(fetchBrief(item.assets.brief, revalidate), '')

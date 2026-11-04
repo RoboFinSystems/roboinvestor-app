@@ -1,15 +1,17 @@
-import type { IndexRow } from './types'
+import type { IndexRow, TickerAlias } from './types'
 
 /**
- * Filers matching a term: an exact ticker first, then ticker prefixes in
- * ticker order, then name matches in name order. Case-insensitive; capped so a
- * dropdown stays small. The same ranking the xbrlkit viewer applies to the
- * same index, so a search reads alike in both.
+ * Filers matching a term: an exact ticker first, then the filer that left the
+ * term as an old ticker, then ticker prefixes in ticker order, then name matches
+ * in name order. Case-insensitive; capped so a dropdown stays small. The same
+ * ranking the xbrlkit viewer applies to the same index, so a search reads alike
+ * in both.
  */
 export function searchIndex(
   rows: IndexRow[],
   term: string,
-  limit = 20
+  limit = 20,
+  aliases: Record<string, TickerAlias> = {}
 ): IndexRow[] {
   const q = term.trim()
   if (!q) return []
@@ -18,9 +20,10 @@ export function searchIndex(
   const exact: IndexRow[] = []
   const prefix: IndexRow[] = []
   const byName: IndexRow[] = []
+  const movedCik = aliases[upper]?.cik
   for (const row of rows) {
     const ticker = row.ticker.toUpperCase()
-    if (ticker === upper) exact.push(row)
+    if (ticker === upper || row.cik === movedCik) exact.push(row)
     else if (ticker.startsWith(upper)) prefix.push(row)
     else if (row.name.toLowerCase().includes(lower)) byName.push(row)
   }

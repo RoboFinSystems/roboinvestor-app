@@ -1,6 +1,11 @@
-import { COMPANY_INDEX_URL } from '@/lib/filings/catalog'
+import { COMPANY_INDEX_URL, TICKER_ALIASES_URL } from '@/lib/filings/catalog'
 import { searchIndex } from '@/lib/filings/search'
-import type { CompanyIndex, IndexRow } from '@/lib/filings/types'
+import type {
+  CompanyIndex,
+  IndexRow,
+  TickerAlias,
+  TickerAliases,
+} from '@/lib/filings/types'
 import type { NextRequest } from 'next/server'
 
 /**
@@ -16,10 +21,28 @@ import type { NextRequest } from 'next/server'
 const TTL_MS = 60 * 60 * 1000
 /** A CDN that stalls rather than errors must not hold searches open. */
 const FETCH_TIMEOUT_MS = 10_000
-let cached: { at: number; rows: IndexRow[] } | null = null
-let inflight: Promise<IndexRow[]> | null = null
+type Loaded = { rows: IndexRow[]; aliases: Record<string, TickerAlias> }
+let cached: ({ at: number } & Loaded) | null = null
+let inflight: Promise<Loaded> | null = null
 
-function refresh(): Promise<IndexRow[]> {
+/**
+ * Old tickers are a convenience, so they never hold a search open: they load
+ * beside the index and join it when they arrive, and a failure keeps the last
+ * copy.
+ */
+function refreshAliases(): void {
+  fetch(TICKER_ALIASES_URL, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  })
+    .then(async (res) => {
+      if (!res.ok || !cached) return
+      cached.aliases = ((await res.json()) as TickerAliases).aliases ?? {}
+    })
+    .catch(() => {})
+}
+
+function refresh(): Promise<Loaded> {
   if (!inflight) {
     inflight = fetch(COMPANY_INDEX_URL, {
       cache: 'no-store',
@@ -29,8 +52,13 @@ function refresh(): Promise<IndexRow[]> {
         if (!res.ok)
           throw new Error(`Company index fetch failed: ${res.status}`)
         const body = (await res.json()) as CompanyIndex
-        cached = { at: Date.now(), rows: body.companies ?? [] }
-        return cached.rows
+        cached = {
+          at: Date.now(),
+          rows: body.companies ?? [],
+          aliases: cached?.aliases ?? {},
+        }
+        refreshAliases()
+        return cached
       })
       .finally(() => {
         inflight = null
@@ -45,14 +73,14 @@ function refresh(): Promise<IndexRow[]> {
  * failing CDN never delays a search that has something to answer with. Only
  * the first load on an instance waits (bounded by the fetch timeout).
  */
-async function loadIndex(): Promise<IndexRow[]> {
+async function loadIndex(): Promise<Loaded> {
   if (cached) {
     if (Date.now() - cached.at >= TTL_MS) {
       refresh().catch(() => {
         // Keep serving the last copy; the next expired read retries.
       })
     }
-    return cached.rows
+    return cached
   }
   return refresh()
 }
@@ -61,9 +89,9 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get('q')?.trim() ?? ''
   if (!q) return Response.json({ companies: [] })
   try {
-    const rows = await loadIndex()
+    const { rows, aliases } = await loadIndex()
     return Response.json(
-      { companies: searchIndex(rows, q) },
+      { companies: searchIndex(rows, q, undefined, aliases) },
       { headers: { 'Cache-Control': 'private, max-age=300' } }
     )
   } catch (e) {
