@@ -18,16 +18,18 @@ export function searchIndex(
   const upper = q.toUpperCase()
   const lower = q.toLowerCase()
   const exact: IndexRow[] = []
+  const moved: IndexRow[] = []
   const prefix: IndexRow[] = []
   const byName: IndexRow[] = []
   const movedCik = aliases[upper]?.cik
   for (const row of rows) {
     const ticker = row.ticker.toUpperCase()
-    if (ticker === upper || row.cik === movedCik) exact.push(row)
+    if (ticker === upper) exact.push(row)
+    else if (row.cik === movedCik) moved.push(row)
     else if (ticker.startsWith(upper)) prefix.push(row)
     else if (row.name.toLowerCase().includes(lower)) byName.push(row)
   }
   prefix.sort((a, b) => a.ticker.localeCompare(b.ticker))
   byName.sort((a, b) => a.name.localeCompare(b.name))
-  return [...exact, ...prefix, ...byName].slice(0, limit)
+  return [...exact, ...moved, ...prefix, ...byName].slice(0, limit)
 }

@@ -60,6 +60,19 @@ describe('searchIndex', () => {
     ])
   })
 
+  it('ranks a current holder of the ticker above the filer that left it', () => {
+    // Index order would put the filer that left first.
+    const rows = [
+      row('PLQ', 'Plinth Quarry Holdings'),
+      row('HV', 'Hollow Valley'),
+    ]
+    const aliases = { HV: { cik: 'PLQ', ticker: 'PLQ', since: '2026-11-05' } }
+    expect(searchIndex(rows, 'hv', 20, aliases).map((r) => r.ticker)).toEqual([
+      'HV',
+      'PLQ',
+    ])
+  })
+
   it('is empty for an empty term', () => {
     expect(searchIndex(ROWS, '   ')).toEqual([])
   })
