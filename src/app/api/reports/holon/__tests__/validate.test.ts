@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { allowedHolonUrl, contentTypeForPath } from '../validate'
 
-// A realistic LocalStack presigned holon URL (shape mirrors the live one).
+// A realistic development-stack presigned holon URL (shape mirrors the live one).
 const VALID =
-  'http://localhost:4566/robosystems-user/report-bundles/kg19f333/rpt_01ABC/g1.holon.jsonld' +
+  'http://localhost:8333/robosystems-user/report-bundles/kg19f333/rpt_01ABC/g1.holon.jsonld' +
   '?response-content-type=application%2Fld%2Bjson&AWSAccessKeyId=test&Signature=abc%3D&Expires=1783315210'
 
 const SIG = 'X-Amz-Credential=cred&X-Amz-Signature=sig&X-Amz-Expires=300'
@@ -191,16 +191,16 @@ describe('allowedHolonUrl', () => {
     it('accepts the endpoint override in a production build with the bucket unset', () => {
       // `next build` bakes NODE_ENV=production into server code, so the local
       // compose stack and the Docker Hub image run as production against
-      // LocalStack. A real deployment carries no override.
+      // the development stack's S3 server. A real deployment carries no override.
       vi.stubEnv('REPORT_BUNDLE_BUCKET', '')
-      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
+      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:8333')
       expect(allowedHolonUrl(VALID)).not.toBeNull()
     })
 
     it('accepts only the endpoint override in development when the bucket is unset', () => {
       vi.stubEnv('NODE_ENV', 'development')
       vi.stubEnv('REPORT_BUNDLE_BUCKET', '')
-      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
+      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:8333')
       expect(allowedHolonUrl(VALID)).not.toBeNull()
       expect(
         allowedHolonUrl(`https://${BUCKET}.s3.amazonaws.com/${KEY}?${SIG}`)
@@ -210,19 +210,19 @@ describe('allowedHolonUrl', () => {
     it('pins the override path to the bucket when one is configured', () => {
       vi.stubEnv('NODE_ENV', 'development')
       vi.stubEnv('REPORT_BUNDLE_BUCKET', 'robosystems-user')
-      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
+      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:8333')
       expect(allowedHolonUrl(VALID)).not.toBeNull()
       expect(
         allowedHolonUrl(
-          `http://localhost:4566/other/report-bundles/g/r/g1.holon.jsonld?${SIG}`
+          `http://localhost:8333/other/report-bundles/g/r/g1.holon.jsonld?${SIG}`
         )
       ).toBeNull()
     })
 
     it('pins the override to its port and protocol', () => {
       vi.stubEnv('NODE_ENV', 'development')
-      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:4566')
-      expect(allowedHolonUrl(VALID.replace(':4566', ':3001'))).toBeNull()
+      vi.stubEnv('NEXT_PUBLIC_S3_ENDPOINT_URL', 'http://localhost:8333')
+      expect(allowedHolonUrl(VALID.replace(':8333', ':3001'))).toBeNull()
       expect(allowedHolonUrl(VALID.replace('http:', 'https:'))).toBeNull()
     })
 

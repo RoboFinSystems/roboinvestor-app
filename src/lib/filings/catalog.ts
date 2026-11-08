@@ -5,7 +5,7 @@
 
 import type { CatalogFiling, CompanyCatalog, CompanyIndex } from './types'
 
-/** The public data CDN (robosystems' PUBLIC_DATA_CDN_URL). Local: LocalStack. */
+/** The public data CDN (robosystems' PUBLIC_DATA_CDN_URL). Local: the dev stack's public bucket. */
 export const FILINGS_CDN_URL = (
   process.env.NEXT_PUBLIC_FILINGS_CDN_URL || 'https://public.robosystems.ai'
 ).replace(/\/$/, '')

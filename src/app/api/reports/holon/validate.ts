@@ -27,7 +27,7 @@ function bundleBucket(): string | null {
 }
 
 /**
- * The S3 endpoint override (LocalStack in local development), if any; matched
+ * The S3 endpoint override (the development stack's S3 server), if any; matched
  * on protocol, host and port. Read per call rather than at module load so a
  * runtime env change (and tests) take effect without a rebuild.
  */
@@ -99,7 +99,7 @@ function trustedOrigin(u: URL, bucket: string | null): string | null {
 }
 
 /**
- * Key inside the LocalStack endpoint: path-style, so `/<bucket>/<key>`. With a
+ * Key inside the development stack's endpoint: path-style, so `/<bucket>/<key>`. With a
  * configured bucket the segment must match it; without one (development only)
  * any single bucket segment is accepted.
  */
@@ -120,7 +120,7 @@ function overrideKey(pathname: string, bucket: string | null): string | null {
  * Fails closed: with `REPORT_BUNDLE_BUCKET` unset, only the configured endpoint
  * override is accepted, and a real deployment carries no override. (NODE_ENV
  * is not consulted: `next build` bakes it to production, including for the
- * LocalStack-backed compose stack and Docker Hub image.)
+ * compose stack and Docker Hub image.)
  */
 export function allowedHolonUrl(raw: string): URL | null {
   let u: URL
