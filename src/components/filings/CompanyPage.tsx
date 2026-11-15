@@ -83,7 +83,7 @@ function FilingRow({
             As filed
           </LinkOut>
         )}
-        <LinkOut href={edgarFilingUrl(company.cik, filing.accession)} muted>
+        <LinkOut href={edgarFilingUrl(company, filing)} muted>
           EDGAR
         </LinkOut>
         {filing.representations.length === 0 && (

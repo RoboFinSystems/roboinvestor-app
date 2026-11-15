@@ -18,9 +18,17 @@ function JsonLd({ data }: { data: Record<string, unknown> }) {
   )
 }
 
-/** The filing's index on EDGAR — the record these pages are based on. */
-export function edgarFilingUrl(cik: string, accession: string): string {
-  return `https://www.sec.gov/Archives/edgar/data/${Number(cik)}/${accession.replace(/-/g, '')}/`
+/**
+ * The filing's index on EDGAR — the record these pages are based on — under
+ * the registrant that filed it, which on a company that changed registrant
+ * is not always the company's current CIK.
+ */
+export function edgarFilingUrl(
+  company: Pick<CompanyCatalog, 'cik'>,
+  filing: Pick<CatalogFiling, 'accession' | 'cik'>
+): string {
+  const cik = filing.cik || company.cik
+  return `https://www.sec.gov/Archives/edgar/data/${Number(cik)}/${filing.accession.replace(/-/g, '')}/`
 }
 
 export function edgarFilerUrl(cik: string): string {
@@ -49,7 +57,7 @@ function datasetFor(
     description: `${company.name} (${company.ticker}) ${filing.form} filed ${filing.filing_date ?? ''}: the XBRL financial statements as a JSON-LD holon and a Project Tavi compiled model, with the filing as filed. Source: SEC EDGAR.`,
     url: pageUrl,
     identifier: filing.accession,
-    isBasedOn: edgarFilingUrl(company.cik, filing.accession),
+    isBasedOn: edgarFilingUrl(company, filing),
     temporalCoverage: filing.report_date ?? undefined,
     creator: {
       '@type': 'Organization',
