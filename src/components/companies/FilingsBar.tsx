@@ -76,9 +76,7 @@ export function FilingsBar({ company, selected, onSelect }: FilingsBarProps) {
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {viewer && <LinkOut href={viewer}>Open in the viewer</LinkOut>}
         {reps.document && <LinkOut href={reps.document.url}>As filed</LinkOut>}
-        <LinkOut href={edgarFilingUrl(company.cik, selected.accession)}>
-          EDGAR
-        </LinkOut>
+        <LinkOut href={edgarFilingUrl(company, selected)}>EDGAR</LinkOut>
       </div>
     </div>
   )

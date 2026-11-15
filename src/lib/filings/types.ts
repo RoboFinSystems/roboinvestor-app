@@ -26,6 +26,12 @@ export interface CatalogFiling {
   fiscal_year: number | null
   fiscal_period: string | null
   report_id: string | null
+  /**
+   * The registrant that filed it. On a ticker whose company changed
+   * registrant, a predecessor's filings carry the predecessor's CIK; absent
+   * on a catalog written before 2026-11-14, where it is the company's own.
+   */
+  cik?: string
   /** The filing's folder on the CDN, or null when its artifacts are not written yet. */
   folder: string | null
   representations: Representation[]
@@ -51,6 +57,8 @@ export interface CompanyCatalog {
   moved_to?: string
   /** The tickers this filer has left. */
   former_tickers?: string[]
+  /** The registrants this one succeeded, whose filings `filings` also lists. */
+  predecessors?: { cik: string; name: string | null }[]
 }
 
 /** An old ticker and the filer that left it. */
