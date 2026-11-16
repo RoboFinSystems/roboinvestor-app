@@ -18,8 +18,6 @@ const RETIRED = [
   'in one model',
   'free account',
   'intelligent',
-  'intro-meeting-scheduler',
-  'hour-meeting-scheduler',
   '—',
 ]
 
@@ -67,6 +65,13 @@ describe('retired phrases', () => {
     const hits = files
       .filter(([, text]) => text.toLowerCase().includes(needle))
       .map(([path]) => path)
+    expect(hits).toEqual([])
+  })
+
+  it('links no booking page but the public intro meeting', () => {
+    const other =
+      /scheduler\.zoom\.us\/[\w-]+\/(?!intro-meeting(?![\w-]))[\w-]+/i
+    const hits = files.filter(([, text]) => other.test(text)).map(([p]) => p)
     expect(hits).toEqual([])
   })
 })
