@@ -1,3 +1,4 @@
+import TalkToUsButton from '@/components/landing/TalkToUsButton'
 import Link from 'next/link'
 
 /**
@@ -25,6 +26,8 @@ import Link from 'next/link'
 
 const CONNECT_HREF = 'https://roboledger.ai/register'
 const FILINGS_HREF = 'https://robosystems.ai/pricing'
+const TALK_CLASS =
+  'text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
 
 export function CompareYourCompany({
   company,
@@ -39,9 +42,10 @@ export function CompareYourCompany({
         Compare your company to {company}
       </h2>
       <p className="mt-3 text-gray-600 dark:text-gray-300">
-        Connect your QuickBooks, add the SEC graph beside your books, and ask
-        your AI how your margins and growth compare to {ticker} — every figure
-        traced to a filing, the same as this report.
+        Connect your QuickBooks to RoboLedger, the general ledger built on
+        RoboSystems, add the SEC graph beside your books, and ask your AI how
+        your margins and growth compare to {ticker}, every figure traced to its
+        entry or its filing.
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <Link
@@ -56,14 +60,15 @@ export function CompareYourCompany({
         >
           Or query the filings yourself
         </Link>
+        <TalkToUsButton className={TALK_CLASS} />
       </div>
     </section>
   )
 }
 
 /**
- * The same door, one line, for the catalog page — where there is no single company to
- * name. Same two destinations so the index carries the door too.
+ * The same door, one line, for the catalog page, where there is no single company to
+ * name. Same destinations so the index carries the door too.
  */
 export function CompareYourCompanyLine() {
   return (
@@ -80,6 +85,11 @@ export function CompareYourCompanyLine() {
       <Link href={FILINGS_HREF} className="font-medium hover:underline">
         query the filings yourself
       </Link>
+      , or{' '}
+      <TalkToUsButton
+        className="font-medium hover:underline"
+        label="talk to us"
+      />
       .
     </p>
   )

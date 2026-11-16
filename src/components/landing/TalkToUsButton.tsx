@@ -3,8 +3,18 @@
 import { useState } from 'react'
 import ContactModal from './ContactModal'
 
-// The secondary CTA beside Get started: a conversation about what a fund needs.
-export default function TalkToUsButton() {
+const BUTTON_CLASS =
+  'inline-flex items-center justify-center gap-2 rounded-lg border border-gray-600 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:border-gray-500 hover:bg-white/5 sm:px-8 sm:py-4 sm:text-lg'
+
+// The conversation path beside Get started on the landing, and beside the research
+// pages' doors. `className` restyles the trigger to sit in a link row or a top bar.
+export default function TalkToUsButton({
+  className = BUTTON_CLASS,
+  label = 'Talk to us',
+}: {
+  className?: string
+  label?: string
+}) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -12,9 +22,9 @@ export default function TalkToUsButton() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-600 px-6 py-3 text-base font-medium text-white transition-all duration-300 hover:border-gray-500 hover:bg-white/5 sm:px-8 sm:py-4 sm:text-lg"
+        className={className}
       >
-        Talk to us
+        {label}
       </button>
       <ContactModal
         isOpen={isOpen}

@@ -29,8 +29,8 @@ export default function ContrastSection() {
             >
               RoboLedger
             </a>
-            , they share reports straight into your fund, in the same taxonomy
-            as every public filer, and your AI can answer questions about them.
+            , they share reports straight into your fund, read side by side with
+            the public filings, and your AI can answer questions about them.
           </p>
         </div>
 

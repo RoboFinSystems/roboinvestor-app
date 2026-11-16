@@ -335,8 +335,9 @@ export default function InvestorSchemaSection() {
               Open source
             </h3>
             <p className="text-sm text-gray-400">
-              Apache 2.0. Run it in your cloud or let us run it; you keep the
-              code and the data.
+              Apache 2.0 and MIT. Run it in your cloud, on your own server, or
+              let us run it. You keep the code and the data whatever happens to
+              any vendor, including us.
             </p>
           </div>
         </div>

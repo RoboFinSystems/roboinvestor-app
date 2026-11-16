@@ -43,6 +43,18 @@ describe('CompareYourCompany', () => {
     ).toHaveAttribute('href', 'https://robosystems.ai/pricing')
   })
 
+  it('names RoboLedger and offers a conversation beside the two doors', () => {
+    const { container } = render(
+      <CompareYourCompany company="Koss Corporation" ticker="KOSS" />
+    )
+    expect(container.textContent).toMatch(
+      /RoboLedger, the general ledger built on\s+RoboSystems/
+    )
+    expect(
+      screen.getByRole('button', { name: 'Talk to us' })
+    ).toBeInTheDocument()
+  })
+
   // The block does not raise writes to QuickBooks at all: the reader has not been asked
   // to connect anything yet, so there is no write objection to answer here, and raising
   // one manufactures it. The reassurance lives on the connect screen.

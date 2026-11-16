@@ -12,7 +12,7 @@ export function CoverageGrid({
   if (!items.length) {
     return (
       <p className="py-12 text-center text-gray-500 dark:text-gray-400">
-        No coverage yet — check back soon.
+        No coverage yet. Check back soon.
       </p>
     )
   }
