@@ -10,19 +10,17 @@ vi.mock('../ContactModal', () => ({
     ) : null,
 }))
 
-import EarlyAccessButton from '../EarlyAccessButton'
+import TalkToUsButton from '../TalkToUsButton'
 
-describe('EarlyAccessButton', () => {
-  it('opens the contact form as an early-access request', () => {
-    render(<EarlyAccessButton />)
+describe('TalkToUsButton', () => {
+  it('opens the contact form as a RoboInvestor conversation', () => {
+    render(<TalkToUsButton />)
     expect(screen.queryByRole('dialog')).toBeNull()
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Talk to us about early access' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Talk to us' }))
 
     const dialog = screen.getByRole('dialog')
-    expect(dialog).toHaveTextContent('Early access to RoboInvestor')
-    expect(dialog).toHaveAttribute('data-form-type', 'early-access')
+    expect(dialog).toHaveTextContent('Talk to us about RoboInvestor')
+    expect(dialog).toHaveAttribute('data-form-type', 'roboinvestor')
   })
 })
