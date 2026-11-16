@@ -12,7 +12,7 @@ export default function InvestorSchemaSection() {
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
             RoboInvestor runs on RoboSystems, the open-source knowledge graph
             for finance, which holds your positions, the companies that issue
-            them, and the public filings in one model.
+            them, and the public filings in one ontology.
           </p>
         </div>
 
