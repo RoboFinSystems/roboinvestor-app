@@ -9,8 +9,8 @@ export const fundSpotlights: Spotlight[] = [
     description:
       'Preferred stock, SAFEs, LLC units, and warrants, each with its own terms, rolled up by issuer with cost basis and current value. Add a position, re-mark one, or record an exit from your AI chat in one update.',
     bullets: [
-      'LLC units, LP interests, SAFEs, notes, warrants, options, and RSUs, with liquidation preference, cap, strike, and vesting terms',
-      'Holdings grouped by issuer, with cost basis, current value, and the source of each mark',
+      'LLC units, LP interests, SAFEs, notes, warrants, options, and RSUs, with liquidation preference, cap, strike, and vesting terms recorded on each. Nothing models a waterfall from them yet.',
+      'Holdings grouped by issuer, with cost basis and current value. The value is the mark you record; RoboInvestor does not price positions.',
       'Portfolio changes apply as one envelope: validated up front, rolled back on any failure',
     ],
     caption: 'Portfolio',
@@ -27,7 +27,7 @@ export const fundSpotlights: Spotlight[] = [
     bullets: [
       "Link a holding to its issuer's graph, and the link resolves when the company shares",
       "Both sides opt in: you name the company's graph, and the company names your fund's",
-      'Statements in the same taxonomy as every public filer, so a comparison needs no remapping',
+      'Statements read side by side with the public filings',
     ],
     caption: 'Portfolio Reports',
     demo: 'reports',
@@ -75,11 +75,11 @@ export const researchSpotlights: Spotlight[] = [
     label: 'Document search',
     title: 'Search the filings by meaning',
     description:
-      'Search across filings and your own uploaded documents, filtered by entity, form type, and fiscal year. Match keywords, or search by meaning when the words differ.',
+      'Search the filings, or the documents saved in your own graph, filtered by entity, form type, and fiscal year. Match keywords, or search by meaning when the words differ.',
     bullets: [
       'Risk factors, MD&A, and every tagged disclosure note',
       'Semantic search finds the passage even when the filer phrased it differently',
-      'Your own documents sit in the same search',
+      'Search the filings, or the documents saved in your own graph',
     ],
     caption: 'Search',
     demo: 'search',

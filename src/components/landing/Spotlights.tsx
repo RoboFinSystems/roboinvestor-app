@@ -88,10 +88,7 @@ export default function Spotlights({
                 </ul>
               </div>
 
-              <ProductShot
-                alt={`RoboInvestor — ${s.title}`}
-                caption={s.caption}
-              >
+              <ProductShot alt={`RoboInvestor: ${s.title}`} caption={s.caption}>
                 <LiveDemo
                   name={s.demo}
                   aspect={1200 / 750}

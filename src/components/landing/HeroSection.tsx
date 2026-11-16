@@ -2,6 +2,7 @@ import { McpLogo } from '@/components/mcp/McpLogo'
 import { AnimatedLogo, LiveDemo } from '@robosystems/core/ui-components'
 import Link from 'next/link'
 import FloatingElementsVariant from './FloatingElementsVariant'
+import TalkToUsButton from './TalkToUsButton'
 
 export default function HeroSection() {
   return (
@@ -34,6 +35,15 @@ export default function HeroSection() {
             </strong>
             .
           </p>
+          <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-gray-400 sm:text-base">
+            RoboInvestor: equity research on public companies, your fund&apos;s
+            positions with their terms, and the reports your portfolio companies
+            share from RoboLedger.
+          </p>
+          <p className="mx-auto mt-2 max-w-3xl text-sm leading-relaxed text-gray-500 sm:text-base">
+            Building next: positions linked to the ledger, brokerage sync, and
+            portfolio analytics.
+          </p>
 
           {/* CTA Buttons */}
           <div className="mx-auto mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center md:mt-16">
@@ -41,9 +51,10 @@ export default function HeroSection() {
               href="/register"
               className="group from-primary-500 to-secondary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative overflow-hidden rounded-lg bg-linear-to-r px-6 py-3 text-base font-medium text-white shadow-2xl transition-all duration-300 sm:px-8 sm:py-4 sm:text-lg"
             >
-              <span className="relative z-10">Get Started</span>
+              <span className="relative z-10">Get started</span>
               <div className="absolute inset-0 -translate-y-full bg-white/20 transition-transform duration-500 group-hover:translate-y-0"></div>
             </Link>
+            <TalkToUsButton />
             <a
               href="https://github.com/RoboFinSystems/roboinvestor-app"
               target="_blank"

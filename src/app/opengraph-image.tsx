@@ -8,8 +8,8 @@ export const alt = SITE_TITLE
 export default function Image() {
   return renderOgImage({
     eyebrow: 'RoboInvestor',
-    title: 'AI Portfolio Management Agent',
+    title: 'Know your portfolio from their books',
     subtitle:
-      'Analyze holdings, track performance, surface investment insights.',
+      'Equity research, your positions, and the reports your companies share.',
   })
 }

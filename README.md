@@ -1,11 +1,13 @@
 # RoboInvestor App
 
-RoboInvestor App is the web interface for AI-powered investment intelligence, providing portfolio analysis and AI-powered investment insights via the RoboSystems knowledge graph.
+Part of RoboSystems, the open-source knowledge graph for finance.
 
-- **Portfolio Intelligence**: Track and analyze investment holdings, with analysis from the AI assistant you already use
-- **Natural Language Queries**: Ask questions about your portfolio in plain English and get instant answers
-- **AI-Powered Guidance**: Investment analysis from the AI assistant you already use, via the knowledge graph
-- **Knowledge Graph Foundation**: Investment data modeled as a semantic graph preserving relationships
+RoboInvestor: equity research on public companies, your fund's positions with their terms, and the reports your portfolio companies share from RoboLedger. This repository is the web app at [roboinvestor.ai](https://roboinvestor.ai).
+
+- **Portfolio**: Private positions with their terms recorded, grouped by issuer with cost basis and the marks you record
+- **Portfolio Reports**: Statements a portfolio company shares from its RoboLedger graph, when both sides opt in
+- **Research**: Equity research and every listed filer's statements, rendered from SEC XBRL filings
+- **Natural Language Queries**: Ask about your positions and the filings in plain English, from the AI assistant you already use
 - **MCP Integration**: Model Context Protocol support for Claude, ChatGPT, Cursor, and any MCP client
 
 ## Core Features
@@ -13,22 +15,21 @@ RoboInvestor App is the web interface for AI-powered investment intelligence, pr
 ### Available Now
 
 - **Investment Dashboard**: Portfolio overview with key metrics and quick actions
-- **Portfolio Management**: Create portfolios, track positions and holdings, manage cost basis
-- **Securities Management**: Track stocks, bonds, and other securities with mutual-handshake cross-graph linking to issuer entities
+- **Portfolio Management**: Create portfolios, record positions and holdings, manage cost basis
+- **Securities Management**: Record LLC units, LP interests, SAFEs, notes, warrants, options, and RSUs, with mutual-handshake cross-graph linking to issuer entities
 - **AI Console**: Natural language and Cypher query terminal with streaming results and MCP integration
 - **Entity Browser**: Search and manage entities (native + linked from portfolio companies) across graphs
-- **Shared Repository Access**: Subscribe to SEC XBRL filings and browse rendered financial reports for public-company holdings
+- **Shared Repository Access**: Subscribe to SEC XBRL filings and browse rendered financial reports for public companies
 - **Research**: SEC-filing-grounded equity research browser, every figure traceable to a filing
-- **Document Search**: Full-text and semantic search across connected sources
+- **Document Search**: Full-text and semantic search over the selected graph
 - **Portfolio Reports**: Reports shared from RoboLedger
 - **Repository API Keys**: Generate a repository-scoped key from a repository's getting-started page for programmatic and MCP connector access
 
-### Roadmap
+### Building Next
 
-- **Asset Allocation**: Visualization by sector, asset class, and geography
-- **Risk Analytics**: Beta, volatility, Sharpe ratio, and correlation analysis
-- **Dividend Tracking**: Yield monitoring and reinvestment tracking
-- **Performance Analytics**: TWR, IRR, and benchmark comparisons
+- **Positions linked to the ledger**
+- **Brokerage sync**
+- **Portfolio analytics**
 
 ## Quick Start
 
@@ -100,7 +101,7 @@ npm install @robosystems/core@latest
 
 - Fork this repo (and the [robosystems](https://github.com/RoboFinSystems/robosystems) backend)
 - AWS account with IAM Identity Center (SSO)
-- Run `just bootstrap` in the backend repo — it deploys OIDC and sets this
+- Run `just bootstrap` in the backend repo: it deploys OIDC and sets this
   repository's `AWS_ROLE_ARN`, `AWS_ACCOUNT_ID` and `AWS_REGION`
 - Run `npm run setup:gha` here to configure the remaining deployment variables
 

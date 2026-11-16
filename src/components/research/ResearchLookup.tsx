@@ -13,7 +13,7 @@ export function ResearchLookup() {
   return (
     <div className="mx-auto mt-8 w-full max-w-xl">
       <CompanySearch
-        placeholder="Any listed company — ticker or name…"
+        placeholder="Any listed company: ticker or name…"
         onSelect={(row) => router.push(`/research/${row.ticker.toLowerCase()}`)}
       />
       <p className="mt-2 text-center text-sm text-gray-400">

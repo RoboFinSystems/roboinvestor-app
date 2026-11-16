@@ -1,5 +1,6 @@
 'use client'
 
+import TalkToUsButton from '@/components/landing/TalkToUsButton'
 import { useAuth } from '@robosystems/core/auth-components'
 import { LogoBadge } from '@robosystems/core/ui-components/Logo'
 import Link from 'next/link'
@@ -23,6 +24,7 @@ export function ResearchTopBar() {
         </span>
       </Link>
       <div className="flex items-center gap-3">
+        <TalkToUsButton className="hidden px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-white sm:inline-flex" />
         {signedIn ? (
           <Link
             href="/home"

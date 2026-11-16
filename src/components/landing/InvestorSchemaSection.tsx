@@ -10,9 +10,9 @@ export default function InvestorSchemaSection() {
             Powered by RoboSystems
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
-            RoboInvestor runs on the RoboSystems knowledge graph platform,
-            organizing your investment data into the RoboInvestor schema for
-            intelligent portfolio analysis
+            RoboInvestor runs on RoboSystems, the open-source knowledge graph
+            for finance, which holds your positions, the companies that issue
+            them, and the public filings in one ontology.
           </p>
         </div>
 
@@ -69,19 +69,18 @@ export default function InvestorSchemaSection() {
                 <div className="border-accent-500/30 from-accent-500/10 rounded-lg border bg-linear-to-br to-blue-500/10 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <div className="bg-accent-600 flex h-8 w-8 items-center justify-center rounded-lg">
-                      <span className="text-xs font-bold text-white">PL</span>
+                      <span className="text-xs font-bold text-white">RL</span>
                     </div>
                     <div>
-                      <div className="font-semibold text-white">Plaid</div>
+                      <div className="font-semibold text-white">RoboLedger</div>
                       <div className="text-xs text-gray-400">
-                        Brokerage Sync
+                        Shared reports
                       </div>
                     </div>
                   </div>
                   <ul className="space-y-1 text-xs text-gray-400">
-                    <li>• Investment accounts</li>
-                    <li>• Holdings &amp; positions</li>
-                    <li className="text-yellow-500/80">• Coming soon</li>
+                    <li>• Statements from a company&apos;s own ledger</li>
+                    <li>• Shared when both sides opt in</li>
                   </ul>
                 </div>
               </div>
@@ -286,8 +285,8 @@ export default function InvestorSchemaSection() {
               Atomic Writes
             </h3>
             <p className="text-sm text-gray-400">
-              Portfolio and position changes apply as one envelope — validated
-              up front, rolled back on any failure
+              Portfolio and position changes apply as one envelope: validated up
+              front, rolled back on any failure
             </p>
           </div>
 
@@ -333,11 +332,12 @@ export default function InvestorSchemaSection() {
               </svg>
             </div>
             <h3 className="mb-2 text-lg font-semibold text-white">
-              Graph Query Performance
+              Open source
             </h3>
             <p className="text-sm text-gray-400">
-              Millisecond queries on complex portfolio relationships powered by
-              knowledge graph technology
+              Apache 2.0 and MIT. Run it in your cloud, on your own server, or
+              let us run it. You keep the code and the data whatever happens to
+              any vendor, including us.
             </p>
           </div>
         </div>

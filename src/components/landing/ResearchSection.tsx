@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import FloatingElementsVariant from './FloatingElementsVariant'
 
-const REGISTER_HREF = '/register'
+const SEC_REPOSITORY_HREF = 'https://robosystems.ai/pricing#sec-repository'
 const RESEARCH_HREF = '/research'
 
 // What every report bundles together.
@@ -9,7 +9,7 @@ const formats = [
   {
     title: 'Video brief',
     description:
-      'A narrated walkthrough of the quarter — the numbers and what moved them',
+      'A narrated walkthrough of the quarter: the numbers and what moved them',
     color: 'primary',
     icon: (
       <svg
@@ -30,7 +30,7 @@ const formats = [
   {
     title: 'Written report',
     description:
-      'The full brief in markdown — every figure traceable to the filing it came from',
+      'The full brief in markdown, with every figure traceable to the filing it came from',
     color: 'secondary',
     icon: (
       <svg
@@ -69,27 +69,6 @@ const formats = [
       </svg>
     ),
   },
-  {
-    title: 'Continuing coverage',
-    description:
-      'We revisit each company every quarter — the full report history stays one click away',
-    color: 'primary',
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-        />
-      </svg>
-    ),
-  },
 ]
 
 const colorClasses = {
@@ -116,7 +95,7 @@ export default function ResearchSection() {
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
             One public company per report. Every figure traceable to an SEC
-            filing — no hype, no price targets. It&apos;s the clearest look at
+            filing. No hype, no price targets. It&apos;s the clearest look at
             what the SEC knowledge graph can do, before you run the same
             analysis yourself.
           </p>
@@ -165,8 +144,8 @@ export default function ResearchSection() {
                   </div>
                   <p className="text-sm text-gray-400">
                     Drawn from the same shared repository of 8,000+ public
-                    companies — 10-K, 10-Q, 20-F, and 40-F filings, structured
-                    as facts you can query.
+                    companies: 10-K, 10-Q, 20-F, and 40-F filings, structured as
+                    facts you can query.
                   </p>
                 </div>
               </div>
@@ -195,8 +174,9 @@ export default function ResearchSection() {
                     Run the same analysis yourself
                   </div>
                   <p className="text-sm text-gray-400">
-                    Subscribe to the shared SEC repository and query it directly
-                    in the console — or from Claude, ChatGPT, or any MCP client.
+                    Subscribe to the SEC repository (14-day free trial) and
+                    query it in the console, or from Claude, ChatGPT or any MCP
+                    client.
                   </p>
                 </div>
               </div>
@@ -207,8 +187,8 @@ export default function ResearchSection() {
                 Every report is public
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Read any report without an account. Register to run the same
-                analysis on the SEC repository yourself.
+                Read any report without an account. To run the same analysis
+                yourself, the SEC repository has a 14-day free trial.
               </p>
             </div>
           </div>
@@ -216,12 +196,12 @@ export default function ResearchSection() {
 
         {/* CTAs */}
         <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:justify-center">
-          <Link
-            href={REGISTER_HREF}
+          <a
+            href={SEC_REPOSITORY_HREF}
             className="from-primary-500 to-secondary-500 shadow-primary-500/25 hover:shadow-primary-500/40 rounded-lg bg-linear-to-r px-8 py-4 text-center text-lg font-medium text-white shadow-lg transition-all duration-300"
           >
-            Create free account
-          </Link>
+            Try the SEC repository
+          </a>
           <Link
             href={RESEARCH_HREF}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-600 px-8 py-4 text-lg font-medium text-white transition-all duration-300 hover:border-gray-500 hover:bg-white/5"

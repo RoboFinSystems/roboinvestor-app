@@ -1,7 +1,6 @@
 'use client'
 
 import ContrastSection from '@/components/landing/ContrastSection'
-import FeaturesSection from '@/components/landing/FeaturesSection'
 import FinalCTA from '@/components/landing/FinalCTA'
 import Footer from '@/components/landing/Footer'
 import Header from '@/components/landing/Header'
@@ -25,7 +24,7 @@ export default function LandingPageContent() {
         <Spotlights
           id="features"
           eyebrow="Inside your fund"
-          heading="Your positions and your companies' books, in one graph"
+          heading="Your positions and the reports your companies share, in your fund's graph"
           intro="Track what the fund holds and read what its companies share, then ask about both from the AI chat you already use."
           spotlights={fundSpotlights}
         />
@@ -38,7 +37,6 @@ export default function LandingPageContent() {
         />
         <InvestorSchemaSection />
         <ResearchSection />
-        <FeaturesSection />
         <FinalCTA />
       </main>
 
