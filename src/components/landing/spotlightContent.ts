@@ -9,8 +9,8 @@ export const fundSpotlights: Spotlight[] = [
     description:
       'Preferred stock, SAFEs, LLC units, and warrants, each with its own terms, rolled up by issuer with cost basis and current value. Add a position, re-mark one, or record an exit from your AI chat in one update.',
     bullets: [
-      'LLC units, LP interests, SAFEs, notes, warrants, options, and RSUs, with liquidation preference, cap, strike, and vesting terms',
-      'Holdings grouped by issuer, with cost basis, current value, and the source of each mark',
+      'LLC units, LP interests, SAFEs, notes, warrants, options, and RSUs, with liquidation preference, cap, strike, and vesting terms recorded on each. Nothing models a waterfall from them yet.',
+      'Holdings grouped by issuer, with cost basis and current value. The value is the mark you record; RoboInvestor does not price positions.',
       'Portfolio changes apply as one envelope: validated up front, rolled back on any failure',
     ],
     caption: 'Portfolio',

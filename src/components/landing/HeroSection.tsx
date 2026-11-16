@@ -1,6 +1,6 @@
 import { McpLogo } from '@/components/mcp/McpLogo'
 import { AnimatedLogo, LiveDemo } from '@robosystems/core/ui-components'
-import Link from 'next/link'
+import EarlyAccessButton from './EarlyAccessButton'
 import FloatingElementsVariant from './FloatingElementsVariant'
 
 export default function HeroSection() {
@@ -15,8 +15,13 @@ export default function HeroSection() {
 
       <div className="relative mx-auto max-w-7xl px-4 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-24 md:pt-48 md:pb-32 lg:px-8">
         <div className="text-center">
-          <div className="bg-primary-500/20 text-primary-400 mb-6 inline-block rounded-full px-4 py-1 text-sm font-semibold">
-            For venture, growth, and private equity funds
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+            <div className="bg-primary-500/20 text-primary-400 inline-block rounded-full px-4 py-1 text-sm font-semibold">
+              For venture, growth, and private equity funds
+            </div>
+            <div className="inline-block rounded-full border border-yellow-500/40 px-4 py-1 text-sm font-semibold text-yellow-400">
+              Early, and we say so
+            </div>
           </div>
           <h1 className="font-heading mb-6 text-4xl leading-tight font-extrabold sm:text-5xl md:mb-8 md:text-7xl lg:text-8xl">
             <span className="block text-white">Know your portfolio</span>
@@ -34,16 +39,15 @@ export default function HeroSection() {
             </strong>
             .
           </p>
+          <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-gray-400 sm:text-base">
+            What works today: positions with their terms, holdings by issuer,
+            and the reports your companies share. Values are the marks you
+            record.
+          </p>
 
           {/* CTA Buttons */}
           <div className="mx-auto mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center md:mt-16">
-            <Link
-              href="/register"
-              className="group from-primary-500 to-secondary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative overflow-hidden rounded-lg bg-linear-to-r px-6 py-3 text-base font-medium text-white shadow-2xl transition-all duration-300 sm:px-8 sm:py-4 sm:text-lg"
-            >
-              <span className="relative z-10">Get Started</span>
-              <div className="absolute inset-0 -translate-y-full bg-white/20 transition-transform duration-500 group-hover:translate-y-0"></div>
-            </Link>
+            <EarlyAccessButton />
             <a
               href="https://github.com/RoboFinSystems/roboinvestor-app"
               target="_blank"

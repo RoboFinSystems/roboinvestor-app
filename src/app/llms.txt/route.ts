@@ -61,7 +61,7 @@ export async function GET() {
     '',
     `> ${SITE_DESCRIPTION}`,
     '',
-    'RoboInvestor is the portfolio product on RoboSystems (https://robosystems.ai), open source under Apache 2.0, by RFS LLC.',
+    'RoboInvestor is early. It is the private-company portfolio product on RoboSystems, the open-source knowledge graph for finance (https://robosystems.ai). RoboInvestor is open source under Apache 2.0, by RFS LLC.',
     '',
     '## Docs',
     ...docsLinks(docs),

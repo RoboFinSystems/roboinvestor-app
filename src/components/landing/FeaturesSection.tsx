@@ -14,7 +14,7 @@ export default function FeaturesSection() {
             The Open Source Investment Platform
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
-            Build, customize, and deploy intelligent investment applications
+            Build, customize, and deploy your own investment applications
           </p>
         </div>
 
@@ -160,7 +160,7 @@ export default function FeaturesSection() {
                 Apache 2.0 Licensed
               </div>
               <p className="mt-1 text-xs text-gray-400">
-                Open source — fork it, self-host it, make it yours.
+                Open source: fork it, self-host it, make it yours.
               </p>
             </div>
           </div>

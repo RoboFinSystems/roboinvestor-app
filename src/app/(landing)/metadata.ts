@@ -6,12 +6,12 @@ export const landingMetadata: Metadata = {
   description: SITE_DESCRIPTION,
   keywords: [
     'AI portfolio management',
-    'portfolio management agent',
+    'private company portfolio tracking',
     'investment analysis AI',
-    'portfolio performance tracking',
+    'portfolio company reporting',
     'AI financial analysis',
     'financial knowledge graph',
-    'investment insights',
+    'SEC filings research',
   ],
   // openGraph/twitter are intentionally inherited from the root layout so the homepage
   // picks up the generated app/opengraph-image.tsx. Defining an openGraph object here

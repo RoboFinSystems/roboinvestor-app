@@ -21,10 +21,16 @@ export default function ContrastSection() {
             Stop retyping investor updates
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
-            A PDF update is out of date before it reaches your tracker. When a
-            portfolio company keeps its books on RoboLedger, it shares its
-            reports straight into your fund, in the same taxonomy as every
-            public filer, and your AI can answer questions about them.
+            A PDF update is out of date before it reaches your tracker. When
+            your portfolio companies keep their books on{' '}
+            <a
+              href="https://roboledger.ai"
+              className="text-primary-400 hover:text-primary-300 underline"
+            >
+              RoboLedger
+            </a>
+            , they share reports straight into your fund, in the same taxonomy
+            as every public filer, and your AI can answer questions about them.
           </p>
         </div>
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import EarlyAccessButton from './EarlyAccessButton'
 import FloatingElementsVariant from './FloatingElementsVariant'
 
 export default function FinalCTA() {
@@ -8,20 +9,14 @@ export default function FinalCTA() {
       <FloatingElementsVariant variant="final" />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
         <h2 className="font-heading mb-6 text-4xl font-bold text-white md:text-5xl">
-          Ready to Analyze Your Investments?
+          RoboInvestor is early
         </h2>
         <p className="mb-12 text-xl text-gray-300">
-          Experience AI-powered investment analysis and SEC research — from the
-          AI assistant you already use, built on RoboSystems.
+          We&apos;d rather show it to you than sign you up. Tell us about your
+          fund and the companies in it.
         </p>
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-          <Link
-            href="/register"
-            className="group from-primary-500 to-secondary-500 shadow-primary-500/25 hover:shadow-primary-500/40 relative overflow-hidden rounded-lg bg-linear-to-r px-8 py-4 text-lg font-medium text-white shadow-2xl transition-all duration-300"
-          >
-            <span className="relative z-10">Get Started</span>
-            <div className="absolute inset-0 -translate-y-full bg-white/20 transition-transform duration-500 group-hover:translate-y-0"></div>
-          </Link>
+          <EarlyAccessButton />
           <a
             href="https://github.com/RoboFinSystems/roboinvestor-app"
             target="_blank"

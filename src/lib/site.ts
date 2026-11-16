@@ -5,7 +5,7 @@
 
 export const SITE_NAME = 'RoboInvestor'
 
-export const SITE_TITLE = 'RoboInvestor | AI Portfolio Management Agent'
+export const SITE_TITLE = 'RoboInvestor | Know your portfolio from their books'
 
 export const SITE_DESCRIPTION =
-  'AI-powered portfolio management agent. Analyze holdings, track performance, and surface investment insights across your portfolio.'
+  "Early, and we say so. Track a fund's private positions and read the reports its companies share from their ledgers, from Claude, ChatGPT or any MCP client."
