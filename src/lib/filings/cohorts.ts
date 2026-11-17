@@ -2,8 +2,8 @@ import type { IndexRow } from './types'
 
 /**
  * The generated filer pages, grouped into the cohorts the sitemaps release them
- * in (specs/roboinvestor/sec-public-surface.md §5). A cohort holds filers that
- * have a renderable filing and no hand-made coverage — the covered companies
+ * in (`RESEARCH_RELEASED_COHORTS` in `lib/research-site.ts`). A cohort holds
+ * filers that have a renderable filing and no hand-made coverage — the covered companies
  * are in the main sitemap already — in a stable order, so a cohort's members
  * do not shuffle between reads: the covered companies' industry peers first
  * (same SIC description as a covered filer, the comps a reader of that

@@ -13,9 +13,9 @@ export const RESEARCH_IS_CANONICAL_HERE =
   RESEARCH_CANONICAL_ORIGIN === SELF_ORIGIN
 
 /**
- * The release switch for the generated filer pages (specs/roboinvestor/sec-public-surface.md
- * §5). Every listed filer has a page at /research/{ticker}, reachable by URL; how many of
- * them the sitemaps list is decided here, in cohorts of RESEARCH_COHORT_SIZE, each cohort
+ * The release switch for the generated filer pages. Every listed filer has a page at
+ * /research/{ticker}, reachable by URL; how many of them the sitemaps list is decided
+ * here, in cohorts of RESEARCH_COHORT_SIZE, each cohort
  * its own sitemap file at /research/sitemap/{n}.xml so Search Console reports indexing per
  * cohort. At 0 nothing generated is listed and the sitemaps are exactly the hand-made
  * coverage. Bump it by one per Search Console read while the stop rule holds — if
