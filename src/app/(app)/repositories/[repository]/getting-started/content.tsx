@@ -178,7 +178,8 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                   Query with Cypher
                 </p>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Use graph queries to explore relationships in the data
+                  Use graph queries to explore relationships in the data. On a
+                  trial, raw Cypher opens with your first payment
                 </p>
               </div>
             </div>
@@ -198,11 +199,12 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
               <HiCheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
               <div>
                 <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                  AI Agent Integration
+                  Your AI, over MCP
                 </p>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Use our in-house agent via Console or connect external AI
-                  tools via MCP
+                  Connect Claude, ChatGPT or any MCP client, or use the AI
+                  analyst in the Console. On a trial, the AI analyst opens with
+                  your first payment
                 </p>
               </div>
             </div>
@@ -309,12 +311,16 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
               <li className="flex items-start gap-2">
                 <HiCheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                <span>Run Cypher queries against the graph database</span>
+                <span>
+                  Run Cypher queries against the graph (after your first
+                  payment, on a trial)
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <HiCheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
                 <span>
-                  Chat with our AI agent using natural language queries
+                  Ask the AI analyst in plain English (after your first payment,
+                  on a trial)
                 </span>
               </li>
               <li className="flex items-start gap-2">
