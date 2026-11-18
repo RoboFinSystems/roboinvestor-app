@@ -10,7 +10,7 @@ export const landingMetadata: Metadata = {
     'investment analysis AI',
     'portfolio company reporting',
     'AI financial analysis',
-    'financial knowledge graph',
+    'knowledge graph for finance',
     'SEC filings research',
   ],
   // openGraph/twitter are intentionally inherited from the root layout so the homepage

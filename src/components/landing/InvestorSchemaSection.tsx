@@ -11,8 +11,8 @@ export default function InvestorSchemaSection() {
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
             RoboInvestor runs on RoboSystems, the open-source knowledge graph
-            for finance, which holds your positions, the companies that issue
-            them, and the public filings in one ontology.
+            for finance: your positions and the companies that issue them, read
+            side by side with the public filings.
           </p>
         </div>
 
@@ -310,8 +310,8 @@ export default function InvestorSchemaSection() {
               Unified Data Model
             </h3>
             <p className="text-sm text-gray-400">
-              Single source of truth connecting portfolios, securities, and the
-              entities that issue them
+              Each position linked to its security and to the company that
+              issued it
             </p>
           </div>
 

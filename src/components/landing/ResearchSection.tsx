@@ -9,7 +9,7 @@ const formats = [
   {
     title: 'Video brief',
     description:
-      'A narrated walkthrough of the quarter: the numbers and what moved them',
+      'A narrated walkthrough of the filing: the numbers and what moved them',
     color: 'primary',
     icon: (
       <svg
@@ -174,9 +174,9 @@ export default function ResearchSection() {
                     Run the same analysis yourself
                   </div>
                   <p className="text-sm text-gray-400">
-                    Subscribe to the SEC repository (14-day free trial) and
-                    query it in the console, or from Claude, ChatGPT or any MCP
-                    client.
+                    Subscribe to the SEC repository (14-day trial, no card
+                    needed) and query it in the console, or from Claude, ChatGPT
+                    or any MCP client.
                   </p>
                 </div>
               </div>
@@ -188,7 +188,8 @@ export default function ResearchSection() {
               </div>
               <p className="mt-1 text-xs text-gray-400">
                 Read any report without an account. To run the same analysis
-                yourself, the SEC repository has a 14-day free trial.
+                yourself, the SEC repository has a 14-day trial, and no card is
+                needed to start it.
               </p>
             </div>
           </div>
