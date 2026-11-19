@@ -460,6 +460,31 @@ describe('portfolio page details', () => {
     expect(screen.queryAllByText(/€1,000/).length).toBeGreaterThan(0)
   })
 
+  it('says when a value total covers only some positions', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Fund One', 'USD')],
+    })
+    getHoldings.mockResolvedValue({
+      holdings: [
+        {
+          entityId: 'e1',
+          entityName: 'Acme Inc',
+          sourceGraphId: null,
+          totalCostBasisDollars: 3000,
+          totalCurrentValueDollars: 1500,
+          positionCount: 2,
+          markedPositionCount: 1,
+          currentValueIsPartial: true,
+          securities: [],
+        },
+      ],
+    })
+
+    render(<PortfolioPageContent />)
+    await screen.findByText('Acme Inc')
+    expect(screen.getByText(/1 of\s+2 marked/)).toBeInTheDocument()
+  })
+
   it('shows a failed portfolio create inside the dialog', async () => {
     listPortfolios.mockResolvedValue({ portfolios: [] })
     createPortfolioBlock.mockRejectedValue(
