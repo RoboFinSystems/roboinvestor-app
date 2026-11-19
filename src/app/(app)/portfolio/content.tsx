@@ -70,6 +70,8 @@ interface Holding {
   total_cost_basis_dollars: number
   total_current_value_dollars: number | null
   position_count: number
+  marked_position_count: number
+  current_value_is_partial: boolean
 }
 
 // Map the camelCase shapes returned by `clients.investor.*` / GraphQL
@@ -105,6 +107,8 @@ type RawHolding = {
   totalCostBasisDollars: number
   totalCurrentValueDollars: number | null
   positionCount: number
+  markedPositionCount?: number
+  currentValueIsPartial?: boolean
 }
 
 function toPortfolio(p: RawPortfolio | Record<string, unknown>): Portfolio {
@@ -138,6 +142,8 @@ function toHolding(h: RawHolding): Holding {
     total_cost_basis_dollars: h.totalCostBasisDollars,
     total_current_value_dollars: h.totalCurrentValueDollars ?? null,
     position_count: h.positionCount,
+    marked_position_count: h.markedPositionCount ?? 0,
+    current_value_is_partial: h.currentValueIsPartial ?? false,
   }
 }
 
@@ -859,6 +865,12 @@ const PortfolioPageContent: FC = function () {
                                   {formatCurrency(
                                     h.total_current_value_dollars,
                                     activeSelection.base_currency
+                                  )}
+                                  {h.current_value_is_partial && (
+                                    <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
+                                      ({h.marked_position_count} of{' '}
+                                      {h.position_count} marked)
+                                    </span>
                                   )}
                                 </span>
                               )}
