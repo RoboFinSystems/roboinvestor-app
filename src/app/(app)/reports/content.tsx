@@ -3,11 +3,12 @@
 /**
  * Reports a portfolio company has sent to this fund.
  *
- * A cross-graph share copies the issuer's published report into the
- * recipient's own tenant schema, so these are ordinary reads against the
- * fund's graph — no repository, and no RoboLedger. A report the fund did not
- * author is exactly the one with a `sourceGraphId`, which is why that field
- * drives both the filter and the provenance line.
+ * A report arrives one of two ways: shared from the company's own graph, or
+ * loaded from a file the company sent (a holon, or rows read out of a PDF or
+ * a workbook). Either way it lives in the fund's own tenant schema, so these
+ * are ordinary reads against the fund's graph — no repository, and no
+ * RoboLedger. `origin` says which way it came; only a shared report has a
+ * `sourceGraphId`.
  */
 
 import DocsLink from '@/components/DocsLink'
@@ -39,7 +40,16 @@ import {
   HiExclamationCircle,
   HiEye,
   HiShare,
+  HiUpload,
 } from 'react-icons/hi'
+
+/**
+ * A report this graph did not author. An API that predates `origin` leaves
+ * it out, and there a received report is one with a `sourceGraphId`.
+ */
+export function isReceived(report: ReportListItem): boolean {
+  return report.origin ? report.origin !== 'authored' : !!report.sourceGraphId
+}
 
 const formatDate = (value: string | null | undefined): string => {
   if (!value) return '—'
@@ -82,10 +92,10 @@ const ReceivedReportsContent: FC = function () {
         const list = await clients.ledger.listReports(currentGraph.graphId)
         if (cancelled) return
 
-        // Only what someone sent us. A report this graph authored has a null
-        // `sourceGraphId`, and authoring is not a RoboInvestor capability.
+        // Only what someone sent us; authoring is not a RoboInvestor
+        // capability.
         const received = (list ?? [])
-          .filter((r) => !!r.sourceGraphId)
+          .filter(isReceived)
           .sort(
             (a, b) =>
               new Date(b.sharedAt ?? b.createdAt).getTime() -
@@ -116,7 +126,7 @@ const ReceivedReportsContent: FC = function () {
           title="Reports"
           subtitle={
             <>
-              Financial reports shared with this fund by its portfolio
+              Financial reports this fund has received from its portfolio
               companies. <DocsLink href="/docs/reports-you-receive" />
             </>
           }
@@ -133,8 +143,8 @@ const ReceivedReportsContent: FC = function () {
         title="Reports"
         subtitle={
           <>
-            Financial reports shared with this fund by its portfolio companies.{' '}
-            <DocsLink href="/docs/reports-you-receive" />
+            Financial reports this fund has received from its portfolio
+            companies. <DocsLink href="/docs/reports-you-receive" />
           </>
         }
       />
@@ -151,7 +161,8 @@ const ReceivedReportsContent: FC = function () {
           title="No reports received yet"
           description={
             'When a portfolio company publishes a report to a distribution ' +
-            'list that includes this fund, it appears here.'
+            'list that includes this fund, it appears here. So does a report ' +
+            'loaded from a file a company sent.'
           }
         />
       )}
@@ -184,7 +195,17 @@ const ReceivedReportsContent: FC = function () {
                     </TableCell>
                     <TableCell>
                       <span className="text-primary-500 flex items-center gap-1">
-                        <HiShare className="h-4 w-4 shrink-0" />
+                        {report.origin === 'uploaded' ? (
+                          <HiUpload
+                            className="h-4 w-4 shrink-0"
+                            title="Loaded from a file"
+                          />
+                        ) : (
+                          <HiShare
+                            className="h-4 w-4 shrink-0"
+                            title="Shared from their graph"
+                          />
+                        )}
                         {report.entityName ?? 'Portfolio company'}
                       </span>
                     </TableCell>
@@ -192,7 +213,7 @@ const ReceivedReportsContent: FC = function () {
                       {formatPeriod(report)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
-                      {formatDate(report.sharedAt)}
+                      {formatDate(report.sharedAt ?? report.createdAt)}
                     </TableCell>
                     <TableCell>
                       <Link

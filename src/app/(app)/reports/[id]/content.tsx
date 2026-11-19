@@ -41,7 +41,12 @@ import {
 } from '@robosystems/report-components'
 import { parseJsonld } from '@robosystems/report-components/adapters'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { HiDocumentReport, HiExclamationCircle, HiShare } from 'react-icons/hi'
+import {
+  HiDocumentReport,
+  HiExclamationCircle,
+  HiShare,
+  HiUpload,
+} from 'react-icons/hi'
 
 const formatDate = (value: string | null | undefined): string | null => {
   if (!value) return null
@@ -179,9 +184,12 @@ export default function ReceivedReportContent({
     void load()
   }, [load])
 
-  const received = formatDate(meta?.sharedAt)
+  const uploaded = meta?.origin === 'uploaded'
+  const received = formatDate(
+    meta?.sharedAt ?? (uploaded ? meta?.createdAt : null)
+  )
   const provenance = meta?.entityName
-    ? `${meta.entityName} shared`
+    ? `${meta.entityName} ${uploaded ? 'sent' : 'shared'}`
     : 'you received'
 
   return (
@@ -198,11 +206,15 @@ export default function ReceivedReportContent({
         }
       />
 
-      {meta?.sourceGraphId && (
+      {(meta?.sourceGraphId || uploaded) && (
         <Card>
           <span className="text-primary-500 flex items-center gap-1 text-sm">
-            <HiShare className="h-4 w-4 shrink-0" />
-            Shared report
+            {uploaded ? (
+              <HiUpload className="h-4 w-4 shrink-0" />
+            ) : (
+              <HiShare className="h-4 w-4 shrink-0" />
+            )}
+            {uploaded ? 'Report loaded from a file' : 'Shared report'}
             {meta.entityName ? ` from ${meta.entityName}` : ''}
             {received ? ` — received ${received}` : ''}
           </span>
