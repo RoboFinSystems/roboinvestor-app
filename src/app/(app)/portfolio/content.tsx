@@ -835,7 +835,7 @@ const PortfolioPageContent: FC = function () {
                     <EmptyState
                       icon={HiOfficeBuilding}
                       title="No holdings yet"
-                      description="Add entities, securities, and positions via the API to see them here."
+                      description="Use Add Security to record a holding and its starting position. Current values are set through your AI assistant."
                       className="py-6"
                     />
                   </Card>
@@ -1130,11 +1130,14 @@ const PortfolioPageContent: FC = function () {
                 </p>
               ) : (
                 <p className="py-2 text-sm text-gray-400">
-                  No companies have shared reports with you yet.
+                  No companies yet. A company appears here once it shares a
+                  report with you or your AI assistant loads one of its reports
+                  from a file.
                 </p>
               )}
               <p className="mt-1 text-xs text-gray-400">
-                Companies appear here after they share a report with your graph
+                Companies that have shared a report with your graph, and
+                companies your AI assistant added to load a report from a file
               </p>
             </div>
             <div>
@@ -1287,7 +1290,9 @@ const PortfolioPageContent: FC = function () {
                 </p>
               ) : (
                 <p className="py-2 text-sm text-gray-400">
-                  No companies have shared reports with you yet.
+                  No companies yet. A company appears here once it shares a
+                  report with you or your AI assistant loads one of its reports
+                  from a file.
                 </p>
               )}
             </div>
