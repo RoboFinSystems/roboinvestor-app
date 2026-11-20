@@ -4,6 +4,7 @@ import {
   anchoredMessage,
   exampleQuestions,
   filingFocus,
+  onSecTrial,
 } from '../chat'
 import type { CatalogFiling, CompanyCatalog } from '../types'
 
@@ -79,5 +80,52 @@ describe('exampleQuestions', () => {
       "Summarize Halvorsen Instruments Corp's 10-Q for Q2 2026"
     )
     expect(peers).toContain('HVI')
+  })
+})
+
+describe('onSecTrial', () => {
+  const now = new Date('2026-11-19T12:00:00Z')
+  const sec = { resource_type: 'repository', resource_id: 'sec' }
+
+  it('is true while the SEC subscription is in its free trial', () => {
+    expect(
+      onSecTrial([{ ...sec, trial_ends_at: '2026-11-25T00:00:00Z' }], 'u1', now)
+    ).toBe(true)
+  })
+
+  it('is false once the trial has ended or the plan never had one', () => {
+    expect(
+      onSecTrial([{ ...sec, trial_ends_at: '2026-11-01T00:00:00Z' }], 'u1', now)
+    ).toBe(false)
+    expect(onSecTrial([{ ...sec, trial_ends_at: null }], 'u1', now)).toBe(false)
+    expect(onSecTrial([sec], 'u1', now)).toBe(false)
+  })
+
+  it("reads the viewer's own seat, never a colleague's", () => {
+    const theirs = {
+      ...sec,
+      user_id: 'u2',
+      trial_ends_at: '2026-11-25T00:00:00Z',
+    }
+    expect(onSecTrial([theirs], 'u1', now)).toBe(false)
+    expect(onSecTrial([{ ...theirs, user_id: 'u1' }], 'u1', now)).toBe(true)
+  })
+
+  it('ignores another repository and a graph subscription', () => {
+    const trial = '2026-11-25T00:00:00Z'
+    expect(
+      onSecTrial(
+        [
+          {
+            resource_type: 'repository',
+            resource_id: 'other',
+            trial_ends_at: trial,
+          },
+          { resource_type: 'graph', resource_id: 'sec', trial_ends_at: trial },
+        ],
+        'u1',
+        now
+      )
+    ).toBe(false)
   })
 })

@@ -79,3 +79,35 @@ export function exampleQuestions(
     `How do ${company.ticker}'s margins compare to its industry peers?`,
   ]
 }
+
+/** The fields of an org subscription that say whether it is an SEC trial. */
+export interface SubscriptionSeat {
+  resource_type?: string | null
+  resource_id?: string | null
+  user_id?: string | null
+  trial_ends_at?: string | null
+}
+
+/**
+ * Whether the viewer's SEC subscription is still in its free trial. The trial
+ * covers the analysis tools and not the operator, which the API refuses until
+ * the first payment, so the chat says so instead of taking the question.
+ */
+export function onSecTrial(
+  subscriptions: SubscriptionSeat[],
+  userId: string | undefined,
+  now: Date = new Date()
+): boolean {
+  return subscriptions.some((sub) => {
+    if (sub.resource_type !== 'repository' || sub.resource_id !== 'sec')
+      return false
+    // An owner or admin is listed every member's seat.
+    if (sub.user_id && sub.user_id !== userId) return false
+    if (!sub.trial_ends_at) return false
+    // The API writes UTC with no zone.
+    const ends = /(Z|[+-]\d\d:?\d\d)$/.test(sub.trial_ends_at)
+      ? sub.trial_ends_at
+      : `${sub.trial_ends_at}Z`
+    return new Date(ends) > now
+  })
+}
