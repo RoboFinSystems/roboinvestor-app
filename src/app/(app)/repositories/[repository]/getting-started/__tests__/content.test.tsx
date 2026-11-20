@@ -5,8 +5,9 @@ import { ApiKeysContent } from '../content'
 
 const showError = vi.hoisted(() => vi.fn())
 const showSuccess = vi.hoisted(() => vi.fn())
+const push = vi.hoisted(() => vi.fn())
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }))
 vi.mock('@robosystems/core', async () => {
   const actual = await vi.importActual('@robosystems/core')
   return {
@@ -45,5 +46,18 @@ describe('ApiKeysContent key generation', () => {
       )
     )
     expect(showSuccess).not.toHaveBeenCalled()
+  })
+})
+
+describe('ApiKeysContent quick start', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  // The repository's own reports route only redirects to Company Research, so
+  // the button goes straight there and says so.
+  it('sends the SEC filings button to Research', () => {
+    render(<ApiKeysContent repository="sec" />)
+    fireEvent.click(screen.getByRole('button', { name: /Research/ }))
+
+    expect(push).toHaveBeenCalledWith('/companies')
   })
 })

@@ -240,16 +240,14 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             {repository === 'sec' && (
               <Button
                 color="primary"
-                onClick={() =>
-                  router.push(`/repositories/${repository}/reports`)
-                }
+                onClick={() => router.push('/companies')}
                 className="h-auto flex-col items-start gap-2 py-4"
               >
                 <HiDocumentSearch className="h-6 w-6" />
                 <div className="text-left">
-                  <div className="font-semibold">Reports</div>
+                  <div className="font-semibold">Research</div>
                   <div className="text-xs font-normal opacity-90">
-                    Browse filings &amp; statements
+                    Company filings &amp; statements
                   </div>
                 </div>
               </Button>

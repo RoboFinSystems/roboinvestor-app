@@ -519,9 +519,54 @@ describe('portfolio page details', () => {
     expect(
       await screen.findByText(/Could not load companies/i)
     ).toBeInTheDocument()
+    expect(screen.queryByText(/^No companies yet\./)).toBeNull()
+  })
+
+  it('points an empty portfolio at Add Security, not the API', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Growth Fund')],
+    })
+    render(<PortfolioPageContent />)
+
     expect(
-      screen.queryByText('No companies have shared reports with you yet.')
-    ).toBeNull()
+      await screen.findByText(/^Use Add Security to record a holding/)
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/via the API/)).toBeNull()
+  })
+
+  it('says a company can come from a shared report or a file', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Growth Fund')],
+    })
+    listEntities.mockResolvedValue([
+      { id: 'e1', name: 'Acme Inc', sourceGraphId: null },
+    ])
+    render(<PortfolioPageContent />)
+    await waitFor(() =>
+      expect(getHoldings).toHaveBeenCalledWith('graph-a', 'p-a1')
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+
+    const dialog = await screen.findByRole('dialog')
+    await within(dialog).findByRole('option', { name: 'Acme Inc' })
+    expect(
+      within(dialog).getByText(/shared a report with your graph/)
+    ).toHaveTextContent(/added to load a report from a file/)
+  })
+
+  it('names both ways in when there are no companies yet', async () => {
+    listPortfolios.mockResolvedValue({
+      portfolios: [portfolio('p-a1', 'Growth Fund')],
+    })
+    render(<PortfolioPageContent />)
+    await waitFor(() =>
+      expect(getHoldings).toHaveBeenCalledWith('graph-a', 'p-a1')
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Add Security/i }))
+
+    expect(await screen.findByText(/^No companies yet\./)).toHaveTextContent(
+      /shares a report with you or your AI assistant loads one of its reports from a file/
+    )
   })
 
   it('drops a linked-companies load that lands after a graph switch', async () => {
