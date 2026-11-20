@@ -49,21 +49,29 @@ export function FilingChat({
   // The trial covers the analysis tools; the operator opens with the plan.
   const { currentOrg } = useOrg()
   const { user } = useUser()
-  const [trial, setTrial] = useState(false)
+  // Kept with the org it was read for, so another org's answer never shows.
+  const [trialIn, setTrialIn] = useState<string | null>(null)
+  const orgId = currentOrg?.id ?? null
   useEffect(() => {
-    if (!hasSec || !currentOrg?.id) return
+    if (!hasSec || !orgId) return
     let live = true
-    SDK.listOrgSubscriptions({ path: { org_id: currentOrg.id } })
+    SDK.listOrgSubscriptions({ path: { org_id: orgId } })
       .then((result) => {
-        const seats = (unwrapSdk(result) ?? []) as SubscriptionSeat[]
-        if (live) setTrial(onSecTrial(seats, user?.id))
+        const seats = unwrapSdk(result)
+        const onTrial =
+          Array.isArray(seats) &&
+          onSecTrial(seats as SubscriptionSeat[], user?.id)
+        if (live) setTrialIn(onTrial ? orgId : null)
       })
       // Unknown is not a trial: the API still says so if it is.
-      .catch(() => {})
+      .catch(() => {
+        if (live) setTrialIn(null)
+      })
     return () => {
       live = false
     }
-  }, [hasSec, currentOrg?.id, user?.id])
+  }, [hasSec, orgId, user?.id])
+  const trial = hasSec && orgId !== null && trialIn === orgId
 
   return (
     <ReportChat

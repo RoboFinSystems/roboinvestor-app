@@ -1,5 +1,5 @@
 import type { CatalogFiling, CompanyCatalog } from '@/lib/filings/types'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FilingChat } from '../FilingChat'
 
@@ -42,12 +42,23 @@ const seat = (trial_ends_at: string | null) => ({
 })
 
 describe('FilingChat', () => {
-  beforeEach(() => listOrgSubscriptions.mockReset())
+  // Braces matter: a function returned from beforeEach is run as teardown.
+  beforeEach(() => {
+    listOrgSubscriptions.mockReset()
+  })
 
   it('takes questions from a paid SEC subscription', async () => {
     listOrgSubscriptions.mockResolvedValue(seat(null))
     render(<FilingChat company={company} filing={filing} />)
     expect(await screen.findByText('chat open')).toBeInTheDocument()
+    expect(screen.queryByText(/start your plan now/)).toBeNull()
+  })
+
+  it('stays open when the subscription cannot be read: the API still refuses a trial', async () => {
+    listOrgSubscriptions.mockRejectedValue(new Error('offline'))
+    render(<FilingChat company={company} filing={filing} />)
+    await waitFor(() => expect(listOrgSubscriptions).toHaveBeenCalled())
+    expect(screen.getByText('chat open')).toBeInTheDocument()
     expect(screen.queryByText(/start your plan now/)).toBeNull()
   })
 
