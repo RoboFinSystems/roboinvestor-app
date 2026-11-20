@@ -38,7 +38,14 @@ const filing = {
 } as CatalogFiling
 
 const seat = (trial_ends_at: string | null) => ({
-  data: [{ resource_type: 'repository', resource_id: 'sec', trial_ends_at }],
+  data: [
+    {
+      resource_type: 'repository',
+      resource_id: 'sec',
+      status: 'active',
+      trial_ends_at,
+    },
+  ],
 })
 
 describe('FilingChat', () => {

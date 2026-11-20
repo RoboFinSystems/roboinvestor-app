@@ -85,29 +85,35 @@ export interface SubscriptionSeat {
   resource_type?: string | null
   resource_id?: string | null
   user_id?: string | null
+  status?: string | null
+  ends_at?: string | null
   trial_ends_at?: string | null
+}
+
+/** The API writes UTC with no zone. */
+function utc(value: string): Date {
+  return new Date(/(Z|[+-]\d\d:?\d\d)$/.test(value) ? value : `${value}Z`)
 }
 
 /**
  * Whether the viewer's SEC subscription is still in its free trial. The trial
  * covers the analysis tools and not the operator, which the API refuses until
  * the first payment, so the chat says so instead of taking the question.
+ * It reads the seat in force: an earlier seat that was cancelled keeps its
+ * trial date, and says nothing about the one the viewer now pays for.
  */
 export function onSecTrial(
   subscriptions: SubscriptionSeat[],
   userId: string | undefined,
   now: Date = new Date()
 ): boolean {
-  return subscriptions.some((sub) => {
+  const seat = subscriptions.find((sub) => {
     if (sub.resource_type !== 'repository' || sub.resource_id !== 'sec')
       return false
     // An owner or admin is listed every member's seat.
     if (sub.user_id && sub.user_id !== userId) return false
-    if (!sub.trial_ends_at) return false
-    // The API writes UTC with no zone.
-    const ends = /(Z|[+-]\d\d:?\d\d)$/.test(sub.trial_ends_at)
-      ? sub.trial_ends_at
-      : `${sub.trial_ends_at}Z`
-    return new Date(ends) > now
+    if (sub.status === 'active') return true
+    return sub.status === 'canceled' && !!sub.ends_at && utc(sub.ends_at) > now
   })
+  return !!seat?.trial_ends_at && utc(seat.trial_ends_at) > now
 }
