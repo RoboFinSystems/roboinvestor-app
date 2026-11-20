@@ -85,7 +85,11 @@ describe('exampleQuestions', () => {
 
 describe('onSecTrial', () => {
   const now = new Date('2026-11-19T12:00:00Z')
-  const sec = { resource_type: 'repository', resource_id: 'sec' }
+  const sec = {
+    resource_type: 'repository',
+    resource_id: 'sec',
+    status: 'active',
+  }
 
   it('is true while the SEC subscription is in its free trial', () => {
     expect(
@@ -99,6 +103,25 @@ describe('onSecTrial', () => {
     ).toBe(false)
     expect(onSecTrial([{ ...sec, trial_ends_at: null }], 'u1', now)).toBe(false)
     expect(onSecTrial([sec], 'u1', now)).toBe(false)
+  })
+
+  it('reads the seat in force, not an earlier cancelled one', () => {
+    const cancelledTrial = {
+      ...sec,
+      status: 'canceled',
+      ends_at: '2026-11-18T09:00:00',
+      trial_ends_at: '2026-11-25T00:00:00',
+    }
+    expect(onSecTrial([cancelledTrial, sec], 'u1', now)).toBe(false)
+    expect(onSecTrial([cancelledTrial], 'u1', now)).toBe(false)
+    // Cancelled but not yet ended: the trial still runs.
+    expect(
+      onSecTrial(
+        [{ ...cancelledTrial, ends_at: '2026-11-25T00:00:00' }],
+        'u1',
+        now
+      )
+    ).toBe(true)
   })
 
   it("reads the viewer's own seat, never a colleague's", () => {
