@@ -1,9 +1,11 @@
 import { LiveDemo } from '@robosystems/core/ui-components'
+import Link from 'next/link'
 import FloatingElementsVariant from './FloatingElementsVariant'
 
 // A PDF update keeps the numbers and loses everything behind them, and the fund retypes it
 // into a tracker. A report shared from the company's ledger arrives as data the fund can ask
-// about. The demo (public/demos/contrast.js) plays both sides.
+// about, and a company that still sends a file has it read in by the fund's assistant. The
+// demo (public/demos/contrast.js) plays the first two.
 
 export default function ContrastSection() {
   return (
@@ -30,7 +32,15 @@ export default function ContrastSection() {
               RoboLedger
             </a>
             , they share reports straight into your fund, read side by side with
-            the public filings, and your AI can answer questions about them.
+            the public filings, and your AI can answer questions about them. A
+            company that isn&apos;t still sends a PDF or a workbook:{' '}
+            <Link
+              href="/docs/reports-from-a-file"
+              className="text-primary-400 hover:text-primary-300 underline"
+            >
+              your AI assistant loads it as a report
+            </Link>
+            , every total checked, and nobody retypes it.
           </p>
         </div>
 

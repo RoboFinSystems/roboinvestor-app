@@ -1,6 +1,6 @@
 import type { Spotlight } from './Spotlights'
 
-// The fund's own lane, for the GP: the positions it holds and the reports its companies share.
+// The fund's own lane, for the GP: the positions it holds and the reports its companies share or send.
 export const fundSpotlights: Spotlight[] = [
   {
     id: 'portfolio',
@@ -21,12 +21,13 @@ export const fundSpotlights: Spotlight[] = [
   {
     id: 'reports',
     label: 'Portfolio reports',
-    title: 'Reports that arrive as data, not PDFs',
+    title: 'Every report as data, even one sent as a PDF',
     description:
-      "When a portfolio company keeps its books on RoboLedger, it shares its reports straight into your fund's graph. Open them rendered, and ask about them in plain English.",
+      "A portfolio company on RoboLedger shares its reports straight into your fund's graph. One that isn't sends a workbook or a PDF, and your AI assistant reads it in as a report. Open either rendered, and ask about them in plain English.",
     bullets: [
       "Link a holding to its issuer's graph, and the link resolves when the company shares",
       "Both sides opt in: you name the company's graph, and the company names your fund's",
+      'From a file, every number keeps the cell or page it came from, and a report whose totals do not add up is refused',
       'Statements read side by side with the public filings',
     ],
     caption: 'Portfolio Reports',
