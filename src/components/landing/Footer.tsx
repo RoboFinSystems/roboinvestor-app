@@ -1,5 +1,6 @@
 'use client'
 
+import { PRODUCT_PAGES } from '@/lib/product-pages'
 import { LandingFooter } from '@robosystems/core'
 import ContactModal from './ContactModal'
 
@@ -15,6 +16,10 @@ export default function Footer() {
         { label: 'Console', href: '/#console' },
         { label: 'Research', href: '/research' },
         { label: 'Docs', href: '/docs' },
+        ...PRODUCT_PAGES.map((page) => ({
+          label: page.navLabel,
+          href: page.path,
+        })),
       ]}
       contactModal={ContactModal}
     />
