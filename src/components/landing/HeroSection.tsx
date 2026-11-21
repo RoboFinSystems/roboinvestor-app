@@ -28,8 +28,9 @@ export default function HeroSection() {
 
           <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:text-lg md:mt-8 md:text-2xl">
             Portfolio companies share reports straight from their ledgers into
-            your fund&apos;s graph. Track every private position, compare
-            companies with public filers, and ask about all of it from{' '}
+            your fund&apos;s graph, or send a PDF and your AI assistant reads it
+            in. Track every private position, compare companies with public
+            filers, and ask about all of it from{' '}
             <strong className="text-primary-400">
               Claude, ChatGPT, or any MCP client
             </strong>
@@ -37,8 +38,9 @@ export default function HeroSection() {
           </p>
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-gray-400 sm:text-base">
             RoboInvestor: equity research on public companies, your fund&apos;s
-            positions with their terms, and the reports your portfolio companies
-            share from RoboLedger.
+            positions with their terms, and your portfolio companies&apos;
+            reports, shared from RoboLedger or read from the PDF or spreadsheet
+            they send.
           </p>
           <p className="mx-auto mt-2 max-w-3xl text-sm leading-relaxed text-gray-500 sm:text-base">
             Building next: positions linked to the ledger, brokerage sync, and
@@ -108,7 +110,7 @@ export default function HeroSection() {
               name="hero"
               aspect={16 / 9}
               phoneAspect={720 / 1080}
-              label="A fund manager asks their AI what the fund is marked at, reads a portfolio company's shared annual report, compares it with public software filers, checks its cash runway, and approves a new valuation mark, while RoboInvestor updates beside the chat."
+              label="A fund manager asks their AI what the fund is marked at, reads a portfolio company's shared annual report, has another company's quarterly package loaded from a PDF, compares the first with public software filers, and approves a new valuation mark, while RoboInvestor updates beside the chat."
               className="rounded-2xl border border-gray-800 bg-black shadow-2xl"
             />
           </div>

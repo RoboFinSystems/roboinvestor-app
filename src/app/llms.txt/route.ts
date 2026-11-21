@@ -61,7 +61,7 @@ export async function GET() {
     '',
     `> ${SITE_DESCRIPTION}`,
     '',
-    "RoboInvestor is the portfolio and equity-research product on RoboSystems, the open-source knowledge graph for finance (https://robosystems.ai). It does today: equity research on public companies, your fund's positions with their terms, and the reports your portfolio companies share from RoboLedger. Building next: positions linked to the ledger, brokerage sync, and portfolio analytics. RoboInvestor is open source under Apache 2.0, by RFS LLC.",
+    "RoboInvestor is the portfolio and equity-research product on RoboSystems, the open-source knowledge graph for finance (https://robosystems.ai). It does today: equity research on public companies, your fund's positions with their terms, and your portfolio companies' reports: shared from RoboLedger, or read by your AI assistant from the PDF or spreadsheet a company sends, with every total checked before it is saved. Building next: positions linked to the ledger, brokerage sync, and portfolio analytics. RoboInvestor is open source under Apache 2.0, by RFS LLC.",
     '',
     '## Docs',
     ...docsLinks(docs),

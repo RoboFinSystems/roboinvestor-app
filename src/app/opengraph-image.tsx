@@ -10,6 +10,6 @@ export default function Image() {
     eyebrow: 'RoboInvestor',
     title: 'Know your portfolio from their books',
     subtitle:
-      'Equity research, your positions, and the reports your companies share.',
+      'Equity research, your positions, and the reports your companies send.',
   })
 }

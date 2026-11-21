@@ -4,13 +4,13 @@
  * Ventures Fund I demo portfolio and the FY2026 report its portfolio company
  * Cadence Labs shares from its ledger (examples/roboinvestor_demo and
  * examples/saas_startup_demo in robosystems), and gross margin and growth from
- * the latest 10-Ks of Asana, Box and Domo on the SEC graph. The LP message and
- * the inbox of PDF updates are illustrative.
+ * the latest 10-Ks of Asana, Box and Domo on the SEC graph. The LP message, the
+ * inbox of PDF updates and Halyard Robotics' Q3 2026 package, which the AI
+ * loads from a PDF in the third beat, are illustrative.
  */
 import {
   appChrome,
   blurIn,
-  clamp01,
   CURSOR,
   dip,
   eio,
@@ -49,8 +49,19 @@ const BEATS = [
     ],
   },
   {
+    k: 'reports',
+    q: 'Halyard sent its Q3 package as a PDF. Load it.',
+    tool: 'ingest-report',
+    res: 'Halyard_Q3_2026_package.pdf · 10 values',
+    a: [
+      'Loaded, each figure with its page, and every total foots. Revenue ',
+      '$412,500',
+      '.',
+    ],
+  },
+  {
     k: 'research',
-    q: 'How does that compare to public SaaS?',
+    q: 'How does Cadence compare to public SaaS?',
     tool: 'financial-statement-analysis',
     res: 'ASAN · BOX · DOMO · latest 10-K each',
     sec: true,
@@ -58,17 +69,6 @@ const BEATS = [
       'Gross margin is on par: ',
       '78.6% vs a 79.2% median',
       '. Cadence grew 546%, the peers 8%.',
-    ],
-  },
-  {
-    k: 'reports',
-    q: 'How long does their cash last?',
-    tool: 'financial-statement-analysis',
-    res: 'Cadence Labs · balance sheet · FY2026',
-    a: [
-      'Cash fell $854K over the year to $1.91M. At that burn, ',
-      'about 27 months',
-      '.',
     ],
   },
   {
@@ -89,8 +89,8 @@ const BEATS = [
 const STEP = [
   '<i>01</i>Check the marks.',
   '<i>02</i>Get their numbers.',
-  '<i>03</i>Compare them.',
-  '<i>04</i>Test the runway.',
+  '<i>03</i>Load the ones sent as files.',
+  '<i>04</i>Compare them.',
   '<i>05</i>Update the mark. <em class="grad">You approve.</em>',
 ]
 
@@ -140,7 +140,19 @@ const views = `
       <tr class="tot"><td>Operating loss</td><td class="n">($1,066,412)</td><td class="n">($203,867)</td></tr>
     </table><div class="hl" id="hl2"></div>
   </div>
-  <div class="view" id="v3">${pageHeader('Box, Inc.', 'BOX · 10-K · fiscal year ended Jan 31, 2026 · one of three peers')}
+  <div class="view" id="v3">${pageHeader('Q3 2026 Quarterly Package', 'Halyard Robotics, Inc. · loaded from a PDF · Oct 14, 2026')}
+    <div class="tabs"><span class="tab on">Income Statement</span><span class="tab">Balance Sheet</span></div>
+    <table>
+      <tr><th>Concept</th><th class="n">Q3 2026</th><th class="n">Source</th></tr>
+      <tr id="hrev"><td>Revenue</td><td class="n">$412,500</td><td class="n pg">p. 2</td></tr>
+      <tr><td>Cost of revenue</td><td class="n">$268,100</td><td class="n pg">p. 2</td></tr>
+      <tr class="tot"><td>Gross profit</td><td class="n">$144,400</td><td class="n pg">p. 2</td></tr>
+      <tr><td>Operating expenses</td><td class="n">$506,900</td><td class="n pg">p. 2</td></tr>
+      <tr class="tot"><td>Operating loss</td><td class="n">($362,500)</td><td class="n pg">p. 2</td></tr>
+    </table><div class="hl" id="hlf"></div>
+    <div class="burn card" id="chk"><span><label>Values loaded</label><div>10</div></span><span><label>Each traced to</label><div>its page</div></span><span><label>Totals</label><div class="grad">all foot</div></span></div>
+  </div>
+  <div class="view" id="v4">${pageHeader('Box, Inc.', 'BOX · 10-K · fiscal year ended Jan 31, 2026 · one of three peers')}
     <div class="tabs"><span class="tab on">Income Statement</span><span class="tab">Balance Sheet</span><span class="tab">Cash Flow</span></div>
     <table>
       <tr><th>Concept · USD thousands</th><th class="n">FY2026</th><th class="n">FY2025</th></tr>
@@ -151,18 +163,6 @@ const views = `
       <tr class="tot"><td>Operating income</td><td class="n">83,189</td><td class="n">79,634</td></tr>
     </table><div class="hl" id="hl3"></div>
     <div class="peers" id="peers"><span>Gross margin</span><b>Asana 89.0%</b><b>Box 79.2%</b><b>Domo 75.0%</b><b class="me">Cadence 78.6%</b></div>
-  </div>
-  <div class="view" id="v4">${pageHeader('FY2026 Annual Report', 'Cadence Labs, Inc. · shared from its ledger · Sep 16, 2026')}
-    <div class="tabs"><span class="tab">Income Statement</span><span class="tab on">Balance Sheet</span></div>
-    <table>
-      <tr><th>Concept</th><th class="n">Aug 31, 2026</th><th class="n">Aug 31, 2025</th></tr>
-      <tr id="cash"><td>Cash and cash equivalents</td><td class="n">$1,913,399</td><td class="n">$2,767,022</td></tr>
-      <tr><td>Receivables, net</td><td class="n">$9,600</td><td class="n">$4,800</td></tr>
-      <tr class="tot"><td>Total assets</td><td class="n">$2,018,721</td><td class="n">$2,853,155</td></tr>
-      <tr><td>Deferred revenue</td><td class="n">$1,154,000</td><td class="n">$922,022</td></tr>
-      <tr class="tot"><td>Stockholders' equity</td><td class="n">$864,722</td><td class="n">$1,931,133</td></tr>
-    </table><div class="hl" id="hl4"></div>
-    <div class="burn card" id="burn"><span><label>Cash used, FY2026</label><div>$853,623</div></span><span><label>Per month</label><div>$71,135</div></span><span><label>Runway</label><div class="grad">≈ 27 months</div></span></div>
   </div>
   <div class="view" id="v5">${pageHeader('Portfolio', 'Fund I — Core Positions · holdings grouped by company')}${holdings('p5')}<div class="hl" id="hl5"></div></div>`
 
@@ -238,7 +238,7 @@ const html = `
   <div class="big grad" id="cu" style="font-size:112px;margin-top:34px">roboinvestor.ai</div>
   <div id="cn" style="font-size:40px;font-weight:600;margin-top:30px">Their reports, public filings, and your marks in one graph.</div>
   <div id="cw" style="font-size:28px;color:var(--muted);margin-top:26px">Works with Claude, ChatGPT, or any MCP client</div>
-  <div id="cd" style="position:absolute;bottom:40px;font-size:18px;color:var(--dim)">Meridian Ventures and Cadence Labs are demo companies. Peers: the latest 10-Ks of Asana, Box and Domo.</div>
+  <div id="cd" style="position:absolute;bottom:40px;font-size:18px;color:var(--dim)">Meridian Ventures, Cadence Labs and Halyard Robotics are demo companies. Peers: the latest 10-Ks of Asana, Box and Domo.</div>
 </div></div>
 `
 
@@ -305,6 +305,7 @@ td.in { padding-left: 34px; }
 .burn { display: flex; gap: 44px; padding: 16px 24px; margin-top: 20px; opacity: 0; }
 .burn label { display: block; font-size: 13px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
 .burn div { font: 700 23px var(--mono); }
+td.pg { color: var(--c300); }
 `
 
 const S1 = [0, 3.6],
@@ -334,12 +335,6 @@ function answer(parts, n) {
     out += i === 1 ? `<b>${s}</b>` : s
   })
   return out
-}
-
-// Blend two #rrggbb colours, so a highlight arrives instead of popping.
-const mix = (a, b, p) => {
-  const c = (h, i) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16)
-  return `rgb(${[0, 1, 2].map((i) => Math.round(c(a, i) + (c(b, i) - c(a, i)) * clamp01(p))).join(',')})`
 }
 
 function setup(ctx) {
@@ -461,16 +456,11 @@ function setup(ctx) {
 
       ctx.ring($('hl1'), $('p1ca'), vi === 0 ? eo(seg(vt, 0.85, 1.2)) : 0)
       ctx.ring($('hl2'), $('rev'), vi === 1 ? eo(seg(vt, 0.85, 1.2)) : 0)
-      ctx.ring($('hl3'), $('bgp'), vi === 2 ? eo(seg(vt, 0.85, 1.2)) : 0)
+      ctx.ring($('hlf'), $('hrev'), vi === 2 ? eo(seg(vt, 0.85, 1.2)) : 0)
+      rise($('chk'), vi === 2 ? eo(seg(vt, 1.1, 1.5)) : 0, 14)
+      ctx.ring($('hl3'), $('bgp'), vi === 3 ? eo(seg(vt, 0.85, 1.2)) : 0)
       peers.forEach((b, i) =>
-        rise(b, vi === 2 ? eo(seg(vt, 1.1 + i * 0.15, 1.4 + i * 0.15)) : 0, 8)
-      )
-      ctx.ring($('hl4'), $('cash'), vi === 3 ? eo(seg(vt, 0.85, 1.2)) : 0)
-      rise($('burn'), vi === 3 ? eo(seg(vt, 1.1, 1.5)) : 0, 14)
-      $('cash').cells[1].style.color = mix(
-        '#f1f6f4',
-        '#f87171',
-        vi === 3 ? seg(vt, 0.85, 1.15) : 0
+        rise(b, vi === 3 ? eo(seg(vt, 1.1 + i * 0.15, 1.4 + i * 0.15)) : 0, 8)
       )
       if (vi === 4) {
         // in this beat vt = bt - 1, so the mark applies at vt 3.15
@@ -553,7 +543,7 @@ export default {
   width: 1920,
   height: 1080,
   total: TOTAL,
-  poster: 30.4,
+  poster: 31.6,
   css,
   html,
   setup,

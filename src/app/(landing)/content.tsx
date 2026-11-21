@@ -24,8 +24,8 @@ export default function LandingPageContent() {
         <Spotlights
           id="features"
           eyebrow="Inside your fund"
-          heading="Your positions and the reports your companies share, in your fund's graph"
-          intro="Track what the fund holds and read what its companies share, then ask about both from the AI chat you already use."
+          heading="Your positions and your companies' reports, in your fund's graph"
+          intro="Track what the fund holds and read what its companies share or send, then ask about both from the AI chat you already use."
           spotlights={fundSpotlights}
         />
         <Spotlights
