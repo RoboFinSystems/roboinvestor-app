@@ -1,8 +1,20 @@
+import { versionSlug } from '@/lib/research/catalog'
 import type { CoverageVersion } from '@/lib/research/types'
+import Link from 'next/link'
 
-/** The continuing-coverage timeline: prior dated reports with links to their archived assets. */
-export function CoverageHistory({ history }: { history: CoverageVersion[] }) {
+/**
+ * The coverage timeline: each earlier report, linked to its own page at
+ * /research/{ticker}/{version} where the brief is rendered, with its video and audio.
+ */
+export function CoverageHistory({
+  ticker,
+  history,
+}: {
+  ticker: string
+  history: CoverageVersion[]
+}) {
   if (!history.length) return null
+  const base = `/research/${ticker.toLowerCase()}`
   return (
     <section className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
       <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
@@ -18,7 +30,16 @@ export function CoverageHistory({ history }: { history: CoverageVersion[] }) {
               {h.version}
             </span>
             <span className="flex-1 text-sm text-gray-700 dark:text-gray-200">
-              {h.title || 'Prior report'}
+              {h.assets.brief ? (
+                <Link
+                  href={`${base}/${versionSlug(h.version)}`}
+                  className="hover:underline"
+                >
+                  {h.title || 'Prior report'}
+                </Link>
+              ) : (
+                h.title || 'Prior report'
+              )}
               {h.legacy_ticker && (
                 <em className="text-gray-400"> (as {h.legacy_ticker})</em>
               )}
@@ -41,12 +62,12 @@ export function CoverageHistory({ history }: { history: CoverageVersion[] }) {
                 </a>
               )}
               {h.assets.brief && (
-                <a
-                  href={h.assets.brief}
+                <Link
+                  href={`${base}/${versionSlug(h.version)}`}
                   className="text-cyan-600 hover:underline dark:text-cyan-400"
                 >
-                  Brief
-                </a>
+                  Read
+                </Link>
               )}
             </span>
           </li>

@@ -158,6 +158,21 @@ describe('sitemap', () => {
     )
   })
 
+  it("lists each earlier report of a company's coverage as its own page", async () => {
+    mockGetAllCoverage.mockResolvedValue([
+      {
+        ticker: 'MSFT',
+        date: '2026-07-30',
+        history: [{ version: '2026-Q2', date: '2026-04-29', assets: {} }],
+      },
+    ])
+    const byUrl = new Map((await sitemap()).map((e) => [e.url, e.lastModified]))
+
+    expect(byUrl.get('https://roboinvestor.ai/research/msft/2026-q2')).toEqual(
+      new Date('2026-04-29')
+    )
+  })
+
   it('sends no lastmod for the hub when a build cannot read coverage', async () => {
     vi.stubEnv('NEXT_PHASE', 'phase-production-build')
     mockGetAllCoverage.mockRejectedValue(new Error('catalog down'))

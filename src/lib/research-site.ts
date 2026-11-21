@@ -35,9 +35,13 @@ export function releasedCohortSitemaps(): string[] {
   )
 }
 
-/** Canonical URL for the research index (no argument) or one ticker page. */
-export function researchCanonical(ticker?: string): string {
-  return ticker
-    ? `${RESEARCH_CANONICAL_ORIGIN}/research/${ticker.toLowerCase()}`
-    : `${RESEARCH_CANONICAL_ORIGIN}/research`
+/**
+ * Canonical URL for the research index (no argument), one ticker page, or one archived
+ * version of a ticker's coverage. An archived version is its own page, about its own
+ * filing, so it is canonical to itself and not to the latest report.
+ */
+export function researchCanonical(ticker?: string, version?: string): string {
+  if (!ticker) return `${RESEARCH_CANONICAL_ORIGIN}/research`
+  const page = `${RESEARCH_CANONICAL_ORIGIN}/research/${ticker.toLowerCase()}`
+  return version ? `${page}/${version.toLowerCase()}` : page
 }

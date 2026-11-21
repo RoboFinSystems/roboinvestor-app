@@ -1,15 +1,18 @@
 import { youtubeId } from '@/lib/research/catalog'
+import { splitPrompt } from '@/lib/research/prompt'
 import type { CoverageItem } from '@/lib/research/types'
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { AskTheFiling } from './AskTheFiling'
 import { CoverageHistory } from './CoverageHistory'
 
 /**
  * The full coverage report: native video, the audio article (a "Listen" card right under
  * the video, played from the CDN MP3), then the brief rendered from markdown (its own
- * leading H1 is stripped — we render the title above it), and the continuing-coverage
- * history. Works in a server component (SSR'd for SEO) or a client one.
+ * leading H1 is stripped — we render the title above it), the trial block carrying the
+ * brief's prompt, and the continuing-coverage history. Works in a server component
+ * (SSR'd for SEO) or a client one.
  *
  * The "Listen" slot used to hold the two-voice Q&A podcast; that format was retired
  * 2026-07-21 and its assets deleted 2026-09-05. `assets.narration` is its replacement:
@@ -27,7 +30,8 @@ export function ResearchArticle({
   item: CoverageItem
   briefMarkdown?: string
 }) {
-  const body = (briefMarkdown || '').replace(/^#\s.*(\r?\n)+/, '')
+  const { body: withoutPrompt, prompt } = splitPrompt(briefMarkdown || '')
+  const body = withoutPrompt.replace(/^#\s.*(\r?\n)+/, '')
   const ytId = youtubeId(item.youtube_url)
   return (
     <article className="mx-auto max-w-3xl">
@@ -91,7 +95,9 @@ export function ResearchArticle({
         </div>
       )}
 
-      <CoverageHistory history={item.history} />
+      <AskTheFiling company={item.company} prompt={prompt} />
+
+      <CoverageHistory ticker={item.ticker} history={item.history} />
 
       <footer className="mt-12 border-t border-gray-200 pt-6 dark:border-gray-800">
         <p className="text-sm text-gray-500 dark:text-gray-400">

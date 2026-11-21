@@ -1,3 +1,4 @@
+import { AskTheFilingLine } from '@/components/research/AskTheFiling'
 import { CompareYourCompanyLine } from '@/components/research/CompareYourCompany'
 import { CoverageBrowser } from '@/components/research/CoverageBrowser'
 import { ResearchListJsonLd } from '@/components/research/ResearchJsonLd'
@@ -77,6 +78,7 @@ export default async function ResearchPage() {
           </p>
           <ResearchLookup />
           <CompareYourCompanyLine />
+          <AskTheFilingLine />
         </div>
       </div>
 
