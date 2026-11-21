@@ -95,7 +95,11 @@ export function ResearchArticle({
         </div>
       )}
 
-      <AskTheFiling company={item.company} prompt={prompt} />
+      <AskTheFiling
+        company={item.company}
+        ticker={item.ticker}
+        prompt={prompt}
+      />
 
       <CoverageHistory ticker={item.ticker} history={item.history} />
 
