@@ -13,9 +13,11 @@ import {
 import { orBuildFallback } from '@robosystems/core/docs/catalog'
 import type { Metadata } from 'next'
 
-const TITLE = 'Research | RoboInvestor'
+// The query this index answers, "equity research reports", leads the title (vault:
+// gtm/content/pages/equity-research-reports.md).
+const TITLE = 'Equity Research Reports from SEC Filings | RoboInvestor'
 const DESCRIPTION =
-  'Equity research from the filings: one public company per report, every figure traceable to an SEC filing. No price targets.'
+  'Equity research reports from the filings: one public company per report, every figure traceable to an SEC filing. No price targets.'
 const URL = `${SELF_ORIGIN}/research`
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -68,7 +70,7 @@ export default async function ResearchPage() {
           <ResearchTopBar />
           <h1 className="font-heading mt-16 text-center text-5xl font-bold md:text-6xl">
             <span className="from-primary-400 via-secondary-400 to-accent-400 bg-linear-to-r bg-clip-text text-transparent">
-              Research
+              Equity research reports
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-gray-300">

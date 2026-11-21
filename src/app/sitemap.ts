@@ -4,6 +4,7 @@ import {
   getDocsNav,
   orBuildFallback,
 } from '@/lib/docs'
+import { PRODUCT_PAGES, productPageUrl } from '@/lib/product-pages'
 import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
 import { versionSlug } from '@/lib/research/catalog'
@@ -22,8 +23,8 @@ function latestDate(dates: (string | undefined)[]): Date | undefined {
   return ts.length ? new Date(Math.max(...ts)) : undefined
 }
 
-// RoboInvestor's public surface is the marketing homepage, the product docs, the
-// research index and one page per covered company. The research entries are listed
+// RoboInvestor's public surface is the marketing homepage, the product pages, the
+// product docs, the research index and one page per covered company. The research entries are listed
 // only while these pages are canonical here (src/lib/research-site.ts); a mirror is
 // deliberately not submitted. Everything else is behind auth in the (app) route
 // group (see robots.ts); /register is de-indexed ahead of the centralized-login
@@ -39,6 +40,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1,
   }
 
+  // Each product page's lastmod is the date its registry entry was last substantively
+  // edited (src/lib/product-pages.ts).
+  const productPages: MetadataRoute.Sitemap = PRODUCT_PAGES.map((page) => ({
+    url: productPageUrl(page),
+    lastModified: new Date(page.updated),
+    changeFrequency: 'monthly' as const,
+    priority: 0.9,
+  }))
+
   const catalog = await orBuildFallback(getDocsCatalog(), null)
   const docs = catalog && getDocsNav(catalog, DOCS_SITE, 'product')
   const docsPages: MetadataRoute.Sitemap = (docs?.ordered ?? []).map(
@@ -50,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   )
 
-  if (!RESEARCH_IS_CANONICAL_HERE) return [home, ...docsPages]
+  if (!RESEARCH_IS_CANONICAL_HERE) return [home, ...productPages, ...docsPages]
 
   const coverage = await orBuildFallback(getAllCoverage(), [])
   const researchPages = coverage.map((item) => ({
@@ -72,6 +82,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     home,
+    ...productPages,
     ...docsPages,
     {
       url: `${baseUrl}/research`,

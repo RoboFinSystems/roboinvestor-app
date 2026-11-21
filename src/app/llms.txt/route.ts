@@ -5,6 +5,7 @@ import {
   getDocsNav,
   orBuildFallback,
 } from '@/lib/docs'
+import { PRODUCT_PAGES, productPageUrl } from '@/lib/product-pages'
 import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
 import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site'
@@ -62,6 +63,11 @@ export async function GET() {
     `> ${SITE_DESCRIPTION}`,
     '',
     "RoboInvestor is the portfolio and equity-research product on RoboSystems, the open-source knowledge graph for finance (https://robosystems.ai). It does today: equity research on public companies, your fund's positions with their terms, and your portfolio companies' reports: shared from RoboLedger, or read by your AI assistant from the PDF or spreadsheet a company sends, with every total checked before it is saved. Building next: positions linked to the ledger, brokerage sync, and portfolio analytics. RoboInvestor is open source under Apache 2.0, by RFS LLC.",
+    '',
+    '## Product',
+    ...PRODUCT_PAGES.map((page) =>
+      link(page.navLabel, productPageUrl(page), page.description)
+    ),
     '',
     '## Docs',
     ...docsLinks(docs),

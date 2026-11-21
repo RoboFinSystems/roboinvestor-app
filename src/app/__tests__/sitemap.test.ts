@@ -1,3 +1,4 @@
+import { PRODUCT_PAGES, productPageUrl } from '@/lib/product-pages'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockGetAllCoverage = vi.fn()
@@ -183,6 +184,17 @@ describe('sitemap', () => {
     expect(hub?.lastModified).toBeUndefined()
   })
 
+  it('lists every product page, dated by its registry entry', async () => {
+    mockGetAllCoverage.mockResolvedValue(coverage)
+    const byUrl = new Map((await sitemap()).map((e) => [e.url, e]))
+
+    for (const page of PRODUCT_PAGES) {
+      expect(byUrl.get(productPageUrl(page))?.lastModified).toEqual(
+        new Date(page.updated)
+      )
+    }
+  })
+
   it('is byte-identical across fetches', async () => {
     mockGetAllCoverage.mockResolvedValue(coverage)
     const first = JSON.stringify(await sitemap())
@@ -219,7 +231,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://roboinvestor.ai/research/msft')
   })
 
-  it('lists the homepage and the docs, and no research, while the research pages are a mirror', async () => {
+  it('lists the homepage, the product pages and the docs, and no research, while the research pages are a mirror', async () => {
     researchSite.canonicalHere = false
     mockGetAllCoverage.mockResolvedValue(coverage)
     mockGetDocsCatalog.mockResolvedValue(docsCatalog)
@@ -227,6 +239,7 @@ describe('sitemap', () => {
 
     expect(entries.map((e) => e.url)).toEqual([
       'https://roboinvestor.ai',
+      ...PRODUCT_PAGES.map(productPageUrl),
       ...expectedDocs.map((d) => d.url),
     ])
     expect(entries.filter((e) => e.url.includes('/docs'))).toEqual(expectedDocs)
