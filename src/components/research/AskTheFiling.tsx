@@ -13,13 +13,34 @@ import { CopyPrompt } from './CopyPrompt'
  * here; pricing lives behind the link. The claims are pinned in the test beside this file.
  */
 
-export const TRIAL_HREF = 'https://robosystems.ai/pricing'
+/**
+ * Where the trial starts, marked with where the reader came from: robosystems.ai serves
+ * /pricing/from/<source> as its pricing page and carries the marker on to sign-up, so the
+ * analytics can count each brief's readers on the way to a trial. A source is a lowercase
+ * slug (robosystems-app src/lib/trial-source.ts); anything else would be a 404 there.
+ */
+export function trialHref(source: string): string {
+  return `https://robosystems.ai/pricing/from/${source}`
+}
+
+/** The marker for one company's coverage: `research-msft`, `research-brk-b`. */
+export function researchSource(ticker: string): string {
+  const slug = ticker
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return slug ? `research-${slug}` : 'research'
+}
+
+export const RESEARCH_INDEX_SOURCE = 'research-index'
 
 export function AskTheFiling({
   company,
+  ticker,
   prompt,
 }: {
   company: string
+  ticker: string
   /** The brief's own prompt; a brief without one gets a question that works for any filer. */
   prompt?: string | null
 }) {
@@ -42,7 +63,7 @@ export function AskTheFiling({
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <Link
-          href={TRIAL_HREF}
+          href={trialHref(researchSource(ticker))}
           className="from-primary-500 to-secondary-500 shadow-primary-500/25 hover:shadow-primary-500/40 rounded-lg bg-linear-to-r px-4 py-2 text-sm font-medium text-white shadow-lg transition-all"
         >
           Start the 14-day trial
@@ -61,7 +82,7 @@ export function AskTheFilingLine() {
     <p className="mx-auto mt-3 max-w-2xl text-center text-gray-400">
       Every report here was made by asking the SEC filings.{' '}
       <Link
-        href={TRIAL_HREF}
+        href={trialHref(RESEARCH_INDEX_SOURCE)}
         className="text-primary-400 font-medium hover:underline"
       >
         Ask them yourself with a 14-day trial
