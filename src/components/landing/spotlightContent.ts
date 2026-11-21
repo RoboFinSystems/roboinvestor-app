@@ -19,15 +19,31 @@ export const fundSpotlights: Spotlight[] = [
       'A portfolio update from the AI chat adds an LLC position and a warrant, re-marks the Series A to a new 409A, and records an exit, while the fund totals follow.',
   },
   {
-    id: 'reports',
-    label: 'Portfolio reports',
-    title: 'Every report as data, even one sent as a PDF',
+    id: 'from-a-file',
+    label: 'Reports from a file',
+    title: 'A PDF or a spreadsheet, read into your graph',
     description:
-      "A portfolio company on RoboLedger shares its reports straight into your fund's graph. One that isn't sends a workbook or a PDF, and your AI assistant reads it in as a report. Open either rendered, and ask about them in plain English.",
+      "Most portfolio companies keep their books somewhere else and send a workbook or a PDF. Hand it to your AI assistant and it loads the report into your fund's graph, checked before anything is saved.",
+    bullets: [
+      'Every number keeps the cell or the page it came from',
+      'Every total has to equal the lines beneath it, or the report is refused',
+      "Lines are named with standard reporting concepts, so one company's report compares with another's",
+      'Actual results only for now: budget and forecast columns are left out',
+    ],
+    caption: 'Your AI chat',
+    demo: 'ingest',
+    demoLabel:
+      "An AI chat is handed a portfolio company's quarterly workbook and loads it into RoboInvestor: each value is read with the cell it came from, the budget column is left out, the totals are checked on a dry run, and the report is saved.",
+  },
+  {
+    id: 'reports',
+    label: 'Shared reports',
+    title: 'Reports shared straight from the ledger',
+    description:
+      "When a portfolio company keeps its books on RoboLedger, it shares its reports straight into your fund's graph. Open them rendered, and ask about them in plain English.",
     bullets: [
       "Link a holding to its issuer's graph, and the link resolves when the company shares",
       "Both sides opt in: you name the company's graph, and the company names your fund's",
-      'From a file, every number keeps the cell or page it came from, and a report whose totals do not add up is refused',
       'Statements read side by side with the public filings',
     ],
     caption: 'Portfolio Reports',

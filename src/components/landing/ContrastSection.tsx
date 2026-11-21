@@ -4,8 +4,8 @@ import FloatingElementsVariant from './FloatingElementsVariant'
 
 // A PDF update keeps the numbers and loses everything behind them, and the fund retypes it
 // into a tracker. A report shared from the company's ledger arrives as data the fund can ask
-// about, and a company that still sends a file has it read in by the fund's assistant. The
-// demo (public/demos/contrast.js) plays the first two.
+// about. The demo (public/demos/contrast.js) plays both sides; the file a company still sends
+// has its own spotlight (public/demos/ingest.js).
 
 export default function ContrastSection() {
   return (

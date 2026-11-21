@@ -110,7 +110,7 @@ export default function HeroSection() {
               name="hero"
               aspect={16 / 9}
               phoneAspect={720 / 1080}
-              label="A fund manager asks their AI what the fund is marked at, reads a portfolio company's shared annual report, compares it with public software filers, checks its cash runway, and approves a new valuation mark, while RoboInvestor updates beside the chat."
+              label="A fund manager asks their AI what the fund is marked at, reads a portfolio company's shared annual report, has another company's quarterly package loaded from a PDF, compares the first with public software filers, and approves a new valuation mark, while RoboInvestor updates beside the chat."
               className="rounded-2xl border border-gray-800 bg-black shadow-2xl"
             />
           </div>
