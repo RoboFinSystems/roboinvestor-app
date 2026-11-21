@@ -6,6 +6,7 @@ import {
 } from '@/lib/docs'
 import { getAllCoverage } from '@/lib/research'
 import { RESEARCH_IS_CANONICAL_HERE, SELF_ORIGIN } from '@/lib/research-site'
+import { versionSlug } from '@/lib/research/catalog'
 import type { MetadataRoute } from 'next'
 
 /**
@@ -59,6 +60,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
+  // Each earlier report of a company's coverage is a page of its own.
+  const archivedPages = coverage.flatMap((item) =>
+    (item.history ?? []).map((h) => ({
+      url: `${baseUrl}/research/${item.ticker.toLowerCase()}/${versionSlug(h.version)}`,
+      lastModified: h.date ? new Date(h.date) : undefined,
+      changeFrequency: 'yearly' as const,
+      priority: 0.5,
+    }))
+  )
+
   return [
     home,
     ...docsPages,
@@ -69,5 +80,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     ...researchPages,
+    ...archivedPages,
   ]
 }

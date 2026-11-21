@@ -23,6 +23,11 @@ export interface CoverageVersion {
   version: string // e.g. "2026-Q1"
   date?: string // ISO date the report was published
   title?: string
+  // The catalog writes an archived version with the fields its report had when it was
+  // the latest, which is what lets /research/{ticker}/{version} render it as a page.
+  summary?: string
+  tags?: string[]
+  coverage_label?: string | null
   legacy_ticker?: string // e.g. TCNNF for Trulieve before the NYSE uplisting
   youtube_url?: string // captured by `just sync-youtube` (RSS title-match)
   assets: CoverageAssets

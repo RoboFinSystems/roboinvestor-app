@@ -61,3 +61,36 @@ export function youtubeId(url?: string | null): string | null {
   const m = url.match(/(?:youtu\.be\/|[?&]v=|embed\/)([A-Za-z0-9_-]{6,})/)
   return m ? m[1] : null
 }
+
+/** A version as it appears in a URL: `2026-Q2` is `/research/{ticker}/2026-q2`. */
+export function versionSlug(version: string): string {
+  return version.toLowerCase()
+}
+
+/**
+ * An earlier report of a company's coverage, shaped as the item it was when it was the
+ * latest, so the page that renders the current report can render it too. Null when the
+ * slug names no archived version (the current version is not archived: it is the ticker page).
+ */
+export function archivedVersion(
+  item: CoverageItem,
+  slug: string
+): CoverageItem | null {
+  const h = item.history.find((v) => versionSlug(v.version) === slug)
+  if (!h) return null
+  return {
+    ticker: item.ticker,
+    company: item.company,
+    title: h.title || `${item.company} (${item.ticker}) ${h.version}`,
+    summary: h.summary || '',
+    tags: h.tags || [],
+    campaign: item.campaign,
+    campaign_slug: item.campaign_slug,
+    coverage_label: h.coverage_label ?? null,
+    date: h.date || '',
+    version: h.version,
+    youtube_url: h.youtube_url,
+    assets: h.assets,
+    history: [],
+  }
+}
