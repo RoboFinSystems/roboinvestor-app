@@ -11,7 +11,11 @@ import type {
   PivotTable,
   UnitInfo,
 } from '@robosystems/report-components'
-import { buildPivot, reportSections } from '@robosystems/report-components'
+import {
+  buildPivot,
+  isExternalFactUrl,
+  reportSections,
+} from '@robosystems/report-components'
 import { parseReportDocument } from '@robosystems/report-components/adapters'
 import { fetchReportText } from './catalog'
 
@@ -253,6 +257,22 @@ export function statementBlocks(report: NormalizedReport): InformationBlock[] {
 }
 
 /**
+ * A statement as this page can render it: its text-block rows removed, or null
+ * when no figure is left. Some filers file a note under a `Statement` role,
+ * and the shared table renders a text block through a client hook, which
+ * throws in the server component this page is.
+ */
+export function withoutTextBlocks(table: PivotTable): PivotTable | null {
+  const rows = table.rows.filter(
+    (row) =>
+      row.element.itemType !== 'textBlock' &&
+      !row.cells.some((c) => c.value === null && isExternalFactUrl(c.textValue))
+  )
+  if (!rows.some((row) => row.cells.some((c) => c.value !== null))) return null
+  return rows.length === table.rows.length ? table : { ...table, rows }
+}
+
+/**
  * The statements a filing carries, projected for rendering, from whichever
  * file the catalog offers: the holon (through its RDF expansion, a few hundred
  * milliseconds) or the Tavi model (walked directly, tens of milliseconds).
@@ -265,7 +285,10 @@ export async function loadPrimaryStatements(
 ): Promise<PrimaryStatements> {
   const text = await fetchReportText(reportFileUrl)
   const { report } = await parseReportDocument(text)
-  const tables = statementBlocks(report).map((ib) => buildPivot(report, ib))
+  const tables = statementBlocks(report).flatMap((ib) => {
+    const table = withoutTextBlocks(buildPivot(report, ib))
+    return table ? [table] : []
+  })
   return {
     entity: report.entity ? { name: report.entity.name } : null,
     tables,
