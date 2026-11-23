@@ -3,10 +3,17 @@ import type {
   Fact,
   NormalizedReport,
   PeriodInfo,
+  PivotRow,
+  PivotTable,
   UnitInfo,
 } from '@robosystems/report-components'
 import { describe, expect, it } from 'vitest'
-import { compactMoney, headlineFacts, statementBlocks } from '../statements'
+import {
+  compactMoney,
+  headlineFacts,
+  statementBlocks,
+  withoutTextBlocks,
+} from '../statements'
 
 const USGAAP = 'http://fasb.org/us-gaap/2025#'
 const IFRS = 'https://xbrl.ifrs.org/taxonomy/2025-03-27/ifrs-full#'
@@ -324,6 +331,65 @@ describe('statementBlocks', () => {
 
   it('is empty for a report with no statements', () => {
     expect(statementBlocks(block('n1', 'Disclosure', 'Leases'))).toEqual([])
+  })
+})
+
+describe('withoutTextBlocks', () => {
+  function row(
+    el: ElementInfo,
+    cell: { value: number | null; textValue?: string }
+  ): PivotRow {
+    return {
+      key: el.id,
+      element: el,
+      depth: 0,
+      header: false,
+      isSubtotal: false,
+      members: [],
+      cells: [{ fact: null, ...cell }],
+    }
+  }
+
+  function table(...rows: PivotRow[]): PivotTable {
+    return { title: 'Statement', rows } as PivotTable
+  }
+
+  const Note: ElementInfo = {
+    ...element(USGAAP, 'us-gaap', 'CashFlowSupplementalDisclosuresTextBlock'),
+    monetary: false,
+    itemType: 'textBlock',
+  }
+  const Policy = element(USGAAP, 'us-gaap', 'RevenueRecognitionPolicy')
+  const numbers = row(Revenues, { value: 100 })
+
+  it('returns a statement of figures as it came', () => {
+    const t = table(numbers)
+    expect(withoutTextBlocks(t)).toBe(t)
+  })
+
+  it('drops an inline text block and one held on the CDN, and keeps the figures', () => {
+    const t = table(
+      numbers,
+      row(Note, { value: null, textValue: '<p>Supplemental</p>' }),
+      row(Policy, {
+        value: null,
+        textValue: 'https://public.robosystems.ai/2026/x/fact_ab12.html',
+      })
+    )
+    expect(withoutTextBlocks(t)?.rows).toEqual([numbers])
+  })
+
+  it('is null for a note filed as a statement, with no figure in it', () => {
+    const header = {
+      ...row(Revenues, { value: null }),
+      header: true,
+      cells: [],
+    }
+    expect(
+      withoutTextBlocks(
+        table(header, row(Note, { value: null, textValue: 'x' }))
+      )
+    ).toBeNull()
   })
 })
 
