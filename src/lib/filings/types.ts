@@ -39,6 +39,17 @@ export interface CatalogFiling {
   viewer: Record<string, string>
 }
 
+/**
+ * One industry a filer is classified in. `id` is the node's slug path
+ * (technology/software/application), so its ancestors are its prefixes;
+ * `labels` is the same path as a reader names it, root first.
+ */
+export interface FilerIndustry {
+  id: string
+  labels: string[]
+  primary: boolean
+}
+
 export interface CompanyCatalog {
   version: number
   generated_at: string
@@ -49,6 +60,12 @@ export interface CompanyCatalog {
   exchange: string | null
   sic: string | null
   sic_description: string | null
+  /**
+   * The filer's place in the industry classification, primary first; empty when
+   * it is not placed. Written by the catalog since robosystems #2126; optional
+   * so an older file still parses.
+   */
+  industries?: FilerIndustry[]
   /** Newest first. */
   filings: CatalogFiling[]
   /** The latest filing per form that has representations to open. */
@@ -87,6 +104,8 @@ export interface IndexRow {
   name: string
   exchange: string | null
   sic_description: string | null
+  /** As on the filer's own file: its industries, primary first. */
+  industries?: FilerIndustry[]
   filings: number
   /** The newest filing of any kind — it may have no artifacts yet. */
   latest: IndexFiling

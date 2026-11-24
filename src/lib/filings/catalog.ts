@@ -56,6 +56,17 @@ export async function getCompanyIndex(
   return (await res.json()) as CompanyIndex
 }
 
+/**
+ * What to call a filer's industry: its primary industry in the classification,
+ * as a path, where it is placed; else the SEC's own SIC description.
+ */
+export function industryLabel(
+  company: Pick<CompanyCatalog, 'industries' | 'sic_description'>
+): string | null {
+  const primary = company.industries?.find((i) => i.primary)
+  return primary ? primary.labels.join(' › ') : company.sic_description
+}
+
 /** The forms whose filing carries a full set of financial statements. */
 const STATEMENT_FORMS = new Set(['10-K', '10-Q', '20-F', '40-F'])
 

@@ -7,6 +7,7 @@
 
 import { CompareYourCompany } from '@/components/research/CompareYourCompany'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
+import { industryLabel } from '@/lib/filings/catalog'
 import type { PrimaryStatements } from '@/lib/filings/statements'
 import { compactMoney } from '@/lib/filings/statements'
 import type { CatalogFiling, CompanyCatalog } from '@/lib/filings/types'
@@ -125,13 +126,14 @@ export function CompanyPage({
   // ranking and the click — and its title is the page's H1; the filing's
   // statements follow under their own heading. Without coverage the facts
   // are the page and the company name is the H1.
+  const industry = industryLabel(company)
   const identity = (
     <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-400">
       <span className="rounded bg-cyan-500/10 px-2 py-0.5 font-semibold text-cyan-400">
         {company.ticker}
       </span>
       {company.exchange && <span>{company.exchange}</span>}
-      {company.sic_description && <span>· {company.sic_description}</span>}
+      {industry && <span>· {industry}</span>}
       <span>· CIK {company.cik}</span>
     </div>
   )

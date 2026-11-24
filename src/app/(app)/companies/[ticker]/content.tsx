@@ -4,7 +4,12 @@ import { FilingChat } from '@/components/companies/FilingChat'
 import { FilingReader } from '@/components/companies/FilingReader'
 import { FilingsBar } from '@/components/companies/FilingsBar'
 import { ResearchArticle } from '@/components/research/ResearchArticle'
-import { getCompany, primaryFiling, tickerSlug } from '@/lib/filings/catalog'
+import {
+  getCompany,
+  industryLabel,
+  primaryFiling,
+  tickerSlug,
+} from '@/lib/filings/catalog'
 import type { CompanyCatalog } from '@/lib/filings/types'
 import { type CoverageItem, fetchBrief, getCoverage } from '@/lib/research'
 import { researchCanonical } from '@/lib/research-site'
@@ -128,7 +133,7 @@ function CompanyInner({ ticker }: CompanyContentProps) {
   const subtitle = [
     company.ticker,
     company.exchange,
-    company.sic_description,
+    industryLabel(company),
     `CIK ${company.cik}`,
   ]
     .filter(Boolean)
