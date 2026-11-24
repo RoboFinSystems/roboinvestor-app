@@ -15,4 +15,5 @@ export {
   youtubeId,
 } from './catalog'
 export { defaultPrompt, splitPrompt } from './prompt'
+export { relatedCoverage, type RelatedCoverage } from './related'
 export * from './types'

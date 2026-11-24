@@ -10,7 +10,7 @@ import { ResearchArticle } from '@/components/research/ResearchArticle'
 import type { PrimaryStatements } from '@/lib/filings/statements'
 import { compactMoney } from '@/lib/filings/statements'
 import type { CatalogFiling, CompanyCatalog } from '@/lib/filings/types'
-import type { CoverageItem } from '@/lib/research'
+import type { CoverageItem, RelatedCoverage } from '@/lib/research'
 import { StatementTable } from '@robosystems/report-components'
 import { edgarFilingUrl } from './FilingsJsonLd'
 
@@ -100,6 +100,7 @@ export function CompanyPage({
   statements,
   coverage,
   briefMarkdown,
+  related,
 }: {
   company: CompanyCatalog
   /** The filing the statements come from, or null when none has a renderable file yet. */
@@ -107,6 +108,8 @@ export function CompanyPage({
   statements: PrimaryStatements | null
   coverage: CoverageItem | null
   briefMarkdown?: string
+  /** The other reports in this company's industry, linked under its own. */
+  related?: RelatedCoverage | null
 }) {
   const name = statements?.entity?.name ?? company.name
   // A quarterly filing's statements are condensed and unaudited; say so where
@@ -141,7 +144,11 @@ export function CompanyPage({
             {identity}
             <p className="text-lg font-semibold text-gray-200">{name}</p>
           </header>
-          <ResearchArticle item={coverage} briefMarkdown={briefMarkdown} />
+          <ResearchArticle
+            item={coverage}
+            briefMarkdown={briefMarkdown}
+            related={related}
+          />
           <header className="mt-14 mb-8 border-t border-gray-800 pt-10">
             <h2 className="text-2xl font-bold text-white sm:text-3xl">
               Financial statements

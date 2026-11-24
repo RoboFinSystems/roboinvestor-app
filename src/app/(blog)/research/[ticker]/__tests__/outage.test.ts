@@ -9,6 +9,7 @@ vi.mock('@/lib/research', async (importOriginal) => ({
   ...(await importOriginal<typeof ResearchLib>()),
   getCoverage: vi.fn(),
   getCoverageTickers: vi.fn().mockResolvedValue([]),
+  getAllCoverage: vi.fn().mockResolvedValue([]),
   fetchBrief: vi.fn(),
 }))
 vi.mock('@/lib/filings/catalog', async (importOriginal) => ({
