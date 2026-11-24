@@ -12,10 +12,12 @@ import {
   fundSpotlights,
   researchSpotlights,
 } from '@/components/landing/spotlightContent'
+import { NodeGlow } from '@robosystems/core/graph-stage'
 
 export default function LandingPageContent() {
   return (
     <div className="min-h-screen bg-black">
+      <NodeGlow />
       <Header />
 
       <main>

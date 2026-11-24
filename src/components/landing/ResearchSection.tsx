@@ -1,5 +1,5 @@
+import { GraphOrb } from '@robosystems/core/graph-stage'
 import Link from 'next/link'
-import FloatingElementsVariant from './FloatingElementsVariant'
 
 const SEC_REPOSITORY_HREF = 'https://robosystems.ai/pricing#sec-repository'
 const RESEARCH_HREF = '/research'
@@ -79,11 +79,8 @@ const colorClasses = {
 
 export default function ResearchSection() {
   return (
-    <section
-      id="research"
-      className="relative bg-linear-to-b from-black to-zinc-900 py-16 sm:py-24"
-    >
-      <FloatingElementsVariant variant="research" />
+    <section id="research" className="relative bg-black py-16 sm:py-24">
+      <GraphOrb side="right" count={1} />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 text-center">
@@ -103,7 +100,7 @@ export default function ResearchSection() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* What's in every report */}
-          <div className="rounded-2xl border border-gray-800 bg-linear-to-br from-zinc-900/80 to-black p-8">
+          <div className="node-card rounded-2xl border border-gray-800 bg-linear-to-br from-zinc-900/80 to-black p-8">
             <h3 className="mb-6 text-2xl font-bold text-white">
               What&apos;s in every report
             </h3>
@@ -129,7 +126,7 @@ export default function ResearchSection() {
           </div>
 
           {/* Powered by the SEC repository */}
-          <div className="border-accent-500/30 from-accent-900/20 rounded-2xl border bg-linear-to-br to-zinc-900 p-8">
+          <div className="node-card border-accent-500/30 from-accent-900/20 rounded-2xl border bg-linear-to-br to-zinc-900 p-8">
             <h3 className="mb-6 text-2xl font-bold text-white">
               Powered by the shared SEC repository
             </h3>

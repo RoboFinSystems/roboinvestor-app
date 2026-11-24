@@ -1,5 +1,5 @@
+import { GraphGalaxies, GraphOrb } from '@robosystems/core/graph-stage'
 import { LiveDemo } from '@robosystems/core/ui-components'
-import FloatingElementsVariant from './FloatingElementsVariant'
 import ProductShot from './ProductShot'
 
 export interface Spotlight {
@@ -33,7 +33,12 @@ export default function Spotlights({
 }: SpotlightsProps) {
   return (
     <section id={id} className="relative bg-black py-16 sm:py-24">
-      <FloatingElementsVariant variant="features" />
+      {/* the two spotlight sections hang their orbs off opposite edges */}
+      <GraphOrb side={id === 'features' ? 'right' : 'left'} count={2} />
+      <GraphGalaxies
+        count={3}
+        keepClear={id === 'features' ? 'right' : 'left'}
+      />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 text-center">
           <div className="bg-primary-500/20 text-primary-400 mb-4 inline-block rounded-full px-4 py-1 text-sm font-semibold">
