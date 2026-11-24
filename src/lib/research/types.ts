@@ -33,6 +33,17 @@ export interface CoverageVersion {
   assets: CoverageAssets
 }
 
+/** One industry a company is classified in. `id` is the node's slug path in the content
+ *  machine's taxonomy (technology/software/application), so its ancestors are its
+ *  prefixes; `labels` is the same path as a reader names it, root first. */
+export interface CoverageIndustry {
+  id: string
+  labels: string[]
+  primary: boolean
+  /** Set on a report written about the industry itself (the cannabis sector report). */
+  hub?: boolean
+}
+
 export interface CoverageItem {
   ticker: string
   company: string
@@ -49,6 +60,8 @@ export interface CoverageItem {
   short_youtube_url?: string
   assets: CoverageAssets
   history: CoverageVersion[]
+  /** Primary industry first. Absent on a catalog built before 2026-11-23. */
+  industries?: CoverageIndustry[]
 }
 
 export interface Catalog {

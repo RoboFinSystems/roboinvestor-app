@@ -1,11 +1,13 @@
 import { youtubeId } from '@/lib/research/catalog'
 import { splitPrompt } from '@/lib/research/prompt'
+import type { RelatedCoverage as Related } from '@/lib/research/related'
 import type { CoverageItem } from '@/lib/research/types'
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { AskTheFiling } from './AskTheFiling'
 import { CoverageHistory } from './CoverageHistory'
+import { RelatedCoverage } from './RelatedCoverage'
 
 /**
  * The full coverage report: native video, the audio article (a "Listen" card right under
@@ -26,9 +28,11 @@ import { CoverageHistory } from './CoverageHistory'
 export function ResearchArticle({
   item,
   briefMarkdown,
+  related,
 }: {
   item: CoverageItem
   briefMarkdown?: string
+  related?: Related | null
 }) {
   const { body: withoutPrompt, prompt } = splitPrompt(briefMarkdown || '')
   const body = withoutPrompt.replace(/^#\s.*(\r?\n)+/, '')
@@ -102,6 +106,8 @@ export function ResearchArticle({
       />
 
       <CoverageHistory ticker={item.ticker} history={item.history} />
+
+      <RelatedCoverage related={related} />
 
       <footer className="mt-12 border-t border-gray-200 pt-6 dark:border-gray-800">
         <p className="text-sm text-gray-500 dark:text-gray-400">

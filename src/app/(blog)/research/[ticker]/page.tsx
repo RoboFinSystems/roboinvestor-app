@@ -11,7 +11,13 @@ import {
   serverRenderUrl,
 } from '@/lib/filings/catalog'
 import { loadPrimaryStatements } from '@/lib/filings/statements'
-import { fetchBrief, getCoverage, getCoverageTickers } from '@/lib/research'
+import {
+  fetchBrief,
+  getAllCoverage,
+  getCoverage,
+  getCoverageTickers,
+  relatedCoverage,
+} from '@/lib/research'
 import {
   RESEARCH_IS_CANONICAL_HERE,
   researchCanonical,
@@ -142,6 +148,13 @@ export default async function ResearchTickerPage({
   const briefMarkdown = item?.assets.brief
     ? await orBuildFallback(fetchBrief(item.assets.brief, revalidate), '')
     : ''
+  // The same catalog fetch as `getCoverage` above, so it costs no second request.
+  const related = item
+    ? relatedCoverage(
+        item,
+        await orBuildFallback(getAllCoverage(revalidate), [])
+      )
+    : null
 
   // A filer in the catalog gets the company page: the facts are the page and
   // the research, where it exists, is the layer on top. Rendering the
@@ -182,6 +195,7 @@ export default async function ResearchTickerPage({
             statements={statements}
             coverage={item}
             briefMarkdown={briefMarkdown}
+            related={related}
           />
         </div>
       </div>
@@ -215,7 +229,11 @@ export default async function ResearchTickerPage({
           </svg>
           All research
         </Link>
-        <ResearchArticle item={item} briefMarkdown={briefMarkdown} />
+        <ResearchArticle
+          item={item}
+          briefMarkdown={briefMarkdown}
+          related={related}
+        />
         <CompareYourCompany company={item.company} ticker={item.ticker} />
       </div>
     </div>
