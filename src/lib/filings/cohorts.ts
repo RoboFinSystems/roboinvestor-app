@@ -1,12 +1,28 @@
 import type { IndexRow } from './types'
 
+/** How deep two filers must agree to be industry peers: sector/subsector/industry. */
+const PEER_DEPTH = 3
+
+/**
+ * The groups a filer is compared in: each of its industries, cut at the
+ * industry level. A filer the classification has not placed falls back to its
+ * SIC description, so an index from before the classification still groups.
+ */
+export function peerGroups(row: IndexRow): string[] {
+  const industries = row.industries ?? []
+  if (industries.length > 0) {
+    return industries.map((i) => i.id.split('/').slice(0, PEER_DEPTH).join('/'))
+  }
+  return row.sic_description ? [`sic:${row.sic_description}`] : []
+}
+
 /**
  * The generated filer pages, grouped into the cohorts the sitemaps release them
  * in (`RESEARCH_RELEASED_COHORTS` in `lib/research-site.ts`). A cohort holds
  * filers that have a renderable filing and no hand-made coverage — the covered companies
  * are in the main sitemap already — in a stable order, so a cohort's members
  * do not shuffle between reads: the covered companies' industry peers first
- * (same SIC description as a covered filer, the comps a reader of that
+ * (in the same industry as a covered filer, the comps a reader of that
  * research would look for next), then everyone else, each group in ticker
  * order. The catalog's first-seen tag is the durable order and can replace
  * this without moving a URL.
@@ -21,22 +37,15 @@ export function cohortsOf(
   const coveredIndustries = new Set(
     rows
       .filter((r) => coveredTickers.has(r.ticker.toUpperCase()))
-      .map((r) => r.sic_description)
-      .filter((s): s is string => !!s)
+      .flatMap(peerGroups)
   )
+  const isPeer = (r: IndexRow) =>
+    peerGroups(r).some((group) => coveredIndustries.has(group))
   const uncovered = rows.filter(
     (r) => r.renderable === true && !coveredTickers.has(r.ticker.toUpperCase())
   )
-  const peers = uncovered
-    .filter(
-      (r) => !!r.sic_description && coveredIndustries.has(r.sic_description)
-    )
-    .sort(byTicker)
-  const rest = uncovered
-    .filter(
-      (r) => !r.sic_description || !coveredIndustries.has(r.sic_description)
-    )
-    .sort(byTicker)
+  const peers = uncovered.filter(isPeer).sort(byTicker)
+  const rest = uncovered.filter((r) => !isPeer(r)).sort(byTicker)
   const eligible = [...peers, ...rest]
   const cohorts: IndexRow[][] = []
   for (let i = 0; i < eligible.length; i += size) {

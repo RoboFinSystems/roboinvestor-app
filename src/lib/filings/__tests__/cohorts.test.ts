@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cohortsOf, pageLastModified } from '../cohorts'
+import { cohortsOf, pageLastModified, peerGroups } from '../cohorts'
 import type { IndexRow } from '../types'
 
 // Fictional filers throughout.
@@ -37,7 +37,53 @@ function row(
   }
 }
 
+const inIndustry = (r: IndexRow, ...ids: string[]): IndexRow => ({
+  ...r,
+  industries: ids.map((id, i) => ({
+    id,
+    labels: id.split('/'),
+    primary: i === 0,
+  })),
+})
+
+describe('peerGroups', () => {
+  it('cuts each industry at the industry level', () => {
+    expect(
+      peerGroups(
+        inIndustry(
+          row('HVI'),
+          'technology/software/application/payroll-and-hcm',
+          'financials/banks'
+        )
+      )
+    ).toEqual(['technology/software/application', 'financials/banks'])
+  })
+
+  it('falls back to the SIC description for a filer not yet placed', () => {
+    expect(
+      peerGroups({ ...row('HVI'), sic_description: 'Instruments' })
+    ).toEqual(['sic:Instruments'])
+    expect(peerGroups(row('HVI'))).toEqual([])
+  })
+})
+
 describe('cohortsOf', () => {
+  it('puts filers in a covered company’s industry first, by any of their industries', () => {
+    const rows = [
+      inIndustry(row('ZEN'), 'industrials/trucking/truckload'),
+      inIndustry(row('HVI'), 'technology/software/application/payroll-and-hcm'),
+      inIndustry(
+        row('AHV'),
+        'consumer-goods/food/packaged',
+        'technology/software/application/crm'
+      ),
+      inIndustry(row('HV'), 'technology/software/infrastructure'),
+      inIndustry(row('MRB'), 'technology/software/application'), // covered
+    ]
+    const cohorts = cohortsOf(rows, new Set(['MRB']), 10)
+    expect(cohorts[0].map((r) => r.ticker)).toEqual(['AHV', 'HVI', 'HV', 'ZEN'])
+  })
+
   const rows = [
     row('ZEN'),
     row('HVI'),

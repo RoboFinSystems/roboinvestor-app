@@ -4,6 +4,7 @@ import {
   fetchReportText,
   FILINGS_CDN_URL,
   getCompany,
+  industryLabel,
   primaryFiling,
   ReportUnavailableError,
   reportUrl,
@@ -288,5 +289,34 @@ describe('fetchReportText', () => {
     )
     expect(failure).toBeInstanceOf(Error)
     expect(failure).not.toBeInstanceOf(ReportUnavailableError)
+  })
+})
+
+describe('industryLabel', () => {
+  it('names the primary industry as a path', () => {
+    expect(
+      industryLabel({
+        sic_description: 'Services-Prepackaged Software',
+        industries: [
+          {
+            id: 'financials/banks',
+            labels: ['Financials', 'Banks'],
+            primary: false,
+          },
+          {
+            id: 'technology/software/application',
+            labels: ['Technology', 'Software', 'Application'],
+            primary: true,
+          },
+        ],
+      })
+    ).toBe('Technology › Software › Application')
+  })
+
+  it('falls back to the SIC description for a filer not placed', () => {
+    expect(
+      industryLabel({ sic_description: 'Blank Checks', industries: [] })
+    ).toBe('Blank Checks')
+    expect(industryLabel({ sic_description: null })).toBeNull()
   })
 })
