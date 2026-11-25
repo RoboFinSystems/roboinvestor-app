@@ -41,12 +41,12 @@ npm run format:check # Check code formatting
 - `/api/companies/search` - Company search
 - `/api/contact` - Contact form submission via SNS
 - `/api/support` - Support request submission via SNS
-- `/api/reports/holon` - Holon JSON-LD validation for report rendering
+- `/api/reports/holon` - Same-origin proxy that fetches a report's holon bundle from the report-bundle bucket for the browser
 - `/api/session/sidebar` - Sidebar state management
 
 **Route Structure:**
 
-- `(app)` route group: Authenticated pages (home, companies, console, graphs, entities, entity, portfolio, reports, repositories, search, settings)
+- `(app)` route group: Authenticated pages (home, companies, graphs, entities, entity, portfolio, reports, repositories, search, settings); `/console` opens the console drawer (core's, on every page) and redirects home
 - `(landing)` route group: Public pages (login, register, auth, legal pages, landing page)
 - `(blog)` route group: Public equity research pages (`/research`)
 - `(docs)` route group: Public docs
