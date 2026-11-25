@@ -11,7 +11,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 // narrower than the pair.
 const NAV_LINKS = [
   { href: '/#features', label: 'Features' },
-  { href: '/#schema', label: 'Platform' },
+  { href: '/#schema', label: 'How it works' },
   { href: '/#console', label: 'Console' },
   { href: '/research', label: 'Research' },
   { href: '/docs', label: 'Docs' },
@@ -122,6 +122,14 @@ export default function Header() {
                 >
                   Login
                 </Link>
+                {/* xl only: at lg the row has no room for it, and the hero and
+                    the closing section carry it there. */}
+                <a
+                  href="https://robosystems.ai/book"
+                  className="hidden rounded-lg border border-gray-600 px-4 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors hover:border-gray-500 hover:bg-white/5 xl:inline-block"
+                >
+                  Book 20 minutes
+                </a>
                 <Link
                   href="/register"
                   className="from-primary-500 to-secondary-500 shadow-primary-500/25 hover:shadow-primary-500/40 rounded-lg bg-linear-to-r px-4 py-2 text-sm font-medium text-white shadow-lg transition-all"
@@ -218,6 +226,13 @@ export default function Header() {
                     >
                       Login
                     </Link>
+                    <a
+                      href="https://robosystems.ai/book"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
+                    >
+                      Book 20 minutes
+                    </a>
                     <Link
                       href="/register"
                       onClick={() => setIsMobileMenuOpen(false)}

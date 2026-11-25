@@ -4,33 +4,14 @@ import Link from 'next/link'
 const SEC_REPOSITORY_HREF = 'https://robosystems.ai/pricing#sec-repository'
 const RESEARCH_HREF = '/research'
 
-// What every report bundles together.
+// What a research page carries: the brief where there is one, and for every covered filer
+// the latest statements, the viewer, the filing's data files and the filing as filed
+// (src/components/filings/CompanyPage.tsx links each of them).
 const formats = [
-  {
-    title: 'Video brief',
-    description:
-      'A narrated walkthrough of the filing: the numbers and what moved them',
-    color: 'primary',
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-        />
-      </svg>
-    ),
-  },
   {
     title: 'Written report',
     description:
-      'The full brief in markdown, with every figure traceable to the filing it came from',
+      'The brief, with every figure traceable to the filing it came from',
     color: 'secondary',
     icon: (
       <svg
@@ -49,9 +30,30 @@ const formats = [
     ),
   },
   {
-    title: 'Audio edition',
+    title: 'Video and audio',
     description:
-      'The written report read end to end, so you can take the filing with you',
+      'A narrated walkthrough and the report read aloud, on the briefs that carry them',
+    color: 'primary',
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'Latest statements',
+    description:
+      'The balance sheet, income statement and cash flows from the latest filing, rendered from its XBRL',
     color: 'accent',
     icon: (
       <svg
@@ -64,7 +66,69 @@ const formats = [
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M6 9H4a1 1 0 00-1 1v4a1 1 0 001 1h2l4 3.5v-15L6 9z"
+          d="M3 10h18M3 14h18M9 6v12M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'Report viewer',
+    description:
+      'The whole filing in the xbrlkit viewer: every statement, note and fact',
+    color: 'primary',
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'The data',
+    description:
+      'The filing as a holon (JSON-LD) and a Tavi model, to load into your own tools',
+    color: 'secondary',
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'As filed',
+    description: 'The original 10-K or 10-Q, and its page on EDGAR',
+    color: 'accent',
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
     ),
@@ -88,7 +152,7 @@ export default function ResearchSection() {
             Equity Research
           </div>
           <h2 className="font-heading mb-6 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
-            Equity Research, Generated From the Filings
+            Equity research, generated from the filings
           </h2>
           <p className="mx-auto max-w-3xl text-base text-gray-300 sm:text-lg md:text-xl">
             One public company per report. Every figure traceable to an SEC
@@ -102,7 +166,7 @@ export default function ResearchSection() {
           {/* What's in every report */}
           <div className="node-card rounded-2xl border border-gray-800 bg-linear-to-br from-zinc-900/80 to-black p-8">
             <h3 className="mb-6 text-2xl font-bold text-white">
-              What&apos;s in every report
+              What a research page gives you
             </h3>
             <div className="space-y-5">
               {formats.map((format) => (
