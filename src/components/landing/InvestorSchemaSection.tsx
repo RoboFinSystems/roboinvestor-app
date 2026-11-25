@@ -80,6 +80,10 @@ const ACCESS: {
     line: 'The same tools from Claude, ChatGPT or any MCP client',
   },
   {
+    name: 'AI Operators',
+    line: 'The AI behind the research Console and the background work, Claude through AWS Bedrock, paid in credits. MCP and the API use none',
+  },
+  {
     name: 'API',
     line: 'GraphQL and REST, with Python and TypeScript clients',
   },
@@ -92,13 +96,22 @@ const ACCESS: {
       href: 'https://xbrlkit.com',
     },
   },
+  {
+    name: 'Graph backup',
+    line: "Your fund's whole graph, backed up nightly, downloads as a LadybugDB file to open in G.V() or query from Python",
+    formats: ['LadybugDB (.lbdb)'],
+  },
 ]
 
 type Tone = 1 | 2 | 3
 const tone = (n: Tone, alpha = 1) => `rgb(var(--graph-${n}) / ${alpha})`
 
-// The schema graph's nodes, on a 420 x 560 canvas: your graph above, the SEC
-// repository below, joined where an issuer is a filer.
+// The schema graph's nodes, as the schema has them (robosystems/schemas/extensions/
+// roboinvestor.py and base.py: Portfolio, Position, Security, Entity, Report, Fact,
+// Industry), on a 420 x 610 canvas. Your fund's graph above, with the reports a portfolio
+// company shares or sends; the SEC repository below. The two meet at the facts: both
+// sides report on the same concepts, so a private company's figures and a public filer's
+// compare line for line.
 const NODES: {
   id: string
   label: string
@@ -124,8 +137,8 @@ const NODES: {
     tone: 1,
   },
   {
-    id: 'issuer',
-    label: 'Issuer',
+    id: 'entity',
+    label: 'Entity',
     sub: 'the company behind it',
     x: 95,
     y: 196,
@@ -140,35 +153,51 @@ const NODES: {
     tone: 2,
   },
   {
-    id: 'company',
-    label: 'Company',
-    sub: 'a public filer',
+    id: 'report',
+    label: 'Report',
+    sub: 'shared, or read from a file',
     x: 95,
-    y: 350,
-    tone: 3,
+    y: 300,
+    tone: 2,
+  },
+  {
+    id: 'fact',
+    label: 'Fact',
+    sub: 'one value, one period',
+    x: 305,
+    y: 300,
+    tone: 2,
   },
   {
     id: 'filing',
-    label: 'Filing',
+    label: 'Report',
     sub: '10-K, 10-Q, 20-F, 40-F',
+    x: 95,
+    y: 452,
+    tone: 3,
+  },
+  {
+    id: 'secfact',
+    label: 'Fact',
+    sub: 'a reported figure',
     x: 305,
-    y: 350,
+    y: 452,
+    tone: 3,
+  },
+  {
+    id: 'filer',
+    label: 'Entity',
+    sub: 'a public filer',
+    x: 95,
+    y: 556,
     tone: 3,
   },
   {
     id: 'industry',
     label: 'Industry',
     sub: 'its peers',
-    x: 95,
-    y: 454,
-    tone: 3,
-  },
-  {
-    id: 'fact',
-    label: 'Fact',
-    sub: 'a reported figure',
     x: 305,
-    y: 454,
+    y: 556,
     tone: 3,
   },
 ]
@@ -182,17 +211,19 @@ const EDGES: {
 }[] = [
   { from: 'portfolio', to: 'position', label: 'holds', dy: -8 },
   { from: 'position', to: 'security', label: 'in', dx: 14, dy: 4 },
-  { from: 'security', to: 'issuer', label: 'issued by', dy: -8 },
-  { from: 'issuer', to: 'company', label: 'where it files', dx: 52, dy: 4 },
-  { from: 'company', to: 'filing', label: 'files', dy: -8 },
-  { from: 'filing', to: 'fact', label: 'reports', dx: 30, dy: 4 },
-  { from: 'company', to: 'industry', label: 'placed in', dx: 36, dy: 4 },
+  { from: 'entity', to: 'security', label: 'issues', dy: -8 },
+  { from: 'entity', to: 'report', label: 'sends', dx: 28, dy: 4 },
+  { from: 'report', to: 'fact', label: 'holds', dy: -8 },
+  { from: 'fact', to: 'secfact', label: 'compares with', dx: -56, dy: -6 },
+  { from: 'filing', to: 'secfact', label: 'holds', dy: -8 },
+  { from: 'filer', to: 'filing', label: 'files', dx: 22, dy: 4 },
+  { from: 'filer', to: 'industry', label: 'placed in', dy: -8 },
 ]
 
 // The two graphs the nodes sit in.
 const FRAMES = [
-  { label: 'Your graph', x: 6, y: 34, w: 404, h: 204, end: false },
-  { label: 'SEC repository', x: 6, y: 292, w: 404, h: 204, end: true },
+  { label: "Your fund's graph", x: 6, y: 34, w: 404, h: 308, end: false },
+  { label: 'Shared repository: SEC', x: 6, y: 394, w: 404, h: 204, end: false },
 ]
 
 const NODE_W = 150
@@ -202,9 +233,9 @@ function SchemaGraph() {
   const at = (id: string) => NODES.find((n) => n.id === id)!
   return (
     <svg
-      viewBox="0 0 420 510"
+      viewBox="0 0 420 610"
       role="img"
-      aria-label="The schema, in two graphs. In your graph, a portfolio holds a position in a security, and the security is issued by an issuer. Where the issuer files with the SEC it is the same company in the SEC repository, which files filings that report facts and is placed in an industry."
+      aria-label="The schema, in two graphs. In your fund's graph, a portfolio holds a position in a security; an entity, the company behind it, issues the security and sends reports that hold facts. In the SEC shared repository, a public filer files reports that hold facts and is placed in an industry. The two graphs' facts compare with each other, because they report on the same concepts."
       className="mx-auto h-auto w-full max-w-md"
     >
       <defs>
@@ -378,8 +409,9 @@ export default function InvestorSchemaSection() {
             <Step n={2} title="Becomes one graph">
               <SchemaGraph />
               <p className="mt-4 text-center text-xs text-gray-400">
-                A position leads to its security, its issuer and, where the
-                issuer is public, to every figure it has filed.
+                A position leads to its security and the company behind it, and
+                that company's reports sit on the same concepts as the public
+                filers', so their figures compare line for line.
               </p>
             </Step>
 
