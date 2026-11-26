@@ -463,7 +463,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             <p className="text-xs text-zinc-500 dark:text-zinc-500">
               Clients without HTTP transport support can use the{' '}
               <a
-                href="https://github.com/RoboFinSystems/robosystems-mcp-client"
+                href="https://github.com/RoboFinSystems/robosystems-mcp-bridge"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-600 dark:text-primary-400 hover:underline"
