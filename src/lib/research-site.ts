@@ -22,7 +22,7 @@ export const RESEARCH_IS_CANONICAL_HERE =
  * "Discovered, currently not indexed" grows faster than "Indexed" for two weeks, hold.
  * A bump is a PR on purpose: the release of each cohort is a reviewable act.
  */
-export const RESEARCH_RELEASED_COHORTS = 0
+export const RESEARCH_RELEASED_COHORTS = 1
 
 /** Filers per cohort sitemap. */
 export const RESEARCH_COHORT_SIZE = 50
