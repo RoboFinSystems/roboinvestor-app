@@ -45,25 +45,25 @@ export function proxy(request: NextRequest) {
     isDevelopment
       ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval' " +
         'https://challenges.cloudflare.com https://static.cloudflareinsights.com ' +
-        'https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com ' +
+        'https://cdn.jsdelivr.net ' +
         'https://www.googletagmanager.com https://www.google-analytics.com ' +
         'https://tagmanager.google.com https://analytics.google.com'
       : "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' " +
         'https://challenges.cloudflare.com https://static.cloudflareinsights.com ' +
-        'https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com ' +
+        'https://cdn.jsdelivr.net ' +
         'https://www.googletagmanager.com https://www.google-analytics.com ' +
         'https://tagmanager.google.com https://analytics.google.com',
 
     // Style sources - Allow unsafe-inline for Next.js Image component and other inline styles
     "style-src 'self' 'unsafe-inline' " +
-      'https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com ' +
-      'https://cdnjs.cloudflare.com https://challenges.cloudflare.com ' +
+      'https://fonts.googleapis.com https://cdn.jsdelivr.net ' +
+      'https://challenges.cloudflare.com ' +
       'https://tagmanager.google.com',
 
     // Image sources - Allow common image hosts and data URIs
     "img-src 'self' data: blob: " +
-      'https://images.unsplash.com https://cdn.jsdelivr.net https://unpkg.com ' +
-      'https://cdnjs.cloudflare.com https://github.com https://avatars.githubusercontent.com ' +
+      'https://images.unsplash.com https://cdn.jsdelivr.net ' +
+      'https://github.com https://avatars.githubusercontent.com ' +
       'https://raw.githubusercontent.com ' +
       'https://www.google-analytics.com https://www.googletagmanager.com ' +
       'https://ssl.gstatic.com https://www.gstatic.com ' +
@@ -73,8 +73,7 @@ export function proxy(request: NextRequest) {
 
     // Font sources - Allow Google Fonts and common CDNs
     "font-src 'self' data: " +
-      'https://fonts.gstatic.com https://cdn.jsdelivr.net https://unpkg.com ' +
-      'https://cdnjs.cloudflare.com',
+      'https://fonts.gstatic.com https://cdn.jsdelivr.net',
 
     // Connection sources - APIs, WebSockets, analytics, and development
     isDevelopment
@@ -106,7 +105,7 @@ export function proxy(request: NextRequest) {
 
     // Media sources - Allow video and audio from common hosts
     "media-src 'self' data: blob: " +
-      'https://cdn.jsdelivr.net https://unpkg.com ' +
+      'https://cdn.jsdelivr.net ' +
       RESEARCH_ASSETS,
 
     // Object sources - Restrict to self for security
