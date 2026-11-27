@@ -461,7 +461,7 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
             </div>
 
             <p className="text-xs text-zinc-500 dark:text-zinc-500">
-              Clients without HTTP transport support can use the{' '}
+              Clients that only run local MCP servers can use the{' '}
               <a
                 href="https://github.com/RoboFinSystems/robosystems-mcp-bridge"
                 target="_blank"
@@ -469,8 +469,8 @@ export function ApiKeysContent({ repository }: ApiKeysContentProps) {
                 className="text-primary-600 dark:text-primary-400 hover:underline"
               >
                 stdio bridge
-              </a>{' '}
-              in proxy mode.
+              </a>
+              .
             </p>
           </div>
 
