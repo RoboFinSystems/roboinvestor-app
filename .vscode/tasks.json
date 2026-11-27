@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "RoboInvestor Dev",
+      "label": "RoboInvestor App Dev",
       "type": "shell",
       "command": "npm run dev${input:bundler} -- --port ${input:portRI}",
       "problemMatcher": []
@@ -140,13 +140,6 @@
       "description": "Update dependencies after creating branch:",
       "default": "no",
       "options": ["yes", "no"]
-    },
-    {
-      "id": "claudeModel",
-      "type": "pickString",
-      "description": "Choose model:",
-      "default": "opus",
-      "options": ["opus", "sonnet"]
     },
     {
       "id": "environment",
