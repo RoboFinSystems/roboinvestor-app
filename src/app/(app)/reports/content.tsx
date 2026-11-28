@@ -173,15 +173,13 @@ const ReceivedReportsContent: FC = function () {
             <Table hoverable>
               <TableHead>
                 <tr>
-                  <TableRow>
-                    <TableHeadCell>Report</TableHeadCell>
-                    <TableHeadCell>From</TableHeadCell>
-                    <TableHeadCell>Period</TableHeadCell>
-                    <TableHeadCell>Received</TableHeadCell>
-                    <TableHeadCell>
-                      <span className="sr-only">View</span>
-                    </TableHeadCell>
-                  </TableRow>
+                  <TableHeadCell>Report</TableHeadCell>
+                  <TableHeadCell>From</TableHeadCell>
+                  <TableHeadCell>Period</TableHeadCell>
+                  <TableHeadCell>Received</TableHeadCell>
+                  <TableHeadCell>
+                    <span className="sr-only">View</span>
+                  </TableHeadCell>
                 </tr>
               </TableHead>
               <TableBody className="divide-y">
